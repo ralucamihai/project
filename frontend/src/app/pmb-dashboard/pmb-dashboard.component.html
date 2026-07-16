@@ -1,0 +1,150 @@
+<div class="sidebar-container">
+  <div class="sidebar" [class.sidebar-open]="sidebarOpen">
+    <div class="sidebar-content">
+      <h3>Date Filter</h3>
+
+      <div class="date-dropdown">
+        <label for="date-range-type">Select Date Range:</label>
+        <select id="date-range-type" [(ngModel)]="selectedDateRangeType" (change)="onDateRangeTypeChange($event)"
+          class="date-select">
+          <option value="current_day">Current Day</option>
+          <option value="current_month">Current Month</option>
+          <option value="all_dates">All Dates</option>
+          <option value="custom_dates">Custom Dates</option>
+        </select>
+      </div>
+
+      <div *ngIf="selectedDateRangeType === 'custom_dates'" class="date-dropdown">
+        <label for="date-select-start">Select Start Date:</label>
+        <select id="date-select-start" [(ngModel)]="selectedStartDate" (change)="onStartDateChange($event)"
+          class="date-select">
+          <option value="">All Dates</option>
+          <option *ngFor="let date of availableStartDates" [value]="date">{{ date }}</option>
+        </select>
+      </div>
+
+      <div *ngIf="selectedDateRangeType === 'custom_dates'" class="date-dropdown">
+        <label for="date-select-end">Select End Date:</label>
+        <select id="date-select-end" [(ngModel)]="selectedEndDate" (change)="onEndDateChange($event)"
+          class="date-select">
+          <option value="">All Dates</option>
+          <option *ngFor="let date of availableEndDates" [value]="date">{{ date }}</option>
+        </select>
+      </div>
+
+      <p *ngIf="selectedStartDate && selectedEndDate" class="selected-info">
+        Showing data for: {{ selectedStartDate }} - {{ selectedEndDate }}
+      </p>
+      <p *ngIf="!selectedStartDate && !selectedEndDate" class="selected-info">
+        Showing all data
+      </p>
+
+      <h3>Product Code Filter</h3>
+      <div class="product-code-dropdown">
+        <label for="product-code-input">Select Product Code:</label>
+        <div class="custom-select-wrapper">
+          <div class="custom-select-display">
+            <input type="text" id="product-code-input" [(ngModel)]="selectedProductCode"
+              (change)="onProductCodeChange($event)" (input)="onProductCodeChange($event)"
+              placeholder="All Product Codes" class="filter-display-input" list="product-codes-datalist"
+              autocomplete="off" />
+            <span class="dropdown-arrow"></span>
+          </div>
+
+          <datalist id="product-codes-datalist">
+            <option value="">All Product Codes</option>
+            <option *ngFor="let product_code of availableProductCodes" [value]="product_code">
+              {{ product_code }}
+            </option>
+          </datalist>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar-toggle" (click)="toggleSidebar()">
+    <span class="arrow" [class.arrow-open]="sidebarOpen">
+      {{ sidebarOpen ? '◀' : '▶' }}
+    </span>
+  </div>
+</div>
+
+<div class="table-wrapper">
+  <table class="dashboard-table">
+    <colgroup>
+      <col *ngFor="let col of displayedColumns" [style.width.px]="columnWidths[col] || defaultColumnWidth" />
+      <col style="width: 75px" />
+    </colgroup>
+
+    <thead>
+      <tr>
+        <th *ngFor="let col of displayedColumns" class="header">
+          <div class="header-content" (click)="sortData(col)">
+            <span>{{ col }}</span>
+            <span class="sort-indicator" *ngIf="sortColumn === col">
+              {{ sortDirection === 'asc' ? '▲' : '▼' }}
+            </span>
+          </div>
+          <span class="resize-handle" (mousedown)="startResize($event, col)"></span>
+        </th>
+        <th class="header small-column">Actions</th>
+      </tr>
+
+      <tr>
+        <th *ngFor="let col of displayedColumns" class="styled-select-cell">
+          <div class="filter-container">
+            <div class="custom-select-wrapper">
+              <div class="custom-select-display" (click)="toggleDropdown(col, $event)">
+                <span class="filter-display-text">{{ getFilterDisplayText(col) }}</span>
+                <span class="dropdown-arrow">▼</span>
+              </div>
+
+              <div class="dropdown-panel" *ngIf="showDropdown[col]">
+                <div class="dropdown-search">
+                  <input type="text" [ngModel]="filterSearchText[col]" (input)="onSearchInput(col, $event)"
+                    placeholder="Search..." (click)="$event.stopPropagation()" class="dropdown-search-input" />
+                </div>
+
+                <div class="dropdown-actions">
+                  <button class="clear-all-btn" (click)="clearSelections(col, $event)"
+                    [disabled]="columnFilters[col].length === 0">
+                    Clear All
+                  </button>
+                </div>
+
+                <div class="dropdown-options-container">
+                  <div *ngFor="let option of filteredOptions[col]" class="dropdown-option"
+                    [class.selected]="isOptionSelected(col, option)" (click)="toggleOption(col, option, $event)">
+                    <span class="checkbox">
+                      <span class="checkmark" *ngIf="isOptionSelected(col, option)">✓</span>
+                    </span>
+                    <span class="option-text">{{ option }}</span>
+                  </div>
+                  <div class="no-results" *ngIf="filteredOptions[col]?.length === 0">
+                    No matching options
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </th>
+        <th class="small-column"></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let row of sortedData" [class.selected]="isRowSelected(row)" (click)="selectRow(row)">
+        <td *ngFor="let col of displayedColumns" [ngClass]="getCellClass(col, row[col])" [title]="row[col]">
+          <ng-container [ngSwitch]="col">
+            <span *ngSwitchCase="'Module'">{{ row[col]?.slice(0, 8) }}</span>
+            <span *ngSwitchDefault>{{ row[col] }}</span>
+          </ng-container>
+        </td>
+
+        <td class="small-column">
+          <button (click)="goToDetails(row); $event.stopPropagation()">View</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,137 @@
+<div class="top-container">
+  <div class="left-section">
+    <div class="info-header">Product Information</div>
+    <div class="info-grid">
+      <div class="info-row">
+        <span class="info-label-small">Product Code</span>
+        <span class="info-value-small">
+          <input type="text" class="editable-input" [(ngModel)]="productCode"
+            placeholder="Enter product codes (comma separated)">
+        </span>
+      </div>
+      <div class="info-row">
+        <span class="info-label-small">Starting Date</span>
+        <span class="info-value-small">
+          <input type="date" class="editable-input" [(ngModel)]="dateFrom">
+        </span>
+      </div>
+      <div class="info-row">
+        <span class="info-label-small">Ending Date</span>
+        <span class="info-value-small">
+          <input type="date" class="editable-input" [(ngModel)]="dateTo">
+        </span>
+      </div>
+      <div class="info-row">
+        <span class="info-label-small">Host / Rack / PC</span>
+        <span class="info-value-small">{{ getInitialValue('Rack') || 'N/A' }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label-small">PLA Nr</span>
+        <span class="info-value-small">{{ getInitialValue('Module') || 'N/A' }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label-small">Idx Dat File</span>
+        <span class="info-value-small">
+          <input type="text" class="editable-input" [(ngModel)]="indexDat"
+            placeholder="Enter index dat (comma separated)">
+        </span>
+      </div>
+      <div class="info-row">
+        <span class="info-label-small">Idx Par File</span>
+        <span class="info-value-small">
+          <input type="text" class="editable-input" [(ngModel)]="indexPar"
+            placeholder="Enter index par (comma separated)">
+        </span>
+      </div>
+      <div class="info-row">
+        <span class="info-label-small">Category</span>
+        <span class="info-value-small">{{ getInitialValue('Category') || 'N/A' }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label-small">Line Count</span>
+        <span class="info-value-small">{{ getInitialValue('Line Count') || 'N/A' }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label-small">FPY</span>
+        <span class="info-value-small">{{ getInitialValue('FPY') || 'N/A' }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label-small">SPY</span>
+        <span class="info-value-small">{{ getInitialValue('SPY') || 'N/A' }}</span>
+      </div>
+    </div>
+
+    <div class="date-filter-section">
+      <div class="filter-actions">
+        <button class="filter-btn apply-btn" (click)="applyCombinedFilter()">Apply Filters</button>
+        <button class="filter-btn clear-btn" (click)="clearCombinedFilter()">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="right-section">
+    <div class="chart-container">
+      <div class="chart-placeholder" *ngIf="!chartData || chartData.length === 0">
+        <p>No data available for chart</p>
+        <p>Apply filters to see fails analysis</p>
+      </div>
+
+      <!-- Simple HTML/CSS Chart -->
+      <div class="custom-chart" *ngIf="chartData && chartData.length > 0">
+        <div class="chart-title">Fails per Test Step</div>
+        <div class="chart-area">
+          <div class="y-axis">
+            <div class="y-label" *ngFor="let tick of getYAxisTicks()">{{ tick }}</div>
+          </div>
+          <div class="chart-bars">
+            <div class="bar-container" *ngFor="let item of chartData">
+              <div class="bar" [style.height.px]="getBarHeight(item.fails)"
+                [title]="item.stepName + ': ' + item.fails + ' fails'">
+              </div>
+
+              <div class="x-label">{{ item.step }}</div>
+            </div>
+          </div>
+        </div>
+        <div class="x-axis-title">Test Step Number</div>
+      </div>
+
+      <div class="chart-summary" *ngIf="chartData && chartData.length > 0">
+        <p><strong>Total Steps:</strong> {{ chartData.length }}</p>
+        <p><strong>Total Fails:</strong> {{ getTotalFails() }}</p>
+        <p><strong>Worst Step:</strong> {{ getWorstStep() }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="data-table-container">
+  <h3 class="table-title">Detailed Data</h3>
+  <div class="table-info" *ngIf="combinedData.length > 0">
+
+  </div>
+
+  <table *ngIf="data?.length > 0">
+    <thead>
+      <tr>
+        <th *ngFor="let col of columns" class="header">
+          <div class="header-content">
+            {{ col }}
+          </div>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of data" [class.header-row]="isHeaderRow(row)">
+        <td *ngFor="let col of columns; let colIndex = index"
+          [class.value-in-range]="colIndex >= 6 && !isHeaderRow(row) && isValueInRange(colIndex, row[col], row)"
+          [class.value-out-range]="colIndex >= 6 && !isHeaderRow(row) && !isValueInRange(colIndex, row[col], row) && row[col] !== 'N/A'"
+          [title]="colIndex >= 6 && !isHeaderRow(row) ? getRangeInfo(colIndex, row) : ''" class="data-cell">
+          {{ row[col] }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p *ngIf="!data || data.length === 0"><em>Nu există date pentru intervalul selectat.</em></p>
+</div>

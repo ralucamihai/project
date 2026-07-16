@@ -1,0 +1,16 @@
+fastapi
+uvicorn[standard]
+pandas
+ipaddress
+networkscan
+psutil
+websockets
+python-multipart
+pydantic
+python-dotenv
+sqlalchemy 
+psycopg2-binary
+python-jose[cryptography] 
+passlib[bcrypt]
+jinja2
+Office365-REST-Python-Client

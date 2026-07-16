@@ -1,0 +1,235 @@
+/* Sidebar styles (now a top navbar) */
+.sidebar {
+  /* position: fixed; */
+  top: 0;
+  left: 0;
+  width: 100%;
+  /* Full width */
+  height: 70px;
+  /* Adjusted height for horizontal nav */
+  background-color: #000000;
+  box-sizing: border-box;
+  z-index: 1000;
+  /* Ensure navbar stays on top of other content */
+}
+
+.sidebar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+  padding: 0 20px;
+}
+
+.left-section {
+  display: flex;
+  align-items: center;
+}
+
+.logo-top-left {
+  height: 50px;
+  margin-right: 20px;
+}
+
+.center-section {
+  flex-grow: 1;
+}
+
+/* Navigation styles inside sidebar */
+.sidebar nav ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  justify-content: space-between; /* Change from 'left' to 'space-between' */
+  align-items: center; /* Add this for better alignment */
+}
+
+.sidebar nav ul li {
+  margin: 0 2.5px;
+  /* Add horizontal spacing between items */
+  display: inline-block;
+  /* Display items inline */
+}
+
+.sidebar nav ul li a {
+  display: block;
+  padding: 10px 15px;
+  /* Adjust padding for horizontal layout */
+  color: white;
+  background-color: #fc8403;
+  text-decoration: none;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.sidebar nav ul li a:hover {
+  background-color: #8c4a03;
+  transition: background-color 0.3s;
+}
+
+.right-section {
+  display: flex;
+  align-items: center;
+}
+
+.version-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.app-version {
+  font-size: 14px;
+  color: #fff;
+}
+
+/* Content area below the horizontal navbar */
+/* .content {
+  margin-top: 70px;
+  padding: 20px;
+  height: calc(100vh - 70px);
+  overflow-y: auto;
+} */
+
+/* Style for active link */
+.active-link {
+  background-color: #8c4a03 !important;
+  font-weight: bold;
+}
+
+
+/* Dropdown Styles */
+.dropdown {
+  position: relative;
+  display: inline-block;
+  z-index: 1500;
+}
+
+.dropdown-toggle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  text-decoration: none;
+  padding: 10px 15px;
+  color: white;
+  background-color: #fc8403;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.dropdown-toggle:hover {
+  background-color: #8c4a03;
+  text-decoration: none;
+}
+
+.dropdown-toggle.active {
+  background-color: #8c4a03;
+}
+
+.dropdown-arrow {
+  font-size: 12px;
+  transition: transform 0.3s ease;
+  margin-left: 5px;
+}
+
+.dropdown-arrow.rotated {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0; /* Change from 'left: 0' to 'right: 0' to align with right edge */
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  box-shadow: none;
+  min-width: 200px;
+  max-width: 300px; /* Add max-width to prevent it from getting too wide */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  z-index: 1001;
+  list-style: none;
+  padding: 12px;
+  margin: 0;
+  margin-top: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  white-space: nowrap; /* Prevent text wrapping */
+  overflow: hidden; /* Hide any overflow */
+  background-color: #ffffff;
+}
+
+.dropdown-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-menu li {
+  margin: 0; /* Remove margin since we're using gap now */
+  display: block;
+  width: 100%;
+}
+
+.dropdown-menu li a {
+  display: block;
+  padding: 10px 12px;
+  text-decoration: none;
+  color: #333;
+  transition: background-color 0.2s ease;
+  border-radius: 4px;
+  background-color: #f8f9fa;
+  text-overflow: ellipsis; /* Add ellipsis for long text */
+  overflow: hidden; /* Hide overflow text */
+  white-space: nowrap; /* Prevent text wrapping */
+}
+
+.dropdown-menu li:first-child a {
+  border-radius: 6px 6px 0 0;
+  margin-top: 10px;
+}
+
+.dropdown-menu li:last-child a {
+  border-radius: 0 0 6px 6px;
+}
+
+.dropdown-menu li:only-child a {
+  border-radius: 6px;
+}
+
+.dropdown-menu li a:hover {
+  background-color: #f8f9fa;
+}
+
+.dropdown-menu li a.active-link {
+  background-color: #007bff;
+  color: white;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .dropdown-menu {
+    position: static;
+    box-shadow: none;
+    border: none;
+    background: transparent;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    min-width: auto;
+  }
+
+  .dropdown-menu.show {
+    display: block;
+  }
+
+  .dropdown-menu:not(.show) {
+    display: none;
+  }
+}

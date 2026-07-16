@@ -1,0 +1,87 @@
+<div class="user-info">
+  <span class="username">{{currentUser.username}}</span>
+  <span class="role">{{currentUser.role}}</span>
+</div>
+
+<div class="hero-section">
+  <div class="hero-content">
+    <div class="text-content">
+      <h1 class="hero-title">
+        Hello!<br>
+        Welcome back!<br>
+      </h1>
+      <div class="button-group">
+        <!-- <button class="btn-custom" (click)="goToForgotPassword()">Uitat parolă</button> -->
+        <!-- <button class="btn-custom" (click)="goToAccountManagement()">Administrare cont</button> -->
+        <button class="btn-custom" (click)="openGuide()">User Guide</button>
+        <button *ngIf="isAdmin()" class="btn-custom btn-admin" (click)="openEditGuide()">Edit User Guide</button>
+        <button class="btn-custom btn-logout" (click)="logout()">Disconnect</button>
+      </div>
+    </div>
+    <div class="image-content">
+      <div class="hero-image-container"></div>
+    </div>
+  </div>
+  <div class="bg-decoration bg-decoration-1"></div>
+  <div class="bg-decoration bg-decoration-2"></div>
+  <div class="bg-decoration bg-decoration-3"></div>
+</div>
+
+<!-- <button class="feedback-button" (click)="openReportProblem()">
+  Ai găsit o problemă? Raportează aici!
+</button> -->
+
+<div *ngIf="showGuide" class="guide-modal-overlay" (click)="closeGuide()">
+  <div class="guide-modal" (click)="$event.stopPropagation()">
+    <h2>User Guide</h2>
+    <div *ngIf="guideText; else loadingTemplate" [innerHTML]="guideText"></div>
+    <ng-template #loadingTemplate>
+      <p>User Guide is loading...</p>
+    </ng-template>
+    <button (click)="closeGuide()">Close</button>
+  </div>
+</div>
+
+<div *ngIf="showEditGuide" class="guide-modal-overlay" (click)="closeEditGuide()">
+  <div class="guide-modal edit-modal" (click)="$event.stopPropagation()">
+    <h2>Edit User Guide</h2>
+    <div class="edit-guide-content">
+      <p class="edit-info">
+        <strong>Available Variables:</strong><br>
+        <span ngNonBindable>{{role}}</span> - will be replaced with user's role<br>
+        <span ngNonBindable>{{username}}</span> - will be replaced with user's username<br>
+      </p>
+
+      <div class="edit-container">
+        <div class="edit-section">
+          <h3>Editor</h3>
+          <textarea [(ngModel)]="editableGuideText" (input)="onTextInput($event)"
+            placeholder="Insert the guide's text..." class="guide-textarea" [disabled]="isLoading">
+          </textarea>
+        </div>
+
+        <div class="preview-section">
+          <h3>Preview</h3>
+          <div class="preview-content" [innerHTML]="getPreviewText()"></div>
+        </div>
+      </div>
+
+      <div class="edit-buttons">
+        <button (click)="saveGuideText()" class="btn-save" [disabled]="isLoading">
+          {{isLoading ? 'Saving...' : 'Save'}}
+        </button>
+        <button (click)="closeEditGuide()" [disabled]="isLoading">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="reportProblemVisible" class="guide-modal-overlay" (click)="closeReportProblem()">
+  <div class="guide-modal" (click)="$event.stopPropagation()">
+    <h2>Report a problem!</h2>
+    <textarea [(ngModel)]="problemDescription" placeholder="Describe the problem..." rows="5"></textarea>
+    <input type="email" [(ngModel)]="userEmail" placeholder="Your email" />
+    <button (click)="submitReport()">Send</button>
+    <button (click)="closeReportProblem()">Close</button>
+  </div>
+</div>

@@ -1,0 +1,44 @@
+<!-- Display the top nav bar only if the use is authenticated -->
+<div *ngIf="shouldShowNav()" class="sidebar">
+  <div class="sidebar-container">
+    <div class="left-section">
+      <img src="assets/steinel_pmb_small.png" alt="Logo" class="logo-top-left">
+    </div>
+    
+    <nav class="center-section">
+      <ul>
+        <div class="nav-left">
+          <li><a routerLink="/home" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Home</a></li> 
+          <li><a routerLink="/ips_monitoring" routerLinkActive="active-link">IPs Monitoring</a></li>
+          <li><a routerLink="/pmb_dashboard" routerLinkActive="active-link">PMB Dashboard</a></li>
+          <li><a routerLink="/pmb_details" routerLinkActive="active-link">PMB Details</a></li>
+        </div>
+        <!-- Settings Dropdown -->
+        <li class="dropdown">
+          <a class="dropdown-toggle" 
+             [class.active]="isDropdownOpen"
+             (click)="toggleDropdown($event)">
+            Settings
+            <span class="dropdown-arrow" [class.rotated]="isDropdownOpen">▼</span>
+          </a>
+          <ul class="dropdown-menu" [class.show]="isDropdownOpen">
+            <li><a routerLink="/login" routerLinkActive="active-link">Login Page</a></li>
+            <li *ngIf="isAdmin"><a routerLink="/user_management" routerLinkActive="active-link" (click)="closeDropdown()">User Management</a></li>
+            <li><a routerLink="/account_management" routerLinkActive="active-link" (click)="closeDropdown()">Account Management</a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+    
+    <div class="right-section">
+      <div class="version-container">
+        <span class="app-version">v{{ version }}</span>
+        <span class="app-version">Build: {{ buildDate }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <router-outlet></router-outlet>
+</div>

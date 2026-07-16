@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Created - Pending Approval</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .email-container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 300;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .status-badge {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 10px 20px;
+            border-radius: 25px;
+            display: inline-block;
+            font-weight: bold;
+            margin: 20px 0;
+            border: 2px solid #ffeaa7;
+        }
+        .user-details {
+            background-color: #f8f9fa;
+            border-left: 4px solid #f39c12;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 5px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .detail-label {
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .detail-value {
+            color: #2c3e50;
+        }
+        .info-box {
+            background-color: #e8f4fd;
+            border: 1px solid #bee5eb;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            color: #0c5460;
+        }
+        .footer {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px 30px;
+            text-align: center;
+            font-size: 14px;
+        }
+        .icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <div class="icon">⏳</div>
+            <h1>Account Created Successfully!</h1>
+        </div>
+        
+        <div class="content">
+            <div class="status-badge">
+                🔍 Pending Admin Approval
+            </div>
+            
+            <p>Hello <strong>{{ first_name }} {{ last_name }}</strong>,</p>
+            <p>Thank you for registering with {{ company_name }}! Your account has been created successfully and is currently pending admin approval.</p>
+            
+            <div class="user-details">
+                <h3>📋 Your Account Details</h3>
+                <div class="detail-row">
+                    <span class="detail-label">Full Name:</span>
+                    <span class="detail-value">{{ first_name }} {{ last_name }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Username:</span>
+                    <span class="detail-value">{{ username }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Email:</span>
+                    <span class="detail-value">{{ email }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Employee No:</span>
+                    <span class="detail-value">{{ employee_no }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Requested Role:</span>
+                    <span class="detail-value">{{ role }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Registration Date:</span>
+                    <span class="detail-value">{{ created_date }}</span>
+                </div>
+            </div>
+            
+            <div class="info-box">
+                <h3>📝 What Happens Next?</h3>
+                <ul>
+                    <li><strong>Admin Review:</strong> An administrator will review your account details</li>
+                    <li><strong>Approval Process:</strong> This typically takes 1-2 business days</li>
+                    <li><strong>Email Notification:</strong> You'll receive an email once your account is approved</li>
+                    <li><strong>Account Access:</strong> After approval, you can log in at {{ login_url }}</li>
+                </ul>
+            </div>
+            
+            <!-- <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ecf0f1;">
+                <p style="color: #7f8c8d; font-size: 14px;">
+                    If you have any questions about your registration, please contact our support team at 
+                    <a href="mailto:{{ support_email }}" style="color: #3498db;">{{ support_email }}</a>
+                </p>
+            </div> -->
+        </div>
+        
+        <div class="footer">
+            <p>&copy; {{ current_year }} {{ company_name }}. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

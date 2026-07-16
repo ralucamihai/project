@@ -1,0 +1,119 @@
+import { HttpClient } from '@angular/common/http';
+import { Component, HostListener } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
+import { filter } from 'rxjs';
+import { ApiCallerService } from './services/api-caller.service';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.css',
+  standalone: false
+})
+export class AppComponent {
+  title = 'PMB TEST DASHBOARD';
+  language: string = 'ro'; // Default language
+  version: string = '1.0'; // Version number
+  buildDate: string = '2025-08-22'; 
+  currentRoute: string = '';
+  isAdmin: boolean = false;
+  isDropdownOpen = false;
+
+  // Variable to store if user is closing the page
+  private isClosing: boolean = false;
+
+  constructor(private router: Router, private http: HttpClient, private api_caller: ApiCallerService) {
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        this.currentRoute = event.urlAfterRedirects;
+      });
+
+      this.api_caller.getUser().subscribe(response => { 
+      if (response["role"] === "Admin") {
+        this.isAdmin = true;
+      } else {
+      this.isAdmin = false;
+      }
+    });
+  }
+
+  getEnvironmentVersion() {
+    this.api_caller.get_environment_version().subscribe(response => {        
+      this.buildDate=response.build;      
+      this.version=response.version;
+    });
+  }
+
+  ngOnInit() {
+    this.getEnvironmentVersion();
+    // Add event listener for visibility change
+    document.addEventListener('visibilitychange', this.handleVisibilityChange.bind(this));
+  }
+
+  handleVisibilityChange() {
+    if (document.visibilityState === 'hidden') {
+      this.isClosing = true;
+    } else {
+      this.isClosing = false;
+    }
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  unloadNotification($event: any) {
+
+    if (this.isClosing) {
+      const username = String(localStorage.getItem('username'));
+
+      if (username != '') { 
+        const logoutData = {"username": username};
+        this.http.post('http://127.0.0.1:8000/api/logout', logoutData).subscribe(
+          (response: any) => {
+            console.log(response);
+          },
+          (error) => {
+            console.log(error);
+          }
+        );
+      }
+    }
+  }
+
+  // Read the user browser local storage which is set in the login page to see if it is authenticated or not
+  isAuthenticated() {
+    if (localStorage.getItem('authenticated') == "yes"){
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  shouldShowNav() {
+    if (this.currentRoute != '/login' && this.currentRoute != '/register' && this.currentRoute != '/forgot-password') {
+      return true;
+    }
+
+    return false;
+  }
+
+  // Updated toggleDropdown method with event parameter
+  toggleDropdown(event: Event) {
+    event.preventDefault(); // Prevent default link behavior
+    event.stopPropagation(); // Stop event bubbling
+    this.isDropdownOpen = !this.isDropdownOpen;
+  }
+
+  closeDropdown() {
+    this.isDropdownOpen = false;
+  }
+
+  // Close dropdown when clicking outside
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event) {
+    const target = event.target as HTMLElement;
+    const dropdown = target.closest('.dropdown');
+    if (!dropdown) {
+      this.closeDropdown();
+    }
+  }
+}

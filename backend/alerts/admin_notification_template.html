@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New User Registration - Action Required</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .email-container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 300;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .priority-badge {
+            background-color: #ffebee;
+            color: #c62828;
+            padding: 10px 20px;
+            border-radius: 25px;
+            display: inline-block;
+            font-weight: bold;
+            margin: 20px 0;
+            border: 2px solid #ffcdd2;
+        }
+        .user-details {
+            background-color: #f8f9fa;
+            border-left: 4px solid #e74c3c;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 5px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .detail-label {
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        .detail-value {
+            color: #2c3e50;
+        }
+        .action-buttons {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            margin: 10px;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+        }
+        .btn-approve {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        }
+        .btn-reject {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .admin-panel-link {
+            background-color: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .footer {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px 30px;
+            text-align: center;
+            font-size: 14px;
+        }
+        .icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 600px) {
+            .detail-row {
+                flex-direction: column;
+            }
+            .btn {
+                display: block;
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <div class="icon">🚨</div>
+            <h1>New User Registration</h1>
+        </div>
+        
+        <div class="content">
+            <div class="priority-badge">
+                ⚡ Action Required
+            </div>
+            
+            <p>Hello Admin,</p>
+            <p>A new user has registered on {{ company_name }} and requires your approval to access the system.</p>
+            
+            <div class="user-details">
+                <h3>👤 User Information</h3>
+                <div class="detail-row">
+                    <span class="detail-label">Full Name: </span>
+                    <span class="detail-value">{{ first_name }} {{ last_name }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Username: </span>
+                    <span class="detail-value">{{ username }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Email: </span>
+                    <span class="detail-value">{{ email }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Employee No: </span>
+                    <span class="detail-value">{{ employee_no }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Requested Role: </span>
+                    <span class="detail-value">{{ role }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Registration Date: </span>
+                    <span class="detail-value">{{ created_date }}</span>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <a href="{{ admin_panel_url }}" class="btn btn-approve">
+                    ✅ Approve User
+                </a>
+                <a href="{{ admin_panel_url }}" class="btn btn-reject">
+                    ❌ Reject User
+                </a>
+            </div>
+            
+            <div class="admin-panel-link">
+                <h3>🔧 Admin Panel</h3>
+                <p>You can also manage this user through the admin panel:</p>
+                <a href="{{ admin_panel_url }}" style="color: #3498db; text-decoration: none; font-weight: bold;">
+                    Go to User Management →
+                </a>
+            </div>
+            
+            <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px; padding: 15px; margin: 20px 0; color: #856404;">
+                <strong>⚠️ Important:</strong> Please review the user's information carefully before approving access to the system.
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>&copy; {{ current_year }} {{ company_name }} - Admin Notification System</p>
+        </div>
+    </div>
+</body>
+</html>

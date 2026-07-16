@@ -1,0 +1,90 @@
+<div class="top-space"></div>
+
+<!-- Container mare -->
+<div (click)="deselectRow()">
+  <table>
+    <thead>
+      <!-- Bara de titlu -->
+      <tr class="section-header">
+        <th class="section-title" colspan="7">Request Section</th>
+        <th class="section-title" colspan="2">Approval Section</th>
+        <th></th>
+      </tr>
+
+      <!-- Headere coloane -->
+      <tr>
+        <th>No.</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Employee No</th>
+        <th class="border-right-strong">Requested Role</th>
+        <th>Approved Role</th>
+        <th>Account Status</th>
+        <th>Actions</th>
+      </tr>
+
+      <!-- Rând filtre -->
+      <tr class="filter-row">
+      <th></th>
+        <th><input class="filter-input" placeholder="Search First Name" [(ngModel)]="filters['nume']" /></th>
+        <th><input class="filter-input" placeholder="Search Last Name" [(ngModel)]="filters['prenume']" /></th>
+        <th><input class="filter-input" placeholder="Search Username" [(ngModel)]="filters['utilizator']" /></th>
+        <th><input class="filter-input" placeholder="Search Email" [(ngModel)]="filters['email']" /></th>
+        <th><input class="filter-input" placeholder="Search Employee No" [(ngModel)]="filters['numar marca']" /></th>
+        <th class="border-right-strong"><input class="filter-input" placeholder="Search Requested Role" [(ngModel)]="filters['rol cerut']" /></th>        
+        <th><input class="filter-input" placeholder="Search Approved Role" [(ngModel)]="filters['rol aprobat']" /></th>
+        <th><input class="filter-input" placeholder="Search Account Status" [(ngModel)]="filters['status cont']" /></th>
+      <th></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let row of filteredData; let i = index"
+          [class.hovered]="hoverIndex === i"
+          [class.selected]="selectedRowIndex === i"
+          (mouseenter)="hoverIndex = i"
+          (mouseleave)="hoverIndex = null"
+          (click)="selectRow(i); $event.stopPropagation()"
+          style="cursor: pointer;">
+        <td>{{ i + 1 }}</td>
+        <td>{{ row['nume'] }}</td>
+        <td>{{ row['prenume'] }}</td>
+        <td>{{ row['utilizator'] }}</td>
+        <td [title]="row['email']">{{ row['email'] }}</td>
+        <td>{{ row['numar marca'] }}</td>
+        <td class="border-right-strong">
+          <span *ngIf="row['rol cerut'] === 'Vizualizare'">Viewer</span>
+          <span *ngIf="row['rol cerut'] === 'Editare'">Editor</span>
+          <span *ngIf="row['rol cerut'] === 'Admin'">Admin</span>
+          <span *ngIf="row['rol cerut'] !== 'Vizualizare' && row['rol cerut'] !== 'Editare' && row['rol cerut'] !== 'Admin'">{{ row['rol cerut'] }}</span>
+        </td>
+        <td>
+          <select [(ngModel)]="row['rol aprobat']" class="role-select" (click)="$event.stopPropagation()">
+            <option value="Vizualizare">Viewer</option>
+            <option value="Editare">Editor</option>
+            <option value="Admin">Admin</option>
+          </select>
+        </td>
+        <td>
+          <select [(ngModel)]="row['status cont']" 
+                  [ngClass]="{
+                    'status-in-asteptare': row['status cont'] === 'in_asteptare',
+                    'status-activ': row['status cont'] === 'activ',
+                    'status-inactiv': row['status cont'] === 'inactiv'
+                  }"
+                  class="role-select"
+                  (click)="$event.stopPropagation()">
+            <option value="in_asteptare">Waiting Approval</option>
+            <option value="activ">Activ</option>
+            <option value="inactiv">Inactiv</option>
+          </select>
+        </td>
+        <td>
+          <button class="save-button" (click)="saveUser(row); $event.stopPropagation()">Salvează</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

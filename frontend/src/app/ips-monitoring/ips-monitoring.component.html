@@ -1,0 +1,38 @@
+
+<label for="columns">Select Columns:</label>
+<div class="column-checkboxes">
+  <label *ngFor="let col of allColumns" class="checkbox-label">
+    <input type="checkbox" [value]="col" (change)="onCheckboxChange($event)" [checked]="displayedColumns.includes(col)">
+    {{ col }}
+  </label>
+</div>
+
+
+<table>
+  <thead>
+    <tr>
+      <th *ngFor="let col of displayedColumns" class="header" (click)="sortData(col)">
+        <div class="header-content">
+          {{ col }}
+          <span class="sort-indicator" *ngIf="sortColumn === col">
+            {{ sortDirection ? '▼' : '▲' }}
+          </span>
+        </div>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let row of sortedData; let i = index" 
+        [ngClass]="{'selected-row': selectedRowIndex === i}"
+        (click)="selectRow(i)">
+      <td *ngFor="let col of displayedColumns">
+        <ng-container *ngIf="col === 'network active'">
+          <span class="status-dot" [ngClass]="{'green-dot': row[col], 'red-dot': !row[col]}"></span>
+        </ng-container>
+        <ng-container *ngIf="col !== 'network active'">
+          {{ row[col] }}
+        </ng-container>
+      </td>
+    </tr>
+  </tbody>
+</table>
