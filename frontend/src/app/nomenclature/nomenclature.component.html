@@ -1,0 +1,106 @@
+<div class="nomenclature-page">
+
+  <!-- Tab switcher -->
+  <div class="tab-switcher">
+    <button *ngFor="let tab of tabs"
+            class="tab-btn"
+            [class.active]="activeTab === tab.key"
+            (click)="setTab(tab.key)">
+      {{ tab.label }}
+    </button>
+  </div>
+
+  <!-- ===================== TAB: TIP ECHIPAMENT ===================== -->
+  <div *ngIf="activeTab === 'tip_echipament'" class="tab-content">
+
+    <div class="page-header">
+      <div>
+        <h2 class="page-title">Tip Echipament</h2>
+        <p class="page-subtitle">Nomenclator coduri de tip echipament PMB</p>
+      </div>
+      <button class="btn btn-primary" (click)="openAddForm()">+ Adaugă tip nou</button>
+    </div>
+
+    <div class="search-bar">
+      <input type="text" [(ngModel)]="searchText" placeholder="Caută după cod sau denumire...">
+    </div>
+
+    <!-- Card grid -->
+    <div class="tip-grid">
+      <div class="tip-card" *ngFor="let item of tipuriFiltrate; let i = index" [class.inactive]="!item.activ">
+        <div class="tip-card-top">
+          <span class="tip-cod">{{ item.cod }}</span>
+          <span class="badge" [ngClass]="item.activ ? 'badge-success' : 'badge-danger'">
+            {{ item.activ ? 'Activ' : 'Inactiv' }}
+          </span>
+        </div>
+        <div class="tip-denumire">{{ item.denumire }}</div>
+        <div class="tip-card-actions">
+          <button class="icon-btn" title="Editează" (click)="openEditForm(item, i)">✏️</button>
+          <button class="icon-btn" title="Activează/Dezactivează" (click)="toggleActiv(item)">🔄</button>
+          <button class="icon-btn icon-btn-danger" title="Șterge" (click)="deleteItem(i)">🗑️</button>
+        </div>
+      </div>
+
+      <div class="empty-state" *ngIf="tipuriFiltrate.length === 0">
+        Nu există tipuri de echipament care să corespundă căutării.
+      </div>
+    </div>
+
+    <!-- Modal formular adaugare / editare -->
+    <div class="modal-overlay" *ngIf="showForm" (click)="closeForm()">
+      <div class="modal-box" (click)="$event.stopPropagation()">
+        <h3 class="modal-title">{{ isEditMode ? 'Editează tip echipament' : 'Adaugă tip echipament' }}</h3>
+
+        <div class="form-field">
+          <label>Cod</label>
+          <input type="text" [(ngModel)]="formModel.cod" placeholder="ex: C, D, E, ELS...">
+        </div>
+
+        <div class="form-field">
+          <label>Denumire</label>
+          <input type="text" [(ngModel)]="formModel.denumire" placeholder="ex: Cabina">
+        </div>
+
+        <div class="form-field form-field-checkbox">
+          <label>
+            <input type="checkbox" [(ngModel)]="formModel.activ">
+            Activ
+          </label>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-cancel" (click)="closeForm()">Anulează</button>
+          <button class="btn btn-primary" (click)="saveForm()">Salvează</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===================== TAB: UTILIZATORI PMB ===================== -->
+  <div *ngIf="activeTab === 'utilizatori_pmb'" class="tab-content">
+    <p class="placeholder-text">Conținutul paginii Utilizatori PMB vine aici.</p>
+  </div>
+
+  <!-- ===================== TAB: TIP INTERVENTIE ===================== -->
+  <div *ngIf="activeTab === 'tip_interventie'" class="tab-content">
+    <p class="placeholder-text">Conținutul paginii Tip Intervenție vine aici.</p>
+  </div>
+
+  <!-- ===================== TAB: CATEGORIE DEFECT ===================== -->
+  <div *ngIf="activeTab === 'categorie_defect'" class="tab-content">
+    <p class="placeholder-text">Conținutul paginii Categorie Defect vine aici.</p>
+  </div>
+
+  <!-- ===================== TAB: PIESE DE SCHIMB ===================== -->
+  <div *ngIf="activeTab === 'piese_schimb'" class="tab-content">
+    <p class="placeholder-text">Conținutul paginii Piese de Schimb vine aici.</p>
+  </div>
+
+  <!-- ===================== TAB: OPERATII ===================== -->
+  <div *ngIf="activeTab === 'operatii'" class="tab-content">
+    <p class="placeholder-text">Conținutul paginii Operații vine aici.</p>
+  </div>
+
+</div>

@@ -1,0 +1,196 @@
+<div class="maintenance-page">
+
+  <!-- Tab switcher -->
+  <div class="tab-switcher">
+    <button class="tab-btn" [class.active]="activeTab === 'echipamente'" (click)="setTab('echipamente')">
+      Echipamente
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'activitati'" (click)="setTab('activitati')">
+      Activități
+    </button>
+  </div>
+
+  <!-- ===================== TAB: ECHIPAMENTE ===================== -->
+  <div *ngIf="activeTab === 'echipamente'" class="tab-content">
+
+    <div *ngIf="isLoadingEchipamente" class="state-box loading-box">
+      Se încarcă echipamentele...
+    </div>
+
+    <div *ngIf="!isLoadingEchipamente && errorEchipamente" class="state-box error-box">
+      {{ errorEchipamente }}
+      <button class="btn btn-retry" (click)="loadEchipamente()">Reîncearcă</button>
+    </div>
+
+    <div *ngIf="!isLoadingEchipamente && !errorEchipamente" class="table-card">
+      <div class="table-header">
+        <h3>Echipamente</h3>
+        <span class="results-count">{{ echipamente.length }} rezultate</span>
+      </div>
+      <div class="table-scroll">
+        <table class="activitati-table">
+          <thead>
+            <tr>
+              <th>Denumire</th>
+              <th>Tip echipament</th>
+              <th>Loc</th>
+              <th>Activ/Inactiv</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let e of echipamente">
+              <td class="denumire-cell">{{ e.denumire }}</td>
+              <td>{{ e.tipEchipament }}</td>
+              <td>{{ e.loc }}</td>
+              <td>
+                <span class="badge" [ngClass]="e.activ ? 'badge-success' : 'badge-danger'">
+                  {{ e.activ ? 'Activ' : 'Inactiv' }}
+                </span>
+              </td>
+            </tr>
+            <tr *ngIf="echipamente.length === 0">
+              <td colspan="4" class="no-results">Nu există echipamente înregistrate.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== TAB: ACTIVITATI ===================== -->
+  <div *ngIf="activeTab === 'activitati'" class="tab-content">
+
+    <!-- Panou de filtrare -->
+    <div class="filter-card">
+      <h3 class="filter-title">Filtrare activități</h3>
+
+      <div class="filter-grid">
+        <div class="filter-field">
+          <label>Tip interv.</label>
+          <select [(ngModel)]="filtre.tipInterventie" (ngModelChange)="onFiltreChanged()">
+            <option value="">Toate</option>
+            <option *ngFor="let t of tipuriInterventie" [value]="t">{{ t }}</option>
+          </select>
+        </div>
+
+        <div class="filter-field">
+          <label>Def. enunțat</label>
+          <select [(ngModel)]="filtre.defEnuntat" (ngModelChange)="onFiltreChanged()">
+            <option value="">Toate</option>
+            <option *ngFor="let d of defEnuntateOptions" [value]="d">{{ d }}</option>
+          </select>
+        </div>
+
+        <div class="filter-field">
+          <label>Piese</label>
+          <input type="text" [(ngModel)]="filtre.piese" (ngModelChange)="onFiltreChanged()" placeholder="Caută piesă...">
+        </div>
+
+        <div class="filter-field">
+          <label>Loc</label>
+          <input type="text" [(ngModel)]="filtre.loc" (ngModelChange)="onFiltreChanged()" placeholder="Caută locație...">
+        </div>
+
+        <div class="filter-field">
+          <label>Executant</label>
+          <input type="text" [(ngModel)]="filtre.executant" (ngModelChange)="onFiltreChanged()" placeholder="Caută executant...">
+        </div>
+
+        <div class="filter-field">
+          <label>Status</label>
+          <select [(ngModel)]="filtre.status" (ngModelChange)="onFiltreChanged()">
+            <option value="">Toate</option>
+            <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
+          </select>
+        </div>
+
+        <div class="filter-field">
+          <label>Activ / Inactiv</label>
+          <select [(ngModel)]="filtre.activ" (ngModelChange)="onFiltreChanged()">
+            <option value="">Toate</option>
+            <option value="true">Activ</option>
+            <option value="false">Inactiv</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="filter-row-bottom">
+        <div class="filtru-listare">
+          <span class="filtru-listare-label">Filtru listare:</span>
+          <label *ngFor="let opt of filtruListareOptions" class="radio-option">
+            <input type="radio" name="filtruListare" [value]="opt.value"
+                   [(ngModel)]="filtre.filtruListare" (ngModelChange)="onFiltreChanged()">
+            {{ opt.label }}
+          </label>
+        </div>
+
+        <div class="filter-actions">
+          <button class="btn btn-reset" (click)="resetFiltre()">Resetează</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stari de incarcare / eroare -->
+    <div *ngIf="isLoadingActivitati" class="state-box loading-box">
+      Se încarcă activitățile...
+    </div>
+
+    <div *ngIf="!isLoadingActivitati && errorActivitati" class="state-box error-box">
+      {{ errorActivitati }}
+      <button class="btn btn-retry" (click)="loadActivitati()">Reîncearcă</button>
+    </div>
+
+    <!-- Tabel activitati -->
+    <div *ngIf="!isLoadingActivitati && !errorActivitati" class="table-card">
+      <div class="table-header">
+        <h3>Activități PMB / CBT</h3>
+        <span class="results-count">{{ activitati.length }} rezultate</span>
+      </div>
+
+      <div class="table-scroll">
+        <table class="activitati-table">
+          <thead>
+            <tr>
+              <th>Denumire</th>
+              <th>Tip interv.</th>
+              <th>Def. enunțat</th>
+              <th>Piese</th>
+              <th>Loc</th>
+              <th>Executant</th>
+              <th>Status</th>
+              <th>Activ/Inactiv</th>
+              <th>Data creare cont</th>
+              <th>Data dezactivare cont</th>
+              <th>Data / Oră</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let a of activitati">
+              <td class="denumire-cell">{{ a.denumire }}</td>
+              <td>{{ a.tipInterventie }}</td>
+              <td>{{ a.defEnuntat }}</td>
+              <td>{{ a.piese }}</td>
+              <td>{{ a.loc }}</td>
+              <td>{{ a.executant }}</td>
+              <td><span [ngClass]="statusClass(a.status)">{{ a.status }}</span></td>
+              <td>
+                <span class="badge" [ngClass]="a.activ ? 'badge-success' : 'badge-danger'">
+                  {{ a.activ ? 'Activ' : 'Inactiv' }}
+                </span>
+              </td>
+              <td>{{ a.dataCreareCont | date:'dd.MM.yyyy' }}</td>
+              <td>{{ a.dataDezactivareCont ? (a.dataDezactivareCont | date:'dd.MM.yyyy') : '—' }}</td>
+              <td>{{ a.dataOra | date:'dd.MM.yyyy HH:mm' }}</td>
+            </tr>
+
+            <tr *ngIf="activitati.length === 0">
+              <td colspan="11" class="no-results">Nu există activități care să corespundă filtrelor selectate.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+</div>

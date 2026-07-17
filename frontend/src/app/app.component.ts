@@ -12,14 +12,18 @@ import { ApiCallerService } from './services/api-caller.service';
 })
 export class AppComponent {
   title = 'PMB TEST DASHBOARD';
-  language: string = 'ro'; // Default language
-  version: string = '1.0'; // Version number
-  buildDate: string = '2025-08-22'; 
+  language: string = 'ro';
+  version: string = '1.0';
+  buildDate: string = '2025-08-22';
   currentRoute: string = '';
   isAdmin: boolean = false;
-  isDropdownOpen = false;
 
-  // Variable to store if user is closing the page
+  // Dropdown activ prin CLICK (Settings)
+  activeClickDropdown: string | null = null;
+
+  // Dropdown activ prin HOVER (Mentenanta / Testing / Nomenclatura)
+  activeHoverDropdown: string | null = null;
+
   private isClosing: boolean = false;
 
   constructor(private router: Router, private http: HttpClient, private api_caller: ApiCallerService) {
@@ -29,25 +33,24 @@ export class AppComponent {
         this.currentRoute = event.urlAfterRedirects;
       });
 
-      this.api_caller.getUser().subscribe(response => { 
+    this.api_caller.getUser().subscribe(response => {
       if (response["role"] === "Admin") {
         this.isAdmin = true;
       } else {
-      this.isAdmin = false;
+        this.isAdmin = false;
       }
     });
   }
 
   getEnvironmentVersion() {
-    this.api_caller.get_environment_version().subscribe(response => {        
-      this.buildDate=response.build;      
-      this.version=response.version;
+    this.api_caller.get_environment_version().subscribe(response => {
+      this.buildDate = response.build;
+      this.version = response.version;
     });
   }
 
   ngOnInit() {
     this.getEnvironmentVersion();
-    // Add event listener for visibility change
     document.addEventListener('visibilitychange', this.handleVisibilityChange.bind(this));
   }
 
@@ -61,12 +64,11 @@ export class AppComponent {
 
   @HostListener('window:beforeunload', ['$event'])
   unloadNotification($event: any) {
-
     if (this.isClosing) {
       const username = String(localStorage.getItem('username'));
 
-      if (username != '') { 
-        const logoutData = {"username": username};
+      if (username != '') {
+        const logoutData = { "username": username };
         this.http.post('http://127.0.0.1:8000/api/logout', logoutData).subscribe(
           (response: any) => {
             console.log(response);
@@ -79,9 +81,8 @@ export class AppComponent {
     }
   }
 
-  // Read the user browser local storage which is set in the login page to see if it is authenticated or not
   isAuthenticated() {
-    if (localStorage.getItem('authenticated') == "yes"){
+    if (localStorage.getItem('authenticated') == "yes") {
       return true;
     } else {
       return false;
@@ -92,28 +93,45 @@ export class AppComponent {
     if (this.currentRoute != '/login' && this.currentRoute != '/register' && this.currentRoute != '/forgot-password') {
       return true;
     }
-
     return false;
   }
 
-  // Updated toggleDropdown method with event parameter
-  toggleDropdown(event: Event) {
-    event.preventDefault(); // Prevent default link behavior
-    event.stopPropagation(); // Stop event bubbling
-    this.isDropdownOpen = !this.isDropdownOpen;
+  // ---- Dropdown pe CLICK (Settings) ----
+  toggleClickDropdown(event: Event, menu: string) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.activeClickDropdown = this.activeClickDropdown === menu ? null : menu;
   }
 
-  closeDropdown() {
-    this.isDropdownOpen = false;
+  closeClickDropdown() {
+    this.activeClickDropdown = null;
   }
 
-  // Close dropdown when clicking outside
+  isClickMenuOpen(menu: string): boolean {
+    return this.activeClickDropdown === menu;
+  }
+
+  // ---- Dropdown pe HOVER (Mentenanta / Testing / Nomenclatura) ----
+  openHoverDropdown(menu: string) {
+    this.activeHoverDropdown = menu;
+  }
+
+  closeHoverDropdown(menu: string) {
+    if (this.activeHoverDropdown === menu) {
+      this.activeHoverDropdown = null;
+    }
+  }
+
+  isHoverMenuOpen(menu: string): boolean {
+    return this.activeHoverDropdown === menu;
+  }
+
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event) {
     const target = event.target as HTMLElement;
     const dropdown = target.closest('.dropdown');
     if (!dropdown) {
-      this.closeDropdown();
+      this.closeClickDropdown();
     }
   }
 }

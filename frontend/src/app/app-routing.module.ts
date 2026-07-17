@@ -12,6 +12,9 @@ import { AccountAdministrationComponent } from './account-administration/account
 import { apiCallerGuard } from './api-caller.guard';
 import { AuthGuard } from './services/auth.guard';
 import { AccountManagementComponent } from './account-management/account-management.component';
+import { MaintenanceComponent } from './maintenance/maintenance.component';
+import { NomenclatureComponent } from './nomenclature/nomenclature.component';
+import { TestingComponent } from './testing/testing.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -21,20 +24,23 @@ const routes: Routes = [
   { path: 'pmb_details', component: PmbDetailsComponent, canActivate: [apiCallerGuard] },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-  { 
-    path: 'user_management', 
-    component: UserManagementComponent, 
+  {
+    path: 'user_management',
+    component: UserManagementComponent,
     canActivate: [apiCallerGuard],
     data: { requiresAdmin: true }
   },
-  { path: 'account_management', component: AccountManagementComponent, canActivate: [apiCallerGuard]},
+  { path: 'account_management', component: AccountManagementComponent, canActivate: [apiCallerGuard] },
   {
     path: 'forgot-password',
     loadComponent: () =>
       import('./forgot-password/forgot-password.component').then(m => m.ForgotPasswordComponent)
   },
-  { path: '**', redirectTo: '/login' }
-  
+  { path: 'maintenance', component: MaintenanceComponent, canActivate: [apiCallerGuard] },
+{ path: 'nomenclature', component: NomenclatureComponent, canActivate: [apiCallerGuard] },
+{ path: 'testing', component: TestingComponent, canActivate: [apiCallerGuard] },
+
+  { path: '**', redirectTo: '/login' } // ÎNTOTDEAUNA ULTIMA rută din array
 ];
 
 @NgModule({

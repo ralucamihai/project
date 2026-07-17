@@ -1,5 +1,4 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { ApiCallerService } from '../services/api-caller.service';
 
 @Component({
@@ -8,8 +7,10 @@ import { ApiCallerService } from '../services/api-caller.service';
   styleUrls: ['./pmb-details.component.css'],
   standalone: false,
 })
-export class PmbDetailsComponent {
-  constructor(private api_caller: ApiCallerService, private router: Router) {}
+export class PmbDetailsComponent implements OnInit, OnChanges {
+  @Input() rowData: any;
+
+  constructor(private api_caller: ApiCallerService) {}
 
   datFilename: string = '';
   parFilename: string = '';
@@ -20,18 +21,15 @@ export class PmbDetailsComponent {
   originalPar: any;
   columns: any;
 
-  // User editable fields
   productCode: string = '';
   dateFrom: string = '';
   dateTo: string = '';
   indexDat: string = '';
   indexPar: string = '';
 
-  // Add these properties at the top of your component
   chartData: any[] = [];
   chartOptions: any = {};
 
-  // Add this method to calculate fails per step
   calculateFailsPerStep(): void {
     if (!this.data || !this.par) {
       return;
@@ -39,21 +37,18 @@ export class PmbDetailsComponent {
 
     const failsPerStep: { [key: number]: number } = {};
 
-    // Initialize fails count for each step
     this.par.forEach((parRow: any[], index: number) => {
-      failsPerStep[index + 1] = 0; // Step numbers start from 1
+      failsPerStep[index + 1] = 0;
     });
 
-    // Count fails for each data row (excluding headers)
     this.data.forEach((row: any) => {
       if (this.isHeaderRow(row)) {
-        return; // Skip header rows
+        return;
       }
 
-      // Check each column starting from the 6th column
       this.columns.forEach((col: string, colIndex: number) => {
         if (colIndex >= 6) {
-          const stepNumber = colIndex - 5; // Step numbers start from 1
+          const stepNumber = colIndex - 5;
           const value = row[col];
 
           if (
@@ -67,7 +62,6 @@ export class PmbDetailsComponent {
       });
     });
 
-    // Convert to chart data format
     this.chartData = Object.keys(failsPerStep).map((step) => ({
       step: parseInt(step),
       fails: failsPerStep[parseInt(step)],
@@ -77,7 +71,6 @@ export class PmbDetailsComponent {
     this.setupChartOptions();
   }
 
-  // Get step name from par file
   getStepName(stepNumber: number): string {
     const parIndex = stepNumber - 1;
     if (
@@ -85,12 +78,11 @@ export class PmbDetailsComponent {
       parIndex < this.par.length &&
       this.par[parIndex].length > 4
     ) {
-      return this.par[parIndex][4]; // Step name is in the 5th column (index 4)
+      return this.par[parIndex][4];
     }
     return `Step ${stepNumber}`;
   }
 
-  // Setup chart configuration
   setupChartOptions(): void {
     this.chartOptions = {
       responsive: true,
@@ -121,13 +113,11 @@ export class PmbDetailsComponent {
     };
   }
 
-  // Call this method after data is loaded
   updateChart(): void {
     this.calculateFailsPerStep();
-    this.testChartData(); // Add this line
+    this.testChartData();
   }
 
-  // Combined data
   combinedData: any[] = [];
 
   checkAndUpdateChart(): void {
@@ -136,8 +126,22 @@ export class PmbDetailsComponent {
     }
   }
 
-  ngOnInit() {
-    const data = history.state.data;
+  ngOnInit(): void {
+    this.loadRowData();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['rowData'] && !changes['rowData'].firstChange && this.rowData) {
+      this.loadRowData();
+    }
+  }
+
+  private loadRowData(): void {
+    const data = this.rowData;
+    if (!data) {
+      return;
+    }
+
     this.row_data = data;
 
     this.productCode = data['Product Code'] || '';
@@ -274,7 +278,6 @@ export class PmbDetailsComponent {
 
           completedRequests++;
           if (completedRequests === totalRequests) {
-            // Generăm interval complet de zile
             if (this.dateFrom && this.dateTo) {
               const fullRange = this.generateDateRange(
                 this.dateFrom,
@@ -303,7 +306,6 @@ export class PmbDetailsComponent {
               this.combinedData = allResponses;
             }
 
-            // Sortare după dată
             this.combinedData.sort((a, b) => {
               const dateA = this.parseDate(a._day);
               const dateB = this.parseDate(b._day);
@@ -316,7 +318,6 @@ export class PmbDetailsComponent {
             if (this.combinedData.length > 0) {
               this.columns = Object.keys(this.combinedData[0]);
               this.data = this.combinedData;
-              // Add this line to update the chart after filtering
               this.updateChart();
             }
           }
@@ -336,7 +337,6 @@ export class PmbDetailsComponent {
     this.indexDat = '';
     this.data = [...this.originalData];
     this.combinedData = [];
-    // Add this line to update the chart after clearing
     this.updateChart();
   }
 
@@ -449,7 +449,6 @@ export class PmbDetailsComponent {
     return `${description}\nRange: ${minValue} - ${maxValue} ${unit}`;
   }
 
-  // Get Y-axis tick marks
   getYAxisTicks(): number[] {
     if (!this.chartData || this.chartData.length === 0) {
       return [0, 1, 2, 3, 4, 5];
@@ -466,7 +465,6 @@ export class PmbDetailsComponent {
     return ticks.reverse();
   }
 
-  // Get total fails
   getTotalFails(): number {
     if (!this.chartData) {
       return 0;
@@ -474,7 +472,6 @@ export class PmbDetailsComponent {
     return this.chartData.reduce((total, item) => total + item.fails, 0);
   }
 
-  // Get worst performing step
   getWorstStep(): string {
     if (!this.chartData || this.chartData.length === 0) {
       return 'N/A';
@@ -488,42 +485,28 @@ export class PmbDetailsComponent {
   }
 
   getBarHeight(fails: number): number {
-    console.log('getBarHeight called with fails:', fails);
-
     if (!this.chartData || this.chartData.length === 0) {
-      console.log('No chart data available');
-      return 5; // 5px minimum
+      return 5;
     }
 
     const maxFails = Math.max(...this.chartData.map((item) => item.fails));
-    console.log('Max fails in dataset:', maxFails);
 
     if (maxFails === 0) {
-      console.log('Max fails is 0, returning minimum height');
-      return 10; // 10px minimum height
+      return 10;
     }
 
-    const maxHeight = 280; // Maximum height in pixels (chart area - padding)
-    const height = Math.max((fails / maxFails) * maxHeight, 5); // Minimum 5px
-
-    console.log(`Fails: ${fails}, Max: ${maxFails}, Final height: ${height}px`);
+    const maxHeight = 280;
+    const height = Math.max((fails / maxFails) * maxHeight, 5);
 
     return height;
   }
 
-  // Add this method to test the chart data
   testChartData(): void {
-    console.log('=== CHART DATA TEST ===');
-    console.log('Chart data exists:', !!this.chartData);
-    console.log('Chart data length:', this.chartData?.length);
-    console.log('Chart data:', this.chartData);
-
     if (this.chartData && this.chartData.length > 0) {
-      this.chartData.forEach((item, index) => {
+      this.chartData.forEach((item) => {
         console.log(
           `Step ${item.step}: ${item.fails} fails (${item.stepName})`
         );
-        console.log(`Bar height would be: ${this.getBarHeight(item.fails)}%`);
       });
     }
   }

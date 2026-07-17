@@ -1,0 +1,23 @@
+<div class="testing-page">
+
+  <div class="tab-switcher">
+    <button class="tab-btn" [class.active]="activeTab === 'pmb_dashboard'" (click)="setTab('pmb_dashboard')">
+      PMB Dashboard
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'pmb_details'" (click)="setTab('pmb_details')">
+      PMB Details
+    </button>
+  </div>
+
+  <div *ngIf="activeTab === 'pmb_dashboard'" class="tab-content">
+    <app-pmb-dashboard (rowSelected)="onRowSelected($event)"></app-pmb-dashboard>
+  </div>
+
+  <div *ngIf="activeTab === 'pmb_details'" class="tab-content">
+    <div *ngIf="!selectedRow" class="no-selection-message">
+      Selectează un rând din PMB Dashboard pentru a vedea detaliile.
+    </div>
+    <app-pmb-details *ngIf="selectedRow" [rowData]="selectedRow"></app-pmb-details>
+  </div>
+
+</div>
