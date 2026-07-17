@@ -12,40 +12,38 @@
 
 .left-section {
   width: 300px;
-  /* Reduced from 350px */
   min-width: 250px;
-  /* Reduced minimum */
   max-width: 300px;
-  background-color: #f5f5f5;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-family: Arial, sans-serif;
+  background-color: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
   font-size: 12px;
   height: fit-content;
   flex-shrink: 0;
-  /* Prevent shrinking */
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
 }
 
 .right-section {
   flex: 1;
-  padding: 15px;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  border: 1px solid #dee2e6;
+  padding: 18px;
+  background-color: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-sm);
   min-height: 400px;
   width: 0;
-  /* Important: allows flex to work properly */
   min-width: 0;
-  /* Allows shrinking below content size */
 }
 
 .info-header {
-  background-color: #e0e0e0;
-  padding: 8px 12px;
-  font-weight: bold;
-  border-bottom: 1px solid #ccc;
+  background: linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%);
+  color: #fff;
+  padding: 10px 12px;
+  font-weight: 700;
   text-align: center;
   font-size: 13px;
+  letter-spacing: 0.02em;
 }
 
 .info-grid {

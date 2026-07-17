@@ -11,6 +11,10 @@
   margin-top: 20px;
   position: relative;
   z-index: 1;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  background: var(--surface);
 }
 
 .dashboard-table {
@@ -22,8 +26,8 @@
 
 th,
 td {
-  border: 1px solid #ddd;
-  padding: 6px 4px;
+  border: 1px solid var(--line);
+  padding: 7px 5px;
   text-align: center;
   font-size: 11px;
   white-space: nowrap;
@@ -36,20 +40,22 @@ thead {
   position: sticky;
   top: 0;
   z-index: 20;
-  background: #5e5851;
+  background: #1a1a1a;
 }
 
 .header {
-  background-color: #5e5851;
+  background: linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%);
   color: #fff;
-  font-weight: bold;
+  font-weight: 600;
   cursor: pointer;
   user-select: none;
   font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 .header:hover {
-  background-color: #4e4841;
+  background: #2a2a2a;
 }
 
 .header-content {
@@ -87,33 +93,35 @@ td.small-column {
 }
 
 td.small-column button {
-  border-radius: 4px;
+  border-radius: 6px;
   width: 60px;
-  height: 25px;
+  height: 26px;
   padding: 2px 4px;
   font-size: 12px;
+  font-weight: 600;
   border: none;
-  background-color: #fc8403;
+  background-color: var(--brand);
   color: white;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.18s var(--ease);
 }
 
 td.small-column button:hover {
-  background-color: #8c4a03;
+  background-color: var(--brand-hover);
+  box-shadow: var(--shadow-xs);
 }
 
 /* stripes + hover + selected */
 tbody tr:nth-child(even) {
-  background-color: #f2f2f2;
+  background-color: var(--surface-2);
 }
 
 tbody tr:hover {
-  background-color: #ddd;
+  background-color: var(--brand-soft);
 }
 
 tbody tr.selected {
-  background-color: #7caadf !important;
+  background-color: var(--brand) !important;
   color: white;
 }
 
@@ -169,14 +177,14 @@ tbody tr.selected {
   background-color: #fff;
   cursor: pointer;
   min-height: 28px;
-  border: 2px solid #4caf50;
+  border: 1.5px solid var(--line-2);
   font-size: 10px;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .custom-select-display:hover {
-  border-color: #3e8e41;
-  box-shadow: 0 0 8px rgba(62, 142, 65, 0.25);
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-ring);
 }
 
 .filter-display-text {
@@ -194,14 +202,14 @@ tbody tr.selected {
 
 .dropdown-panel {
   position: absolute;
-  top: calc(100% + 2px);
+  top: calc(100% + 4px);
   left: 0;
   width: 220px;
   background-color: white;
-  border: 2px solid #4caf50;
-  border-radius: 0 0 8px 8px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius);
   z-index: 9999;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--shadow-lg);
   max-height: 350px;
   overflow-y: auto;
 }
@@ -268,7 +276,7 @@ tbody tr.selected {
 }
 
 .dropdown-option.selected {
-  background-color: #e8f5e9;
+  background-color: var(--brand-soft);
 }
 
 .checkbox {
@@ -277,14 +285,14 @@ tbody tr.selected {
   justify-content: center;
   width: 14px;
   height: 14px;
-  border: 1px solid #4caf50;
-  border-radius: 2px;
+  border: 1.5px solid var(--brand);
+  border-radius: 3px;
   margin-right: 6px;
   flex-shrink: 0;
 }
 
 .checkmark {
-  color: #4caf50;
+  color: var(--brand);
   font-weight: bold;
   font-size: 10px;
 }
@@ -320,9 +328,9 @@ tbody tr.selected {
   left: -280px;
   width: 280px;
   height: 100vh;
-  background-color: #f9f9f9;
-  border-right: 2px solid #5e5851;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  background-color: var(--surface);
+  border-right: 1px solid var(--line);
+  box-shadow: var(--shadow-md);
   transition: left 0.3s ease-in-out;
   overflow-y: auto;
 }
@@ -338,16 +346,17 @@ tbody tr.selected {
 
 .sidebar-content h3 {
   margin: 0 0 20px 0;
-  color: #5e5851;
+  color: var(--ink);
   font-size: 18px;
-  border-bottom: 2px solid #5e5851;
+  font-weight: 700;
+  border-bottom: 2px solid var(--brand);
   padding-bottom: 10px;
 }
 
 .sidebar-content label {
   display: block;
   margin-bottom: 8px;
-  color: #5e5851;
+  color: var(--ink-2);
   font-weight: 600;
 }
 
@@ -359,16 +368,16 @@ tbody tr.selected {
 .sidebar .date-select {
   width: 100%;
   padding: 10px 12px;
-  border: 2px solid #5e5851;
-  border-radius: 6px;
-  background: white;
+  border: 1.5px solid var(--line-2);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
   font-size: 14px;
 }
 
 .sidebar .date-select:focus {
   outline: none;
-  border-color: #7caadf;
-  box-shadow: 0 0 0 3px rgba(124, 170, 223, 0.25);
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-ring);
 }
 
 .filter-display-input {
@@ -380,12 +389,12 @@ tbody tr.selected {
 
 .selected-info {
   margin: 15px 0 0 0;
-  padding: 10px;
-  background-color: #e8f4f8;
-  border-left: 4px solid #7caadf;
+  padding: 12px;
+  background-color: var(--brand-soft);
+  border-left: 4px solid var(--brand);
   font-size: 13px;
-  color: #5e5851;
-  border-radius: 0 4px 4px 0;
+  color: var(--ink-2);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
 
 .sidebar-toggle {
@@ -395,18 +404,18 @@ tbody tr.selected {
   transform: translateY(-50%);
   width: 40px;
   height: 60px;
-  background-color: #5e5851;
-  border-radius: 0 8px 8px 0;
+  background: linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: background-color 0.2s;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-sm);
 }
 
 .sidebar-toggle:hover {
-  background-color: #4e4841;
+  background: #2a2a2a;
 }
 
 .arrow {

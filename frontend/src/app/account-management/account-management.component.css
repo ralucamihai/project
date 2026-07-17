@@ -1,127 +1,152 @@
-html, body {
-  height: 100%;
-  margin: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
-  outline: none;
-  border: none;
-}
+:host { display: block; }
 
-/* Center the entire page content */
+/* Page */
 .page-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 40px 20px;
+  padding: 40px 24px 56px;
   min-height: 100vh;
   box-sizing: border-box;
 }
 
-/* Container for the two columns */
+/* Two columns */
 .split-container {
   display: flex;
-  gap: 30px; /* space between columns */
+  gap: 28px;
   width: 100%;
-  max-width: 1100px; /* limit max width for large screens */
-  flex-wrap: wrap; /* allow wrapping on small screens */
+  max-width: 1100px;
+  flex-wrap: wrap;
+  align-items: stretch;
 }
 
-/* Style for each half container */
+/* Card */
 .half {
-  flex: 1 1 45%; /* grow, shrink, basis */
-  background: #fff;
-  border-radius: 15px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-  padding: 30px;
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  flex: 1 1 45%;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 32px 30px;
+  transition: box-shadow 0.25s var(--ease), transform 0.25s var(--ease);
   display: flex;
   flex-direction: column;
-}
-
-/* Add a hover effect for a subtle lift */
-.half:hover {
-  box-shadow: 0 12px 30px rgba(0,0,0,0.15);
-  transform: translateY(-5px);
-}
-
-/* Title styles */
-.card-title {
-  font-weight: 600;
-  color: #222;
-  text-align: center;
-  margin-bottom: 20px;
-  font-size: 22px;
-}
-
-/* Style for form inputs */
-.form-control {
-  width: 100%;
-  padding: 14px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  font-size: 15px;
-  margin-bottom: 15px;
   box-sizing: border-box;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+.half::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 30px;
+  right: 30px;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--brand), var(--brand-dark));
+}
+.half:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-4px);
 }
 
-.form-control:focus {
-  border-color: #fc8403;
-  box-shadow: 0 0 8px rgba(252, 132, 3, 0.3);
-  outline: none;
+/* Nested split (name fields) should not re-card */
+.half .split-container {
+  gap: 18px;
+}
+.half .split-container .half {
+  background: none;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  transform: none;
+}
+.half .split-container .half::before { display: none; }
+.half .split-container .half:hover {
+  transform: none;
+  box-shadow: none;
 }
 
-/* Style for buttons */
-.btn-custom {
-  width: 100%;
-  padding: 14px;
-  border-radius: 10px;
-  border: 2px solid #fc8403;
-  background-color: transparent;
-  color: #fc8403;
+/* Titles */
+.card-title {
   font-weight: 700;
-  font-size: 16px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-top: 10px;
+  color: var(--ink);
+  text-align: center;
+  margin: 6px 0 24px;
+  font-size: 1.35rem;
+  letter-spacing: -0.01em;
 }
 
-.btn-custom:hover {
-  background-color: #fc8403;
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(252, 132, 3, 0.2);
-}
-
-/* Optional: add some spacing for labels if needed */
+/* Labels */
 label {
   display: block;
   margin-bottom: 6px;
   font-weight: 600;
-  font-size: 14px;
-  color: #333;
+  font-size: 0.82rem;
+  color: var(--ink-2);
 }
 
-.split-container {
-  display: flex;
-  width: 100%; /* or any specific width */
-  height: auto; /* or fixed height if needed */
+.mb-3 { margin-bottom: 16px; }
+
+/* Inputs */
+.form-control {
+  width: 100%;
+  padding: 12px 15px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--line-2);
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+  box-sizing: border-box;
+  background: var(--surface-2);
+  color: var(--ink);
+  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease), background-color 0.2s var(--ease);
+}
+.form-control::placeholder { color: var(--muted); }
+.form-control:focus {
+  border-color: var(--brand);
+  background: var(--surface);
+  box-shadow: 0 0 0 4px var(--brand-ring);
+  outline: none;
+}
+.form-control[readonly] {
+  background: var(--surface-2);
+  color: var(--muted);
+  cursor: not-allowed;
 }
 
-.half {
-  flex: 1; /* each takes equal space */
-  padding: 10px; /* optional padding */
-  box-sizing: border-box; /* include padding in width calculation */
-}
-
-.error-message {
+/* Buttons */
+.btn-custom {
+  width: 100%;
+  padding: 13px;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--brand);
+  background-color: var(--brand);
   color: #fff;
-  background-color: #e53935;
-  border: 1px solid #b71c1c;
-  border-radius: 8px;
-  padding: 12px 18px;
-  margin-bottom: 18px;
-  font-size: 16px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s var(--ease);
+  margin-top: 12px;
+  box-shadow: 0 8px 20px rgba(252, 132, 3, 0.24);
+}
+.btn-custom:hover {
+  background-color: var(--brand-hover);
+  border-color: var(--brand-hover);
+  transform: translateY(-1px);
+}
+
+/* Messages */
+.error-message {
+  color: var(--danger);
+  font-size: 0.82rem;
   font-weight: 500;
-  text-align: center;
-  box-shadow: 0 2px 8px rgba(229,57,53,0.08);
+  margin-top: 4px;
+  margin-bottom: 8px;
+  text-align: left;
+}
+
+@media (max-width: 768px) {
+  .split-container { flex-direction: column; }
+  .half { flex: 1 1 100%; }
+  .half .split-container { flex-direction: row; }
 }

@@ -99,3 +99,103 @@ h4 {
   outline: 3px solid var(--brand-ring);
   outline-offset: 2px;
 }
+
+/* ============================================================
+   Shared, reusable premium primitives
+   (low-specificity defaults — component CSS can still override)
+   ============================================================ */
+
+/* Page shell */
+.page-shell {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 32px 28px 56px;
+}
+.page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.page-title {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+.page-subtitle {
+  margin: 6px 0 0;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+/* Card */
+.ui-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Buttons — shared look, opt-in via .ui-btn */
+.ui-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 18px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.18s var(--ease);
+  white-space: nowrap;
+}
+.ui-btn:active {
+  transform: translateY(1px);
+}
+.ui-btn--primary {
+  background: var(--brand);
+  color: #fff;
+  box-shadow: var(--shadow-xs);
+}
+.ui-btn--primary:hover {
+  background: var(--brand-hover);
+  box-shadow: var(--shadow-sm);
+}
+.ui-btn--ghost {
+  background: var(--surface);
+  color: var(--ink-2);
+  border-color: var(--line-2);
+}
+.ui-btn--ghost:hover {
+  border-color: var(--brand);
+  color: var(--brand-hover);
+}
+.ui-btn--danger {
+  background: var(--danger);
+  color: #fff;
+}
+.ui-btn--danger:hover {
+  background: var(--danger-hover);
+}
+
+/* Status pills */
+.ui-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 999px;
+  line-height: 1.4;
+}
+.ui-pill--success { background: #e9f7ef; color: #15803d; }
+.ui-pill--danger  { background: #fdecec; color: #b91c1c; }
+.ui-pill--warn    { background: var(--brand-soft); color: var(--brand-dark); }
+.ui-pill--info    { background: #eaf1fe; color: #1d4ed8; }
+.ui-pill--muted   { background: var(--surface-2); color: var(--muted); }
