@@ -1,16 +1,17 @@
-/* Sidebar styles (now a top navbar) */
+/* ============================================================
+   Top Navbar — premium refinement (paletă păstrată)
+   ============================================================ */
+
 .sidebar {
-  /* position: fixed; */
+  position: sticky;
   top: 0;
   left: 0;
   width: 100%;
-  /* Full width */
-  height: 70px;
-  /* Adjusted height for horizontal nav */
-  background-color: #000000;
+  height: 68px;
+  background: linear-gradient(180deg, var(--header-2, #1a1a1a) 0%, var(--header, #0f0f0f) 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   box-sizing: border-box;
   z-index: 1000;
-  /* Ensure navbar stays on top of other content */
 }
 
 .sidebar-container {
@@ -18,88 +19,93 @@
   justify-content: space-between;
   align-items: center;
   height: 100%;
-  padding: 0 20px;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 24px;
+  gap: 24px;
 }
 
+/* Left / logo */
 .left-section {
   display: flex;
   align-items: center;
+  position: relative;
+  padding-right: 20px;
+}
+
+.left-section::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 28px;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .logo-top-left {
-  height: 50px;
-  margin-right: 20px;
+  height: 40px;
+  transition: opacity 0.2s var(--ease);
+}
+.logo-top-left:hover {
+  opacity: 0.85;
 }
 
 .center-section {
   flex-grow: 1;
 }
 
-/* Navigation styles inside sidebar */
+/* Nav list */
 .sidebar nav ul {
   list-style-type: none;
   padding: 0;
   margin: 0;
   display: flex;
-  justify-content: space-between; /* Change from 'left' to 'space-between' */
-  align-items: center; /* Add this for better alignment */
-}
-
-.sidebar nav ul li {
-  margin: 0 2.5px;
-  /* Add horizontal spacing between items */
-  display: inline-block;
-  /* Display items inline */
-}
-
-.sidebar nav ul li a {
-  display: block;
-  padding: 10px 15px;
-  /* Adjust padding for horizontal layout */
-  color: white;
-  background-color: #fc8403;
-  text-decoration: none;
-  border-radius: 4px;
-  text-align: center;
-}
-
-.sidebar nav ul li a:hover {
-  background-color: #8c4a03;
-  transition: background-color 0.3s;
-}
-
-.right-section {
-  display: flex;
+  justify-content: space-between;
   align-items: center;
 }
 
-.version-container {
+.nav-left {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
+  gap: 4px;
 }
 
-.app-version {
+.sidebar nav ul li {
+  margin: 0;
+  display: inline-block;
+}
+
+/* Base nav links — subtle by default, accent on hover/active */
+.sidebar nav ul li a {
+  display: flex;
+  align-items: center;
+  padding: 9px 14px;
+  color: rgba(255, 255, 255, 0.82);
+  background-color: transparent;
+  text-decoration: none;
+  border-radius: var(--radius-sm, 8px);
+  text-align: center;
   font-size: 14px;
-  color: #fff;
+  font-weight: 500;
+  line-height: 1;
+  transition: color 0.2s var(--ease), background-color 0.2s var(--ease);
 }
 
-/* Content area below the horizontal navbar */
-/* .content {
-  margin-top: 70px;
-  padding: 20px;
-  height: calc(100vh - 70px);
-  overflow-y: auto;
-} */
+.sidebar nav ul li a:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
 
-/* Style for active link */
+/* Active link — brand accent */
 .active-link {
-  background-color: #8c4a03 !important;
-  font-weight: bold;
+  background-color: rgba(252, 132, 3, 0.16) !important;
+  color: var(--brand, #fc8403) !important;
+  font-weight: 600;
 }
 
-
-/* Dropdown Styles */
+/* ---- Dropdown ---- */
 .dropdown {
   position: relative;
   display: inline-block;
@@ -109,60 +115,71 @@
 .dropdown-toggle {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   cursor: pointer;
   text-decoration: none;
-  padding: 10px 15px;
-  color: white;
-  background-color: #fc8403;
-  border-radius: 4px;
-  transition: all 0.3s ease;
+  padding: 9px 14px;
+  color: rgba(255, 255, 255, 0.82);
+  background-color: transparent;
+  border-radius: var(--radius-sm, 8px);
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.2s var(--ease), background-color 0.2s var(--ease);
 }
 
 .dropdown-toggle:hover {
-  background-color: #8c4a03;
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
   text-decoration: none;
 }
 
-.dropdown-toggle.active {
-  background-color: #8c4a03;
+.dropdown-toggle.active,
+.dropdown-toggle.active-link {
+  background-color: rgba(252, 132, 3, 0.16);
+  color: var(--brand, #fc8403);
+  font-weight: 600;
 }
 
 .dropdown-arrow {
-  font-size: 12px;
-  transition: transform 0.3s ease;
-  margin-left: 5px;
+  font-size: 9px;
+  line-height: 1;
+  opacity: 0.7;
+  transition: transform 0.25s var(--ease);
 }
 
 .dropdown-arrow.rotated {
   transform: rotate(180deg);
 }
 
+/* Dropdown menu — floating card */
 .dropdown-menu {
   position: absolute;
-  top: 100%;
-  right: 0; /* Change from 'left: 0' to 'right: 0' to align with right edge */
-  background: transparent;
-  border: none;
-  border-radius: 6px;
-  box-shadow: none;
-  min-width: 200px;
-  max-width: 300px; /* Add max-width to prevent it from getting too wide */
+  top: calc(100% + 8px);
+  right: 0;
+  background-color: var(--surface, #ffffff);
+  border: 1px solid var(--line, #ece8e3);
+  border-radius: var(--radius, 12px);
+  box-shadow: var(--shadow-lg, 0 18px 48px rgba(28, 25, 23, 0.12));
+  min-width: 220px;
+  max-width: 320px;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-10px);
-  transition: all 0.3s ease;
+  transform: translateY(-8px);
+  transition: opacity 0.2s var(--ease), transform 0.2s var(--ease), visibility 0.2s var(--ease);
   z-index: 1001;
   list-style: none;
-  padding: 12px;
+  padding: 6px;
   margin: 0;
-  margin-top: 5px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  white-space: nowrap; /* Prevent text wrapping */
-  overflow: hidden; /* Hide any overflow */
-  background-color: #ffffff;
+  gap: 2px;
+  white-space: nowrap;
+}
+
+/* dropdowns in the left cluster open to the left edge */
+.nav-left .dropdown-menu {
+  left: 0;
+  right: auto;
 }
 
 .dropdown-menu.show {
@@ -172,7 +189,7 @@
 }
 
 .dropdown-menu li {
-  margin: 0; /* Remove margin since we're using gap now */
+  margin: 0;
   display: block;
   width: 100%;
 }
@@ -181,38 +198,85 @@
   display: block;
   padding: 10px 12px;
   text-decoration: none;
-  color: #333;
-  transition: background-color 0.2s ease;
-  border-radius: 4px;
-  background-color: #f8f9fa;
-  text-overflow: ellipsis; /* Add ellipsis for long text */
-  overflow: hidden; /* Hide overflow text */
-  white-space: nowrap; /* Prevent text wrapping */
+  color: var(--ink-2, #44403c);
+  transition: background-color 0.15s var(--ease), color 0.15s var(--ease);
+  border-radius: var(--radius-sm, 8px);
+  background-color: transparent;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
 }
 
-.dropdown-menu li:first-child a {
-  border-radius: 6px 6px 0 0;
-  margin-top: 10px;
-}
-
-.dropdown-menu li:last-child a {
-  border-radius: 0 0 6px 6px;
-}
-
+/* reset the special first/last rounding + margins from the old design */
+.dropdown-menu li:first-child a,
+.dropdown-menu li:last-child a,
 .dropdown-menu li:only-child a {
-  border-radius: 6px;
+  border-radius: var(--radius-sm, 8px);
+  margin-top: 0;
 }
 
 .dropdown-menu li a:hover {
-  background-color: #f8f9fa;
+  background-color: var(--brand-soft, #fff4e8);
+  color: var(--brand-dark, #8c4a03);
 }
 
 .dropdown-menu li a.active-link {
-  background-color: #007bff;
-  color: white;
+  background-color: var(--brand, #fc8403) !important;
+  color: #ffffff !important;
 }
 
-/* Responsive adjustments */
+/* Right / version */
+.right-section {
+  display: flex;
+  align-items: center;
+}
+
+.version-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm, 8px);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.app-version {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 0.02em;
+}
+.app-version:first-child {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+  font-size: 12px;
+}
+
+/* Content area */
+.content {
+  min-height: calc(100vh - 68px);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .sidebar-container {
+    padding: 0 14px;
+    gap: 12px;
+  }
+  .sidebar nav ul li a,
+  .dropdown-toggle {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+  .nav-left {
+    gap: 2px;
+  }
+}
+
 @media (max-width: 768px) {
   .dropdown-menu {
     position: static;
@@ -223,6 +287,7 @@
     visibility: visible;
     transform: none;
     min-width: auto;
+    padding: 0;
   }
 
   .dropdown-menu.show {

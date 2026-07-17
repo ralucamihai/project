@@ -1,25 +1,27 @@
-<div class="user-info">
-  <span class="username">{{currentUser.username}}</span>
-  <span class="role">{{currentUser.role}}</span>
-</div>
-
 <div class="hero-section">
+  <div class="user-info">
+    <div class="user-avatar">{{ (currentUser.username || '?').charAt(0).toUpperCase() }}</div>
+    <div class="user-meta">
+      <span class="username">{{currentUser.username}}</span>
+      <span class="role">{{currentUser.role}}</span>
+    </div>
+  </div>
+
   <div class="hero-content">
     <div class="text-content">
+      <span class="hero-eyebrow">PMB Test Dashboard</span>
       <h1 class="hero-title">
-        Hello!<br>
-        Welcome back!<br>
+        Hello, <span class="highlight">welcome back!</span>
       </h1>
+      <p class="hero-description">
+        Manage your equipment maintenance, testing and nomenclature from a single place.
+        Use the menu above to navigate, or pick a quick action below to get started.
+      </p>
       <div class="button-group">
-        <!-- <button class="btn-custom" (click)="goToForgotPassword()">Uitat parolă</button> -->
-        <!-- <button class="btn-custom" (click)="goToAccountManagement()">Administrare cont</button> -->
-        <button class="btn-custom" (click)="openGuide()">User Guide</button>
+        <button class="btn-custom btn-primary" (click)="openGuide()">User Guide</button>
         <button *ngIf="isAdmin()" class="btn-custom btn-admin" (click)="openEditGuide()">Edit User Guide</button>
         <button class="btn-custom btn-logout" (click)="logout()">Disconnect</button>
       </div>
-    </div>
-    <div class="image-content">
-      <div class="hero-image-container"></div>
     </div>
   </div>
   <div class="bg-decoration bg-decoration-1"></div>
