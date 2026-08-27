@@ -1,0 +1,588 @@
+<div class="support-page">
+
+  <!-- Tab switcher -->
+  <div class="tab-switcher">
+    <button *ngFor="let tab of tabs"
+            class="tab-btn"
+            [class.active]="activeTab === tab.key"
+            (click)="setTab(tab.key)">
+      {{ tab.label }}
+    </button>
+  </div>
+
+  <!-- ===================== TAB: TICKETS ===================== -->
+  <div *ngIf="activeTab === 'tickets'" class="tab-content">
+    <div class="table-card">
+      <div class="table-header" style="background-color: #35424f; color: white; display: flex; gap: 15px; align-items: center; padding: 12px 20px; border-radius: 8px 8px 0 0; flex-wrap: wrap;">
+        <button class="btn-add" (click)="openAddForm('tickets')" style="margin: 0; background-color: #fc8403; border: none; color: white; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer;">+ Adaugă ticket</button>
+        <h3 style="margin: 0; color: white; font-weight: 600;">Tichetele mele</h3>
+        
+        <div style="margin-left: auto; display: flex; align-items: center; gap: 15px;">
+          <!-- Checkbox pentru afișarea exclusivă a tichetelor deschise -->
+          <label style="color: white; font-size: 13px; display: flex; align-items: center; gap: 6px; cursor: pointer; margin: 0; font-weight: 500;">
+            <input type="checkbox" [(ngModel)]="ticketFiltre.doarDeschise" style="accent-color: #fc8403; width: 15px; height: 15px; cursor: pointer;">
+            Doar deschise
+          </label>
+
+          <input type="text" [(ngModel)]="ticketFiltre.search" placeholder="Caută orice atribut..." 
+                 style="padding: 7px 12px; border-radius: 6px; border: none; font-size: 13px; outline: none; width: 280px; color: #333;">
+          <span class="results-count" style="color: #eef1f4;">{{ ticketsFiltrate.length }} rezultate</span>
+        </div>
+      </div> 
+      
+      <div class="table-scroll" style="max-height: 70vh;">
+        <table class="support-table">
+          <thead>
+            <tr>
+              <th>Nr.</th>
+              <th>Initiator</th>
+              <th>Echipament</th>
+              <th>Tip interv.</th>
+              <th>Descr. simptom</th>
+              <th>Secție</th>
+              <th>Linie</th>
+              <th>Cod afectat</th>
+              <th>Denumire produs</th>
+              <th>Prioritate</th>
+              <th>Termen initiat</th>
+              <th>Termen cerut</th>
+              <th>Status</th>
+              <th>Acțiuni</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let t of ticketsFiltrate">
+              <td class="denumire-cell">{{ t.id }}</td>
+              <td>{{ t.initiator }}</td>
+              <td>{{ t.echipa }}</td>
+              <td>{{ t.tipInterventie }}</td>
+              <td>{{ t.descriereSimptom }}</td>
+              <td>{{ t.sectie }}</td>
+              <td>{{ t.linie }}</td>
+              <td>{{ t.codAfectat }}</td>
+              <td>{{ t.denumireProdus }}</td>
+              <td><span [ngClass]="prioritateClass(t.prioritate)">{{ t.prioritate }}</span></td>
+              <!-- Formatează coloanele pentru afișare completă Dată și Oră -->
+              <td>{{ formatDataOra(t.termenInitiat) }}</td>
+              <td>{{ formatDataOra(t.termenCerut) }}</td>
+              <td><span [ngClass]="statusClass(t.status)">{{ t.status }}</span></td>
+              <td class="actions-cell">
+                <button class="btn-icon" (click)="openEditForm('tickets', t)">✎</button>
+                <button class="btn-icon danger" (click)="deleteItem('tickets', t.id)">✕</button>
+              </td>
+            </tr>
+            <tr *ngIf="ticketsFiltrate.length === 0">
+              <td colspan="14" class="no-results">Nu există tickete înregistrate care să corespundă căutării.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== TAB: ORDERS ===================== -->
+  <div *ngIf="activeTab === 'orders'" class="tab-content">
+    <div class="filter-panel">
+      <div class="filter-panel-header" (click)="toggleAdvanced('orders')">
+        <h3>Lista comenzi</h3>
+        <span class="toggle-icon">{{ showAdvanced['orders'] ? '▲' : '▼' }}</span>
+      </div>
+
+      <div class="filter-panel-body" *ngIf="showAdvanced['orders']">
+        <div class="filter-grid">
+          <div class="f-field"><label>Numar / Client</label><input type="text" [(ngModel)]="orderFiltre.search" placeholder="Caută nr. comandă / client..."></div>
+          <div class="f-field"><label>Initiator</label><input type="text" [(ngModel)]="orderFiltre.initiator"></div>
+          <div class="f-field">
+            <label>Categorie produs</label>
+            <select [(ngModel)]="orderFiltre.categorieProdus">
+              <option value="">Toate</option>
+              <option *ngFor="let c of orderCategorieProdusOptions" [value]="c">{{ c }}</option>
+            </select>
+          </div>
+          <div class="f-field"><label>Sectie</label><input type="text" [(ngModel)]="orderFiltre.sectie"></div>
+          <div class="f-field"><label>Linie</label><input type="text" [(ngModel)]="orderFiltre.linie"></div>
+          <div class="f-field"><label>Locatie</label><input type="text" [(ngModel)]="orderFiltre.locatie"></div>
+          <div class="f-field"><label>Responsabil</label><input type="text" [(ngModel)]="orderFiltre.responsabil"></div>
+          <div class="f-field"><label>KPI</label><input type="text" [(ngModel)]="orderFiltre.kpi"></div>
+        </div>
+
+        <div class="filter-row-bottom">
+          <div class="stare-box">
+            <span class="stare-label">Filtrare dupa stare:</span>
+            <label class="chk" *ngFor="let s of orderStatusOptions">
+              <input type="checkbox" [(ngModel)]="orderFiltre.stare[s]"> {{ s }}
+            </label>
+          </div>
+
+          <div class="radio-box">
+            <span class="radio-label">Filtru listare:</span>
+            <label class="rad" *ngFor="let p of perioadaOptions">
+              <input type="radio" name="perioadaOrders" [value]="p.value" [(ngModel)]="orderFiltre.perioada"> {{ p.label }}
+            </label>
+            <input *ngIf="orderFiltre.perioada === 'La_data'" type="date" class="inline-date" [(ngModel)]="orderFiltre.laData">
+          </div>
+
+          <div class="radio-box">
+            <span class="radio-label">Limita listare:</span>
+            <label class="rad" *ngFor="let l of limitaOptions">
+              <input type="radio" name="limitaOrders" [value]="l" [(ngModel)]="orderFiltre.limita"> {{ l }}
+            </label>
+          </div>
+
+          <div class="actions-box">
+            <button class="btn-reset" (click)="resetFiltre()">Resetează filtre</button>
+            <button class="btn-add" (click)="openAddForm('orders')">+ Adaugă comandă</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-header">
+        <h3>Orders</h3>
+        <span class="results-count">{{ ordersFiltrate.length }} rezultate</span>
+      </div>
+      <div class="table-scroll">
+        <table class="support-table">
+          <thead>
+            <tr>
+              <th>Nr. comandă</th>
+              <th>Client</th>
+              <th>Produs</th>
+              <th>Cantitate</th>
+              <th>Status</th>
+              <th>Data comandă</th>
+              <th>Acțiuni</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let o of ordersFiltrate">
+              <td class="denumire-cell">{{ o.numarComanda }}</td>
+              <td>{{ o.client }}</td>
+              <td>{{ o.produs }}</td>
+              <td>{{ o.cantitate }}</td>
+              <td><span [ngClass]="statusClass(o.status)">{{ o.status }}</span></td>
+              <td>{{ o.dataComanda | date:'dd.MM.yyyy' }}</td>
+              <td class="actions-cell">
+                <button class="btn-icon" (click)="openEditForm('orders', o)">✎</button>
+                <button class="btn-icon danger" (click)="deleteItem('orders', o.id)">✕</button>
+              </td>
+            </tr>
+            <tr *ngIf="ordersFiltrate.length === 0">
+              <td colspan="7" class="no-results">Nu există comenzi înregistrate.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== TAB: SUGESTII & RECLAMAȚII ===================== -->
+  <div *ngIf="activeTab === 'feedback'" class="tab-content">
+    <div class="split-grid">
+
+      <!-- ---- Coloana stanga: SUGGESTIONS ---- -->
+      <div class="split-col">
+        <div class="filter-panel">
+          <div class="filter-panel-header" (click)="toggleAdvanced('suggestions')">
+            <h3>Lista sugestii</h3>
+            <span class="toggle-icon">{{ showAdvanced['suggestions'] ? '▲' : '▼' }}</span>
+          </div>
+
+          <div class="filter-panel-body" *ngIf="showAdvanced['suggestions']">
+            <div class="filter-grid">
+              <div class="f-field"><label>Titlu / Autor</label><input type="text" [(ngModel)]="sugestieFiltre.search" placeholder="Caută titlu / autor..."></div>
+              <div class="f-field"><label>Initiator</label><input type="text" [(ngModel)]="sugestieFiltre.initiator"></div>
+              <div class="f-field">
+                <label>Categorie</label>
+                <select [(ngModel)]="sugestieFiltre.categorie">
+                  <option value="">Toate</option>
+                  <option *ngFor="let c of sugestieCategorieOptions" [value]="c">{{ c }}</option>
+                </select>
+              </div>
+              <div class="f-field"><label>Sectie</label><input type="text" [(ngModel)]="sugestieFiltre.sectie"></div>
+              <div class="f-field"><label>Linie</label><input type="text" [(ngModel)]="sugestieFiltre.linie"></div>
+              <div class="f-field"><label>Locatie</label><input type="text" [(ngModel)]="sugestieFiltre.locatie"></div>
+              <div class="f-field"><label>Responsabil</label><input type="text" [(ngModel)]="sugestieFiltre.responsabil"></div>
+              <div class="f-field"><label>KPI</label><input type="text" [(ngModel)]="sugestieFiltre.kpi"></div>
+            </div>
+
+            <div class="filter-row-bottom">
+              <div class="stare-box">
+                <span class="stare-label">Filtrare dupa stare:</span>
+                <label class="chk" *ngFor="let s of sugestieStatusOptions">
+                  <input type="checkbox" [(ngModel)]="sugestieFiltre.stare[s]"> {{ s }}
+                </label>
+              </div>
+
+              <div class="radio-box">
+                <span class="radio-label">Filtru listare:</span>
+                <label class="rad" *ngFor="let p of perioadaOptions">
+                  <input type="radio" name="perioadaSugestii" [value]="p.value" [(ngModel)]="sugestieFiltre.perioada"> {{ p.label }}
+                </label>
+                <input *ngIf="sugestieFiltre.perioada === 'La_data'" type="date" class="inline-date" [(ngModel)]="sugestieFiltre.laData">
+              </div>
+
+              <div class="radio-box">
+                <span class="radio-label">Limita listare:</span>
+                <label class="rad" *ngFor="let l of limitaOptions">
+                  <input type="radio" name="limitaSugestii" [value]="l" [(ngModel)]="sugestieFiltre.limita"> {{ l }}
+                </label>
+              </div>
+
+              <div class="actions-box">
+                <button class="btn-reset" (click)="resetFiltre()">Resetează filtre</button>
+                <button class="btn-add" (click)="openAddForm('suggestions')">+ Adaugă sugestie</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <div class="table-header">
+            <h3>Suggestions</h3>
+            <span class="results-count">{{ sugestiiFiltrate.length }} rezultate</span>
+          </div>
+          <div class="table-scroll">
+            <table class="support-table">
+              <thead>
+                <tr>
+                  <th>Titlu</th>
+                  <th>Autor</th>
+                  <th>Categorie</th>
+                  <th>Status</th>
+                  <th>Data trimitere</th>
+                  <th>Acțiuni</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let s of sugestiiFiltrate">
+                  <td class="denumire-cell">{{ s.titlu }}</td>
+                  <td>{{ s.autor }}</td>
+                  <td>{{ s.categorie }}</td>
+                  <td><span [ngClass]="statusClass(s.status)">{{ s.status }}</span></td>
+                  <td>{{ s.dataTrimitere | date:'dd.MM.yyyy' }}</td>
+                  <td class="actions-cell">
+                    <button class="btn-icon" (click)="openEditForm('suggestions', s)">✎</button>
+                    <button class="btn-icon danger" (click)="deleteItem('suggestions', s.id)">✕</button>
+                  </td>
+                </tr>
+                <tr *ngIf="sugestiiFiltrate.length === 0">
+                  <td colspan="6" class="no-results">Nu există sugestii înregistrate.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ---- Coloana dreapta: COMPLAINTS ---- -->
+      <div class="split-col">
+        <div class="filter-panel">
+          <div class="filter-panel-header" (click)="toggleAdvanced('complaints')">
+            <h3>Lista reclamații</h3>
+            <span class="toggle-icon">{{ showAdvanced['complaints'] ? '▲' : '▼' }}</span>
+          </div>
+
+          <div class="filter-panel-body" *ngIf="showAdvanced['complaints']">
+            <div class="filter-grid">
+              <div class="f-field"><label>Titlu / Client</label><input type="text" [(ngModel)]="reclamatieFiltre.search" placeholder="Caută titlu / client..."></div>
+              <div class="f-field"><label>Initiator</label><input type="text" [(ngModel)]="reclamatieFiltre.initiator"></div>
+              <div class="f-field">
+                <label>Severitate</label>
+                <select [(ngModel)]="reclamatieFiltre.severitate">
+                  <option value="">Toate</option>
+                  <option *ngFor="let sv of reclamatieSeveritateOptions" [value]="sv">{{ sv }}</option>
+                </select>
+              </div>
+              <div class="f-field"><label>Sectie</label><input type="text" [(ngModel)]="reclamatieFiltre.sectie"></div>
+              <div class="f-field"><label>Linie</label><input type="text" [(ngModel)]="reclamatieFiltre.linie"></div>
+              <div class="f-field"><label>Locatie</label><input type="text" [(ngModel)]="reclamatieFiltre.locatie"></div>
+              <div class="f-field"><label>Responsabil</label><input type="text" [(ngModel)]="reclamatieFiltre.responsabil"></div>
+              <div class="f-field"><label>KPI</label><input type="text" [(ngModel)]="reclamatieFiltre.kpi"></div>
+            </div>
+
+            <div class="filter-row-bottom">
+              <div class="stare-box">
+                <span class="stare-label">Filtrare dupa stare:</span>
+                <label class="chk" *ngFor="let s of reclamatieStatusOptions">
+                  <input type="checkbox" [(ngModel)]="reclamatieFiltre.stare[s]"> {{ s }}
+                </label>
+              </div>
+
+              <div class="radio-box">
+                <span class="radio-label">Filtru listare:</span>
+                <label class="rad" *ngFor="let p of perioadaOptions">
+                  <input type="radio" name="perioadaReclamatii" [value]="p.value" [(ngModel)]="reclamatieFiltre.perioada"> {{ p.label }}
+                </label>
+                <input *ngIf="reclamatieFiltre.perioada === 'La_data'" type="date" class="inline-date" [(ngModel)]="reclamatieFiltre.laData">
+              </div>
+
+              <div class="radio-box">
+                <span class="radio-label">Limita listare:</span>
+                <label class="rad" *ngFor="let l of limitaOptions">
+                  <input type="radio" name="limitaReclamatii" [value]="l" [(ngModel)]="reclamatieFiltre.limita"> {{ l }}
+                </label>
+              </div>
+
+              <div class="actions-box">
+                <button class="btn-reset" (click)="resetFiltre()">Resetează filtre</button>
+                <button class="btn-add" (click)="openAddForm('complaints')">+ Adaugă reclamație</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <div class="table-header">
+            <h3>Complaints</h3>
+            <span class="results-count">{{ reclamatiiFiltrate.length }} rezultate</span>
+          </div>
+          <div class="table-scroll">
+            <table class="support-table">
+              <thead>
+                <tr>
+                  <th>Titlu</th>
+                  <th>Client</th>
+                  <th>Severitate</th>
+                  <th>Status</th>
+                  <th>Data trimitere</th>
+                  <th>Acțiuni</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let r of reclamatiiFiltrate">
+                  <td class="denumire-cell">{{ r.titlu }}</td>
+                  <td>{{ r.client }}</td>
+                  <td><span [ngClass]="severitateClass(r.severitate)">{{ r.severitate }}</span></td>
+                  <td><span [ngClass]="statusClass(r.status)">{{ r.status }}</span></td>
+                  <td>{{ r.dataTrimitere | date:'dd.MM.yyyy' }}</td>
+                  <td class="actions-cell">
+                    <button class="btn-icon" (click)="openEditForm('complaints', r)">✎</button>
+                    <button class="btn-icon danger" (click)="deleteItem('complaints', r.id)">✕</button>
+                  </td>
+                </tr>
+                <tr *ngIf="reclamatiiFiltrate.length === 0">
+                  <td colspan="6" class="no-results">Nu există reclamații înregistrate.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===================== FORM MODAL (ADD / EDIT) ===================== -->
+  <div class="modal-overlay" *ngIf="showForm">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>{{ isEditMode ? 'Editează' : 'Adaugă' }} {{ formEntity }}</h3>
+        <button class="btn-icon" (click)="closeForm()">✕</button>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- TICKET FORM -->
+        <ng-container *ngIf="formEntity === 'tickets'">
+          <div class="form-grid">
+            <div class="f-field">
+              <label>Număr (ID auto-completat)</label>
+              <input type="text" [value]="isEditMode ? formModel.id : nextTicketId" disabled class="field-readonly">
+            </div>
+            
+            <div class="f-field">
+              <label>Initiator (auto-completat)</label>
+              <input type="text" [value]="formModel.initiator" disabled class="field-readonly">
+            </div>
+            
+            <div class="f-field">
+              <label>Nr. Inventar Echipament *</label>
+              <input type="text" [(ngModel)]="formModel.tipEchipament" (input)="onTipEchipamentChange()" placeholder="Introdu nr. inventar...">
+            </div>
+            
+            <div class="f-field">
+              <label>Echipament (auto-completat)</label>
+              <input type="text" [(ngModel)]="formModel.echipa" disabled class="field-readonly" style="background-color: #e9ecef; color: #6c757d; font-weight: bold;">
+            </div>
+            
+            <div class="f-field">
+              <label>Secție (auto-completat)</label>
+              <input type="text" [(ngModel)]="formModel.sectie" disabled class="field-readonly" style="background-color: #e9ecef; color: #6c757d; font-weight: bold;">
+            </div>
+            
+            <div class="f-field">
+              <label>Linie (auto-completat)</label>
+              <input type="text" [(ngModel)]="formModel.linie" disabled class="field-readonly" style="background-color: #e9ecef; color: #6c757d; font-weight: bold;">
+            </div>
+
+            <div class="f-field">
+              <label>Tip interv.</label>
+              <select [(ngModel)]="formModel.tipInterventie">
+                <option *ngFor="let t of ticketTipInterventieOptions" [value]="t">{{ t }}</option>
+              </select>
+            </div>
+            
+            <div class="f-field">
+              <label>Grup Intervenție</label>
+              <select [(ngModel)]="formModel.grup" (change)="onGrupChange()">
+                <option value="">-- Alege grupul --</option>
+                <option *ngFor="let g of grupOptions" [value]="g">{{ g | uppercase }}</option>
+              </select>
+            </div>
+
+            <div class="f-field" *ngIf="formModel.grup">
+              <label>Responsabil / Executant</label>
+              <select [(ngModel)]="formModel.responsabil" style="border-color: #007bff; border-width: 2px;">
+                <option value="">-- Alege membrul --</option>
+                <option *ngFor="let om of responsabiliCurenti" [value]="om">{{ om }}</option>
+              </select>
+            </div>
+
+            <div class="f-field full">
+              <label>Descr. simptom</label>
+              <input type="text" [(ngModel)]="formModel.descriereSimptom" placeholder="Explică pe scurt problema...">
+            </div>
+            
+            <div class="f-field">
+              <label>Cod afectat (auto-completat)</label>
+              <input type="text" [(ngModel)]="formModel.codAfectat" disabled class="field-readonly" style="background-color: #e9ecef; color: #6c757d; font-weight: bold;">
+            </div>
+
+            <div class="f-field"><label>Denumire produs</label><input type="text" [(ngModel)]="formModel.denumireProdus"></div>
+            
+            <div class="f-field">
+              <label>Prioritate</label>
+              <select [(ngModel)]="formModel.prioritate">
+                <option *ngFor="let p of ticketPrioritateOptions" [value]="p">{{ p }}</option>
+              </select>
+            </div>
+
+            <div class="f-field">
+              <label>Termen initiat (auto-completat)</label>
+              <input type="text" [value]="formatDataOra(formModel.termenInitiat)" disabled class="field-readonly">
+            </div>
+
+            <!-- Noul calendar complet pentru DATA si ORA -->
+            <div class="f-field">
+              <label>Termen cerut</label>
+              <input type="datetime-local" step="1" [(ngModel)]="formModel.termenCerut">
+            </div>
+            
+          </div>
+        </ng-container>
+
+        <!-- ORDER FORM -->
+        <ng-container *ngIf="formEntity === 'orders'">
+          <div class="form-grid">
+            <div class="f-field"><label>Nr. comandă *</label><input type="text" [(ngModel)]="formModel.numarComanda"></div>
+            <div class="f-field"><label>Client *</label><input type="text" [(ngModel)]="formModel.client"></div>
+            <div class="f-field"><label>Produs</label><input type="text" [(ngModel)]="formModel.produs"></div>
+            <div class="f-field"><label>Cantitate</label><input type="number" [(ngModel)]="formModel.cantitate"></div>
+            <div class="f-field"><label>Furnizor</label><input type="text" [(ngModel)]="formModel.furnizor"></div>
+            <div class="f-field">
+              <label>Categorie produs</label>
+              <select [(ngModel)]="formModel.categorieProdus">
+                <option *ngFor="let c of orderCategorieProdusOptions" [value]="c">{{ c }}</option>
+              </select>
+            </div>
+            <div class="f-field">
+              <label>Status</label>
+              <select [(ngModel)]="formModel.status">
+                <option *ngFor="let s of orderStatusOptions" [value]="s">{{ s }}</option>
+              </select>
+            </div>
+            <div class="f-field">
+              <label>Prioritate</label>
+              <select [(ngModel)]="formModel.prioritate">
+                <option *ngFor="let p of ticketPrioritateOptions" [value]="p">{{ p }}</option>
+              </select>
+            </div>
+            <div class="f-field"><label>Sectie</label><input type="text" [(ngModel)]="formModel.sectie"></div>
+            <div class="f-field"><label>Linie</label><input type="text" [(ngModel)]="formModel.linie"></div>
+            <div class="f-field"><label>Locatie</label><input type="text" [(ngModel)]="formModel.locatie"></div>
+            <div class="f-field"><label>Initiator</label><input type="text" [(ngModel)]="formModel.initiator"></div>
+            <div class="f-field"><label>Responsabil</label><input type="text" [(ngModel)]="formModel.responsabil"></div>
+            <div class="f-field"><label>KPI</label><input type="text" [(ngModel)]="formModel.kpi"></div>
+            <div class="f-field full"><label>Explicatie</label><input type="text" [(ngModel)]="formModel.explicatie"></div>
+            <div class="f-field"><label>Data comandă</label><input type="date" [(ngModel)]="formModel.dataComanda"></div>
+            <div class="f-field"><label>Termen (data)</label><input type="date" [(ngModel)]="formModel.termenData"></div>
+            <div class="f-field"><label>Termen (ora)</label><input type="time" [(ngModel)]="formModel.termenOra"></div>
+          </div>
+        </ng-container>
+
+        <!-- SUGGESTION FORM -->
+        <ng-container *ngIf="formEntity === 'suggestions'">
+          <div class="form-grid">
+            <div class="f-field"><label>Titlu *</label><input type="text" [(ngModel)]="formModel.titlu"></div>
+            <div class="f-field"><label>Autor *</label><input type="text" [(ngModel)]="formModel.autor"></div>
+            <div class="f-field full"><label>Descriere</label><textarea [(ngModel)]="formModel.descriere"></textarea></div>
+            <div class="f-field">
+              <label>Categorie</label>
+              <select [(ngModel)]="formModel.categorie">
+                <option *ngFor="let c of sugestieCategorieOptions" [value]="c">{{ c }}</option>
+              </select>
+            </div>
+            <div class="f-field">
+              <label>Status</label>
+              <select [(ngModel)]="formModel.status">
+                <option *ngFor="let s of sugestieStatusOptions" [value]="s">{{ s }}</option>
+              </select>
+            </div>
+            <div class="f-field">
+              <label>Prioritate</label>
+              <select [(ngModel)]="formModel.prioritate">
+                <option *ngFor="let p of ticketPrioritateOptions" [value]="p">{{ p }}</option>
+              </select>
+            </div>
+            <div class="f-field"><label>Sectie</label><input type="text" [(ngModel)]="formModel.sectie"></div>
+            <div class="f-field"><label>Locatie</label><input type="text" [(ngModel)]="formModel.locatie"></div>
+            <div class="f-field"><label>Responsabil evaluare</label><input type="text" [(ngModel)]="formModel.responsabil"></div>
+            <div class="f-field"><label>KPI / impact</label><input type="text" [(ngModel)]="formModel.kpi"></div>
+            <div class="f-field full"><label>Explicatie</label><input type="text" [(ngModel)]="formModel.explicatie"></div>
+            <div class="f-field"><label>Data trimitere</label><input type="date" [(ngModel)]="formModel.dataTrimitere"></div>
+            <div class="f-field"><label>Termen implementare</label><input type="date" [(ngModel)]="formModel.termenData"></div>
+          </div>
+        </ng-container>
+
+        <!-- COMPLAINT FORM -->
+        <ng-container *ngIf="formEntity === 'complaints'">
+          <div class="form-grid">
+            <div class="f-field"><label>Titlu *</label><input type="text" [(ngModel)]="formModel.titlu"></div>
+            <div class="f-field"><label>Client *</label><input type="text" [(ngModel)]="formModel.client"></div>
+            <div class="f-field full"><label>Descriere</label><textarea [(ngModel)]="formModel.descriere"></textarea></div>
+            <div class="f-field">
+              <label>Severitate</label>
+              <select [(ngModel)]="formModel.severitate">
+                <option *ngFor="let sv of reclamatieSeveritateOptions" [value]="sv">{{ sv }}</option>
+              </select>
+            </div>
+            <div class="f-field">
+              <label>Status</label>
+              <select [(ngModel)]="formModel.status">
+                <option *ngFor="let s of reclamatieStatusOptions" [value]="s">{{ s }}</option>
+              </select>
+            </div>
+            <div class="f-field"><label>Sectie</label><input type="text" [(ngModel)]="formModel.sectie"></div>
+            <div class="f-field"><label>Locatie</label><input type="text" [(ngModel)]="formModel.locatie"></div>
+            <div class="f-field"><label>Responsabil</label><input type="text" [(ngModel)]="formModel.responsabil"></div>
+            <div class="f-field"><label>Cauza</label><input type="text" [(ngModel)]="formModel.cauzaInterventie"></div>
+            <div class="f-field full"><label>Explicatie</label><input type="text" [(ngModel)]="formModel.explicatie"></div>
+            <div class="f-field full"><label>Acțiune corectivă (Oper.supl.)</label><input type="text" [(ngModel)]="formModel.operatiiSuplimentare"></div>
+            <div class="f-field"><label>KPI</label><input type="text" [(ngModel)]="formModel.kpi"></div>
+            <div class="f-field"><label>Data trimitere</label><input type="date" [(ngModel)]="formModel.dataTrimitere"></div>
+            <div class="f-field"><label>Termen rezolvare</label><input type="date" [(ngModel)]="formModel.termenData"></div>
+          </div>
+        </ng-container>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-reset" (click)="closeForm()">Anulează</button>
+        <button class="btn-add" (click)="saveForm()">Salvează</button>
+      </div>
+    </div>
+  </div>
+
+</div>

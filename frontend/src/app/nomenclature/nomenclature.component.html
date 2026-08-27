@@ -1,0 +1,979 @@
+<div class="nomenclature-page">
+
+  <!-- Tab switcher -->
+  <div class="tab-switcher">
+    <button *ngFor="let tab of tabs"
+            class="tab-btn"
+            [class.active]="activeTab === tab.key"
+            (click)="setTab(tab.key)">
+      {{ tab.label }}
+    </button>
+  </div>
+
+  <!-- ===================== TAB: TIP ECHIPAMENT ===================== -->
+  <div *ngIf="activeTab === 'tip_echipament'" class="tab-content">
+
+    <div class="panel">
+
+      <div class="panel-title-bar">
+        <span class="panel-title-icon">▤</span>
+        <span>Tip Echipament</span>
+      </div>
+
+      <div class="panel-toolbar">
+        <input type="text" class="search-input" [(ngModel)]="searchText" placeholder="Caută după cod sau denumire...">
+        <button class="btn btn-primary" (click)="openAddForm()">+ Adaugă tip nou</button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="legacy-table">
+          <thead>
+            <tr>
+              <th class="col-nr">Nr.</th>
+              <th (click)="setSort('cod')" style="width: 150px;">
+                Cod
+                <span class="sort-arrow" *ngIf="sortKey === 'cod'">{{ sortAsc ? '▲' : '▼' }}</span>
+              </th>
+              <th (click)="setSort('denumire')">
+                Denumire
+                <span class="sort-arrow" *ngIf="sortKey === 'denumire'">{{ sortAsc ? '▲' : '▼' }}</span>
+              </th>
+              <th class="col-actions">Acțiuni</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of tipuriFiltrate; let i = index"
+                [class.row-alt]="i % 2 === 1"
+                [class.row-selected]="selectedIndex === i"
+                (click)="selectRow(i)">
+              <td class="col-nr">{{ i + 1 }}</td>
+              <td class="cell-cod">{{ item.cod }}</td>
+              <td>{{ item.denumire }}</td>
+              <td class="col-actions">
+                <button class="icon-btn" title="Editează" (click)="openEditForm(item, i); $event.stopPropagation()">✏️</button>
+                <button class="icon-btn icon-btn-danger" title="Șterge" (click)="deleteItem(i); $event.stopPropagation()">🗑️</button>
+              </td>
+            </tr>
+
+            <tr *ngIf="tipuriFiltrate.length === 0">
+              <td colspan="4" class="empty-state">
+                Nu există tipuri de echipament care să corespundă căutării.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="panel-bottom-bar">
+        <button class="btn btn-toolbar" (click)="listeaza()">Listează</button>
+        <button class="btn btn-toolbar" (click)="salveaza()">Salvează</button>
+      </div>
+
+    </div>
+
+    <!-- Modal formular adaugare / editare Tip Echipament -->
+    <div class="modal-overlay" *ngIf="showForm" (click)="closeForm()">
+      <div class="modal-box" (click)="$event.stopPropagation()">
+        <h3 class="modal-title">{{ isEditMode ? 'Editează tip echipament' : 'Adaugă tip echipament nou' }}</h3>
+
+        <div class="form-field">
+          <label>Cod</label>
+          <input type="text" [(ngModel)]="formModel.cod" placeholder="ex: C, D, E...">
+        </div>
+
+        <div class="form-field">
+          <label>Denumire</label>
+          <input type="text" [(ngModel)]="formModel.denumire" placeholder="ex: Cabina, Dispozitiv...">
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-cancel" (click)="closeForm()">Anulează</button>
+          <button class="btn btn-primary" (click)="saveForm()">Salvează</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===================== TAB: UTILIZATORI PMB ===================== -->
+  <div *ngIf="activeTab === 'utilizatori_pmb'" class="tab-content">
+
+    <div class="panel">
+
+      <div class="panel-title-bar">
+        <span class="panel-title-icon">▤</span>
+        <span>Responsabili PMB</span>
+      </div>
+
+      <div class="panel-toolbar panel-toolbar-multi">
+        <input type="text" class="search-input" [(ngModel)]="filtruMarca" placeholder="Marca...">
+        <input type="text" class="search-input" [(ngModel)]="filtruNume" placeholder="Nume...">
+        <input type="text" class="search-input" [(ngModel)]="filtruFunctie" placeholder="Funcție...">
+        <input type="text" class="search-input" [(ngModel)]="filtruGrup" placeholder="Grup...">
+        <input type="text" class="search-input" [(ngModel)]="filtruUser" placeholder="User...">
+        <label class="checkbox-inline">
+          <input type="checkbox" [(ngModel)]="filtruAccesPmb"> Doar cu acces
+        </label>
+        <label class="checkbox-inline">
+          <input type="checkbox" [(ngModel)]="arataInactivi"> Arată inactivi
+        </label>
+        <button class="btn btn-primary" (click)="openAddFormUtil()" *ngIf="isAdmin">+ Adaugă utilizator</button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="legacy-table">
+          <thead>
+            <tr>
+              <th class="col-nr">Nr.</th>
+              <th (click)="setSortUtil('marca')">Marca <span class="sort-arrow" *ngIf="sortKeyUtil === 'marca'">{{ sortAscUtil ? '▲' : '▼' }}</span></th>
+              <th (click)="setSortUtil('nume')">Nume <span class="sort-arrow" *ngIf="sortKeyUtil === 'nume'">{{ sortAscUtil ? '▲' : '▼' }}</span></th>
+              <th (click)="setSortUtil('functie')">Funcție <span class="sort-arrow" *ngIf="sortKeyUtil === 'functie'">{{ sortAscUtil ? '▲' : '▼' }}</span></th>
+              <th (click)="setSortUtil('grup')">Grup <span class="sort-arrow" *ngIf="sortKeyUtil === 'grup'">{{ sortAscUtil ? '▲' : '▼' }}</span></th>
+              <th (click)="setSortUtil('user')">User <span class="sort-arrow" *ngIf="sortKeyUtil === 'user'">{{ sortAscUtil ? '▲' : '▼' }}</span></th>
+              <th (click)="setSortUtil('nivelAcces')">Nivel Acces <span class="sort-arrow" *ngIf="sortKeyUtil === 'nivelAcces'">{{ sortAscUtil ? '▲' : '▼' }}</span></th>
+              <th (click)="setSortUtil('activ')">Activ <span class="sort-arrow" *ngIf="sortKeyUtil === 'activ'">{{ sortAscUtil ? '▲' : '▼' }}</span></th>
+              <th (click)="setSortUtil('dataActiv')">Data Activ. <span class="sort-arrow" *ngIf="sortKeyUtil === 'dataActiv'">{{ sortAscUtil ? '▲' : '▼' }}</span></th>
+              <th class="col-actions">Acțiuni</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="isLoadingUtilizatori">
+              <td colspan="9" class="empty-state">Se încarcă...</td>
+            </tr>
+
+            <tr *ngFor="let item of utilizatoriFiltrati; let i = index"
+                [class.row-alt]="i % 2 === 1"
+                [class.row-selected]="selectedIndexUtil === i"
+                (click)="selectRowUtil(i)">
+              <td class="col-nr">{{ i + 1 }}</td>
+              <td>{{ item.marca }}</td>
+              <td>{{ item.nume }}</td>
+              <td>{{ item.functie }}</td>
+              <td>{{ item.grup }}</td>
+              <td>{{ item.user }}</td>
+              <td>{{ item.nivelAcces }}</td>
+              <td>
+                <span [class.status-active]="item.activ" [class.status-inactive]="!item.activ">
+                  {{ item.activ ? 'Da' : 'Nu' }}
+                </span>
+              </td>
+              <td>{{ item.dataActiv }}</td>
+              <td class="col-actions">
+                <button class="icon-btn" title="Editează" (click)="openEditFormUtil(item, i); $event.stopPropagation()">✏️</button>
+                <button class="icon-btn" title="Activează/Dezactivează" (click)="toggleActivUtilizator(item); $event.stopPropagation()" *ngIf="isAdmin">🔄</button>
+                <button class="icon-btn icon-btn-danger" title="Șterge" (click)="deleteUtilizator(item); $event.stopPropagation()" *ngIf="isAdmin">🗑️</button>
+              </td>
+            </tr>
+
+            <tr *ngIf="!isLoadingUtilizatori && utilizatoriFiltrati.length === 0">
+              <td colspan="9" class="empty-state">
+                Nu există utilizatori care să corespundă filtrelor.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="panel-bottom-bar">
+        <button class="btn btn-toolbar" (click)="listeazaUtil()">Listează</button>
+        <button class="btn btn-toolbar" (click)="salveazaUtil()">Salvează</button>
+      </div>
+
+    </div>
+
+    <!-- Modal formular adaugare / editare Utilizator -->
+    <div class="modal-overlay" *ngIf="showFormUtil" (click)="closeFormUtil()">
+      <div class="modal-box" (click)="$event.stopPropagation()">
+        <h3 class="modal-title">{{ isEditModeUtil ? 'Editează utilizator' : 'Adaugă utilizator nou' }}</h3>
+
+        <div class="form-field">
+          <label>Marca</label>
+          <input type="text" [(ngModel)]="formModelUtil.marca">
+        </div>
+        <div class="form-field">
+          <label>Nume</label>
+          <input type="text" [(ngModel)]="formModelUtil.nume">
+        </div>
+        <div class="form-field">
+          <label>Funcție</label>
+          <input type="text" [(ngModel)]="formModelUtil.functie">
+        </div>
+        <div class="form-field">
+          <label>Grup</label>
+          <select [(ngModel)]="formModelUtil.grup">
+            <option value="">-- Fără grup --</option>
+            <option *ngFor="let g of numeGrupuriDisponibile" [value]="g">{{ g }}</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>User</label>
+          <input type="text" [(ngModel)]="formModelUtil.user">
+        </div>
+        <div class="form-field">
+          <label>Nivel Acces</label>
+          <select [(ngModel)]="formModelUtil.nivelAcces">
+            <option *ngFor="let nivel of nivelAccesOptions" [value]="nivel">{{ nivel }}</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="checkbox-inline">
+            <input type="checkbox" [(ngModel)]="formModelUtil.acces"> Are acces PMB
+          </label>
+        </div>
+        <div class="form-field">
+          <label class="checkbox-inline">
+            <input type="checkbox" [(ngModel)]="formModelUtil.activ"> Activ
+          </label>
+        </div>
+        <div class="form-field">
+          <label>Data activare</label>
+          <input type="date" [(ngModel)]="formModelUtil.dataActiv">
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-cancel" (click)="closeFormUtil()">Anulează</button>
+          <button class="btn btn-primary" (click)="saveFormUtil()">Salvează</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===================== TAB: TIP INTERVENȚIE ===================== -->
+  <div *ngIf="activeTab === 'tip_interventie'" class="tab-content">
+
+    <div class="panel">
+
+      <div class="panel-title-bar">
+        <span class="panel-title-icon">▤</span>
+        <span>Tip Intervenție</span>
+      </div>
+
+      <div class="panel-toolbar">
+        <input type="text" class="search-input" [(ngModel)]="searchTextInterv" placeholder="Caută după denumire...">
+        <button class="btn btn-primary" (click)="openAddFormInterv()">+ Adaugă tip nou</button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="legacy-table">
+          <thead>
+            <tr>
+              <th class="col-nr">Nr.</th>
+              <th (click)="setSortInterv('denumire')">
+                Denumire
+                <span class="sort-arrow" *ngIf="sortKeyInterv === 'denumire'">{{ sortAscInterv ? '▲' : '▼' }}</span>
+              </th>
+              <th class="col-actions">Acțiuni</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of tipuriInterventieFiltrate; let i = index"
+                [class.row-alt]="i % 2 === 1"
+                [class.row-selected]="selectedIndexInterv === i"
+                (click)="selectRowInterv(i)">
+              <td class="col-nr">{{ i + 1 }}</td>
+              <td>{{ item.denumire }}</td>
+              <td class="col-actions">
+                <button class="icon-btn" title="Editează" (click)="openEditFormInterv(item, i); $event.stopPropagation()">✏️</button>
+                <button class="icon-btn icon-btn-danger" title="Șterge" (click)="deleteItemInterv(i); $event.stopPropagation()">🗑️</button>
+              </td>
+            </tr>
+
+            <tr *ngIf="tipuriInterventieFiltrate.length === 0">
+              <td colspan="3" class="empty-state">
+                Nu există tipuri de intervenție care să corespundă căutării.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="panel-bottom-bar">
+        <button class="btn btn-toolbar" (click)="listeazaInterv()">Listează</button>
+        <button class="btn btn-toolbar" (click)="salveazaInterv()">Salvează</button>
+      </div>
+
+    </div>
+
+    <!-- Modal formular adaugare / editare Tip Intervenție -->
+    <div class="modal-overlay" *ngIf="showFormInterv" (click)="closeFormInterv()">
+      <div class="modal-box" (click)="$event.stopPropagation()">
+        <h3 class="modal-title">{{ isEditModeInterv ? 'Editează tip intervenție' : 'Adaugă tip intervenție nou' }}</h3>
+
+        <div class="form-field">
+          <label>Denumire</label>
+          <input type="text" [(ngModel)]="formModelInterv.denumire" placeholder="ex: Preventiva, Predictiva...">
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-cancel" (click)="closeFormInterv()">Anulează</button>
+          <button class="btn btn-primary" (click)="saveFormInterv()">Salvează</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===================== TAB: CATEGORIE DEFECT ===================== -->
+  <div *ngIf="activeTab === 'categorie_defect'" class="tab-content">
+
+    <div class="panel">
+
+      <div class="panel-title-bar">
+        <span class="panel-title-icon">▤</span>
+        <span>Categorie Defect</span>
+      </div>
+
+      <div class="panel-toolbar">
+        <input type="text" class="search-input" [(ngModel)]="searchTextCtg" placeholder="Caută după ID sau denumire...">
+        <button class="btn btn-primary" (click)="openAddFormCtg()">+ Adaugă categorie nouă</button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="legacy-table">
+          <thead>
+            <tr>
+              <th class="col-nr">Nr.</th>
+              <th (click)="setSortCtg('idCategorie')" style="width: 150px;">
+                ID Categorie
+                <span class="sort-arrow" *ngIf="sortKeyCtg === 'idCategorie'">{{ sortAscCtg ? '▲' : '▼' }}</span>
+              </th>
+              <th (click)="setSortCtg('denumire')">
+                Denumire
+                <span class="sort-arrow" *ngIf="sortKeyCtg === 'denumire'">{{ sortAscCtg ? '▲' : '▼' }}</span>
+              </th>
+              <th class="col-actions">Acțiuni</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of categoriiFiltrate; let i = index"
+                [class.row-alt]="i % 2 === 1"
+                [class.row-selected]="selectedIndexCtg === i"
+                (click)="selectRowCtg(i)">
+              <td class="col-nr">{{ i + 1 }}</td>
+              <td class="cell-cod">{{ item.idCategorie }}</td>
+              <td>{{ item.denumire }}</td>
+              <td class="col-actions">
+                <button class="icon-btn" title="Editează" (click)="openEditFormCtg(item, i); $event.stopPropagation()">✏️</button>
+                <button class="icon-btn icon-btn-danger" title="Șterge" (click)="deleteItemCtg(i); $event.stopPropagation()">🗑️</button>
+              </td>
+            </tr>
+
+            <tr *ngIf="categoriiFiltrate.length === 0">
+              <td colspan="4" class="empty-state">
+                Nu există categorii de defect care să corespundă căutării.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="panel-bottom-bar">
+        <button class="btn btn-toolbar" (click)="listeazaCtg()">Listează</button>
+        <button class="btn btn-toolbar" (click)="salveazaCtg()">Salvează</button>
+      </div>
+
+    </div>
+
+    <!-- Modal formular adaugare / editare Categorie Defect -->
+    <div class="modal-overlay" *ngIf="showFormCtg" (click)="closeFormCtg()">
+      <div class="modal-box" (click)="$event.stopPropagation()">
+        <h3 class="modal-title">{{ isEditModeCtg ? 'Editează categorie defect' : 'Adaugă categorie defect nouă' }}</h3>
+
+        <div class="form-field">
+          <label>ID Categorie</label>
+          <input type="text" [(ngModel)]="formModelCtg.idCategorie" placeholder="ex: 001, 002...">
+        </div>
+
+        <div class="form-field">
+          <label>Denumire</label>
+          <input type="text" [(ngModel)]="formModelCtg.denumire" placeholder="ex: Defect electronic...">
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-cancel" (click)="closeFormCtg()">Anulează</button>
+          <button class="btn btn-primary" (click)="saveFormCtg()">Salvează</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===================== TAB: PIESE ===================== -->
+  <div *ngIf="activeTab === 'piese_schimb'" class="tab-content">
+
+    <div class="dual-panel-wrap">
+
+      <!-- Panou stanga: Liste de piese, sau piesele listei selectate -->
+      <div class="panel dual-panel dual-panel-liste">
+        <div class="panel-title-bar">
+          <span class="panel-title-icon">▤</span>
+          <span *ngIf="!listaSelectataPiese">Liste</span>
+          <span *ngIf="listaSelectataPiese">Piese din listă: {{ listaSelectataPiese.denumire }}</span>
+          <button class="btn-back" *ngIf="listaSelectataPiese" (click)="inapoiLaListe()" title="Înapoi la liste">◀ Liste</button>
+          
+          <!-- Butoanele mutate sus pe bara albastra -->
+          <div class="header-actions" *ngIf="!listaSelectataPiese">
+            <button class="btn-header" (click)="openAddFormLista()">Adaugă listă</button>
+            <button class="btn-header btn-header-danger" [disabled]="!selectedLista" (click)="deleteLista()">Elimină</button>
+          </div>
+        </div>
+
+        <div class="filter-panel" *ngIf="!listaSelectataPiese">
+          <div class="filter-grid">
+            <div class="filter-field">
+              <label>Nr.listă:</label>
+              <input type="text" [(ngModel)]="filtruListaNr" placeholder="filtrează după nr...">
+            </div>
+            <div class="filter-field">
+              <label>Denumire:</label>
+              <input type="text" [(ngModel)]="filtruListaDenumire" placeholder="filtrează după denumire...">
+            </div>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="legacy-table" *ngIf="!listaSelectataPiese">
+            <thead>
+              <tr>
+                <th class="col-nr">Nr.</th>
+                <th style="width: 90px;">Nr.listă</th>
+                <th>Denumire</th>
+                <th style="width: 50px;">Acțiuni</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of listePieseFiltrate; let i = index"
+                  [class.row-alt]="i % 2 === 1"
+                  [class.row-selected]="selectedLista === item"
+                  (click)="selectLista(item)"
+                  (dblclick)="deschideLista(item)">
+                <td class="col-nr">{{ i + 1 }}</td>
+                <td class="cell-cod">{{ item.nrLista }}</td>
+                <td>{{ item.denumire }}</td>
+                <td class="col-actions">
+                  <button class="icon-btn" title="Editează" (click)="openEditFormLista(item); $event.stopPropagation()">✏️</button>
+                </td>
+              </tr>
+
+              <tr *ngIf="listePieseFiltrate.length === 0">
+                <td colspan="4" class="empty-state">Nu există liste de piese.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <table class="legacy-table" *ngIf="listaSelectataPiese">
+            <thead>
+              <tr>
+                <th class="col-nr">Nr.</th>
+                <th style="width: 60px;">ID</th>
+                <th>Denumire</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of pieseInLista; let i = index"
+                  [class.row-alt]="i % 2 === 1"
+                  [class.row-selected]="selectedLeftPieceIndex === i"
+                  (click)="selectPiesaStanga(i)"
+                  (dblclick)="openEditFormPiesa(item)">
+                <td class="col-nr">{{ i + 1 }}</td>
+                <td>{{ item.id }}</td>
+                <td>{{ item.denumire }}</td>
+              </tr>
+
+              <tr *ngIf="pieseInLista.length === 0">
+                <td colspan="3" class="empty-state">Nicio piesă alocată acestei liste.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Sageti de transfer -->
+      <div class="transfer-arrows">
+        <button class="icon-btn transfer-btn" title="Adaugă în listă"
+                [disabled]="!listaSelectataPiese || selectedRightPieceIndex === null"
+                (click)="mutaInLista()">◀</button>
+        <button class="icon-btn transfer-btn" title="Scoate din listă"
+                [disabled]="!listaSelectataPiese || selectedLeftPieceIndex === null"
+                (click)="scoateDinLista()">▶</button>
+      </div>
+
+      <!-- Panou dreapta: toate piesele / piesele neasociate listei selectate -->
+      <div class="panel dual-panel dual-panel-piese">
+        <div class="panel-title-bar">
+          <span class="panel-title-icon">▤</span>
+          <span>Piese</span>
+          
+          <!-- Butoanele mutate sus pe bara albastra -->
+          <div class="header-actions" *ngIf="!listaSelectataPiese">
+            <button class="btn-header" (click)="openAddFormPiesa()">Adaugă piesă</button>
+            <button class="btn-header btn-header-danger" [disabled]="selectedRightPieceIndex === null" (click)="deleteSelectedPiesa()">Elimină</button>
+          </div>
+        </div>
+
+        <div class="filter-panel" *ngIf="!listaSelectataPiese">
+          <div class="filter-grid filter-grid-piese">
+            <div class="filter-field">
+              <label>ID:</label>
+              <input type="text" [(ngModel)]="filtruPiesaId">
+            </div>
+            <div class="filter-field">
+              <label>Denumire:</label>
+              <input type="text" [(ngModel)]="filtruPiesaDenumire">
+            </div>
+            <div class="filter-field">
+              <label>Cod SAP:</label>
+              <input type="text" [(ngModel)]="filtruPiesaCodSap">
+            </div>
+            <div class="filter-field">
+              <label>Poz.raft:</label>
+              <input type="text" [(ngModel)]="filtruPiesaPozRaft">
+            </div>
+            <div class="filter-field">
+              <label>Part nr.:</label>
+              <input type="text" [(ngModel)]="filtruPiesaPartNr">
+            </div>
+            <div class="filter-field">
+              <label>Stoc:</label>
+              <input type="text" [(ngModel)]="filtruPiesaStoc">
+            </div>
+            <div class="filter-field">
+              <label>Condiție:</label>
+              <select [(ngModel)]="filtruPiesaConditie">
+                <option value="">Toate</option>
+                <option *ngFor="let opt of conditieAprovOptions" [value]="opt">{{ opt }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="legacy-table" *ngIf="!listaSelectataPiese">
+            <thead>
+              <tr>
+                <th class="col-nr" style="width: 20px;">Nr.</th>
+                <th (click)="setSortPiese('id')" style="width: 25px;">
+                  ID
+                  <span class="sort-arrow" *ngIf="sortKeyPiese === 'id'">{{ sortAscPiese ? '▲' : '▼' }}</span>
+                </th>
+                <th (click)="setSortPiese('denumire')">
+                  Denumire
+                  <span class="sort-arrow" *ngIf="sortKeyPiese === 'denumire'">{{ sortAscPiese ? '▲' : '▼' }}</span>
+                </th>
+                <th (click)="setSortPiese('codSap')" style="width: 75px;">
+                  Cod SAP
+                  <span class="sort-arrow" *ngIf="sortKeyPiese === 'codSap'">{{ sortAscPiese ? '▲' : '▼' }}</span>
+                </th>
+                <th (click)="setSortPiese('pozitieRaft')" style="width: 70px;">
+                  Poz.raft
+                  <span class="sort-arrow" *ngIf="sortKeyPiese === 'pozitieRaft'">{{ sortAscPiese ? '▲' : '▼' }}</span>
+                </th>
+                <th (click)="setSortPiese('partNumber')" style="width: 70px;">
+                  Part nr.
+                  <span class="sort-arrow" *ngIf="sortKeyPiese === 'partNumber'">{{ sortAscPiese ? '▲' : '▼' }}</span>
+                </th>
+                <th (click)="setSortPiese('pretRon')" style="width: 50px;">
+                  Preț
+                  <span class="sort-arrow" *ngIf="sortKeyPiese === 'pretRon'">{{ sortAscPiese ? '▲' : '▼' }}</span>
+                </th>
+                <th (click)="setSortPiese('stocCurent')" style="width: 40px;">
+                  Stoc
+                  <span class="sort-arrow" *ngIf="sortKeyPiese === 'stocCurent'">{{ sortAscPiese ? '▲' : '▼' }}</span>
+                </th>
+                <th (click)="setSortPiese('stocMinim')" style="width: 70px;">
+                  Stoc minim
+                  <span class="sort-arrow" *ngIf="sortKeyPiese === 'stocMinim'">{{ sortAscPiese ? '▲' : '▼' }}</span>
+                </th>
+                <th style="width: 90px;">Cond. aprov.</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of pieseDisponibileFiltrate; let i = index"
+                  [class.row-alt]="i % 2 === 1"
+                  [class.row-selected]="selectedRightPieceIndex === i"
+                  (click)="selectPiesaDreapta(i)"
+                  (dblclick)="openEditFormPiesa(item)">
+                <td class="col-nr">{{ i + 1 }}</td>
+                <td>{{ item.id }}</td>
+                <td>{{ item.denumire }}</td>
+                <td>{{ item.codSap }}</td>
+                <td>{{ item.pozitieRaft }}</td>
+                <td>{{ item.partNumber }}</td>
+                <td>{{ item.pretRon }}</td>
+                <td>{{ item.stocCurent }}</td>
+                <td>{{ item.stocMinim }}</td>
+                <td>
+                  <span class="badge-aprov" [ngClass]="conditieAprovizionare(item).cls">
+                    {{ conditieAprovizionare(item).label }}
+                  </span>
+                </td>
+              </tr>
+
+              <tr *ngIf="pieseDisponibileFiltrate.length === 0">
+                <td colspan="10" class="empty-state">Nu există piese disponibile.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <table class="legacy-table" *ngIf="listaSelectataPiese">
+            <thead>
+              <tr>
+                <th class="col-nr">Nr.</th>
+                <th style="width: 60px;">ID</th>
+                <th>Denumire</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of pieseDisponibile; let i = index"
+                  [class.row-alt]="i % 2 === 1"
+                  [class.row-selected]="selectedRightPieceIndex === i"
+                  (click)="selectPiesaDreapta(i)"
+                  (dblclick)="openEditFormPiesa(item)">
+                <td class="col-nr">{{ i + 1 }}</td>
+                <td>{{ item.id }}</td>
+                <td>{{ item.denumire }}</td>
+              </tr>
+
+              <tr *ngIf="pieseDisponibile.length === 0">
+                <td colspan="3" class="empty-state">Nu există piese disponibile.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Modal formular adaugare Lista de piese -->
+    <div class="modal-overlay" *ngIf="showFormLista" (click)="closeFormLista()">
+      <div class="modal-box" (click)="$event.stopPropagation()">
+        <h3 class="modal-title">{{ isEditModeLista ? 'Editează listă' : 'Adaugă listă nouă' }}</h3>
+
+        <div class="form-field">
+          <label>Număr listă</label>
+          <input type="text" [(ngModel)]="formModelLista.nrLista" placeholder="ex: 4, 5...">
+        </div>
+
+        <div class="form-field">
+          <label>Denumire</label>
+          <input type="text" [(ngModel)]="formModelLista.denumire" placeholder="ex: Listă mentenanță...">
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-cancel" (click)="closeFormLista()">Anulează</button>
+          <button class="btn btn-primary" (click)="saveFormLista()">Salvează</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal formular adaugare Piesa -->
+    <div class="modal-overlay" *ngIf="showFormPiesa" (click)="closeFormPiesa()">
+      <div class="modal-box modal-box-wide" (click)="$event.stopPropagation()">
+        <h3 class="modal-title">{{ isEditModePiesa ? 'Editează piesă' : 'Adaugă piesă nouă' }}</h3>
+
+        <fieldset class="piesa-fieldset">
+          <legend>Piese de schimb</legend>
+
+          <div class="piesa-columns">
+
+            <!-- Coloana 1 -->
+            <div class="piesa-col">
+              <div class="piesa-field">
+                <label>Denumire:</label>
+                <input type="text" [(ngModel)]="formModelPiesa.denumire">
+              </div>
+              <div class="piesa-field">
+                <label>Cod SAP:</label>
+                <input type="text" [(ngModel)]="formModelPiesa.codSap">
+              </div>
+              <div class="piesa-field">
+                <label>Pret(RON):</label>
+                <input type="text" [(ngModel)]="formModelPiesa.pretRon">
+              </div>
+              <div class="piesa-field">
+                <label>UM :</label>
+                <select [(ngModel)]="formModelPiesa.um">
+                  <option value="" disabled selected>—</option>
+                  <option *ngFor="let opt of umOptions" [value]="opt">{{ opt }}</option>
+                </select>
+              </div>
+              <div class="piesa-field">
+                <label>Magazie:</label>
+                <select [(ngModel)]="formModelPiesa.magazie">
+                  <option value="" disabled selected>—</option>
+                  <option *ngFor="let opt of magazieOptions" [value]="opt">{{ opt }}</option>
+                </select>
+              </div>
+              <div class="piesa-field">
+                <label>Pozitie raft:</label>
+                <input type="text" [(ngModel)]="formModelPiesa.pozitieRaft">
+              </div>
+              <div class="piesa-field">
+                <label>Stoc minim:</label>
+                <input type="text" [(ngModel)]="formModelPiesa.stocMinim">
+              </div>
+              <div class="piesa-field">
+                <label>Stoc curent:</label>
+                <input type="text" [(ngModel)]="formModelPiesa.stocCurent">
+              </div>
+            </div>
+
+            <!-- Coloana 2 -->
+            <div class="piesa-col">
+              <div class="piesa-field">
+                <label>Frecventa:</label>
+                <select [(ngModel)]="formModelPiesa.frecventa">
+                  <option value="" disabled selected>—</option>
+                  <option *ngFor="let opt of frecventaOptions" [value]="opt">{{ opt }}</option>
+                </select>
+              </div>
+              <div class="piesa-field">
+                <label>Producator:</label>
+                <input type="text" [(ngModel)]="formModelPiesa.producator">
+              </div>
+              <div class="piesa-field">
+                <label>!! Part number:</label>
+                <input type="text" [(ngModel)]="formModelPiesa.partNumber">
+              </div>
+              <div class="piesa-field">
+                <label>MOQ :</label>
+                <input type="text" [(ngModel)]="formModelPiesa.moq">
+              </div>
+              <div class="piesa-field">
+                <label>Utilizare:</label>
+                <input type="text" [(ngModel)]="formModelPiesa.utilizare">
+              </div>
+              <div class="piesa-field">
+                <label>Dublura:</label>
+                <input type="text" [(ngModel)]="formModelPiesa.dublura">
+              </div>
+
+              <fieldset class="piesa-exclude-fieldset">
+                <legend>Exclude:</legend>
+                <label class="piesa-checkbox">
+                  <input type="checkbox" [(ngModel)]="formModelPiesa.excludeDublate"> Dublate
+                </label>
+                <label class="piesa-checkbox">
+                  <input type="checkbox" [(ngModel)]="formModelPiesa.excludeIesiteDinFabricatie"> Iesite din fabricatie
+                </label>
+              </fieldset>
+            </div>
+
+            <!-- Coloana 3 -->
+            <div class="piesa-col">
+              <div class="piesa-field">
+                <label>Furnizor:</label>
+                <input type="text" [(ngModel)]="formModelPiesa.furnizor">
+              </div>
+              <div class="piesa-field">
+                <label>Ref.furnizor:</label>
+                <input type="text" [(ngModel)]="formModelPiesa.refFurnizor">
+              </div>
+              <div class="piesa-field">
+                <label>Furnizor 1:</label>
+                <input type="text" [(ngModel)]="formModelPiesa.furnizor1">
+              </div>
+              <div class="piesa-field">
+                <label>Ref.furn. 1:</label>
+                <input type="text" [(ngModel)]="formModelPiesa.refFurn1">
+              </div>
+              <div class="piesa-field">
+                <label>Furnizor 2:</label>
+                <input type="text" [(ngModel)]="formModelPiesa.furnizor2">
+              </div>
+              <div class="piesa-field">
+                <label>Ref.furn. 2:</label>
+                <input type="text" [(ngModel)]="formModelPiesa.refFurn2">
+              </div>
+            </div>
+
+          </div>
+        </fieldset>
+
+        <div class="modal-actions">
+          <button class="btn btn-cancel" (click)="closeFormPiesa()">Anulează</button>
+          <button class="btn btn-primary" (click)="saveFormPiesa()">Salvează</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===================== TAB: OPERAȚII ===================== -->
+  <div *ngIf="activeTab === 'operatii'" class="tab-content">
+
+    <div class="panel">
+
+      <div class="panel-title-bar">
+        <span class="panel-title-icon">▤</span>
+        <span>Operații</span>
+      </div>
+
+      <div class="panel-toolbar">
+        <input type="text" class="search-input" [(ngModel)]="searchTextOp" placeholder="Caută după cod sau denumire...">
+        <button class="btn btn-primary" (click)="openAddFormOp()">+ Adaugă operație nouă</button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="legacy-table">
+          <thead>
+            <tr>
+              <th class="col-nr">Nr.</th>
+              <th (click)="setSortOp('cod')" style="width: 100px;">
+                Cod
+                <span class="sort-arrow" *ngIf="sortKeyOp === 'cod'">{{ sortAscOp ? '▲' : '▼' }}</span>
+              </th>
+              <th (click)="setSortOp('denumireRO')">
+                Denumire RO
+                <span class="sort-arrow" *ngIf="sortKeyOp === 'denumireRO'">{{ sortAscOp ? '▲' : '▼' }}</span>
+              </th>
+              <th (click)="setSortOp('denumireDE')">
+                Denumire DE
+                <span class="sort-arrow" *ngIf="sortKeyOp === 'denumireDE'">{{ sortAscOp ? '▲' : '▼' }}</span>
+              </th>
+              <th class="col-actions">Acțiuni</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of operatiiFiltrate; let i = index"
+                [class.row-alt]="i % 2 === 1"
+                [class.row-selected]="selectedIndexOp === i"
+                (click)="selectRowOp(i)">
+              <td class="col-nr">{{ i + 1 }}</td>
+              <td class="cell-cod">{{ item.cod }}</td>
+              <td>{{ item.denumireRO }}</td>
+              <td>{{ item.denumireDE }}</td>
+              <td class="col-actions">
+                <button class="icon-btn" title="Editează" (click)="openEditFormOp(item, i); $event.stopPropagation()">✏️</button>
+                <button class="icon-btn icon-btn-danger" title="Șterge" (click)="deleteItemOp(i); $event.stopPropagation()">🗑️</button>
+              </td>
+            </tr>
+
+            <tr *ngIf="operatiiFiltrate.length === 0">
+              <td colspan="5" class="empty-state">
+                Nu există operații care să corespundă căutării.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="panel-bottom-bar">
+        <button class="btn btn-toolbar" (click)="listeazaOp()">Listează</button>
+        <button class="btn btn-toolbar" (click)="salveazaOp()">Salvează</button>
+      </div>
+
+    </div>
+
+    <!-- Modal formular adaugare / editare Operație -->
+    <div class="modal-overlay" *ngIf="showFormOp" (click)="closeFormOp()">
+      <div class="modal-box" (click)="$event.stopPropagation()">
+        <h3 class="modal-title">{{ isEditModeOp ? 'Editează operație' : 'Adaugă operație nouă' }}</h3>
+
+        <div class="form-field">
+          <label>Cod</label>
+          <input type="text" [(ngModel)]="formModelOp.cod" placeholder="ex: 10010">
+        </div>
+
+        <div class="form-field">
+          <label>Denumire RO</label>
+          <input type="text" [(ngModel)]="formModelOp.denumireRO" placeholder="ex: Montaj">
+        </div>
+
+        <div class="form-field">
+          <label>Denumire DE</label>
+          <input type="text" [(ngModel)]="formModelOp.denumireDE" placeholder="ex: Montage">
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-cancel" (click)="closeFormOp()">Anulează</button>
+          <button class="btn btn-primary" (click)="saveFormOp()">Salvează</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===================== TAB: GRUPURI ===================== -->
+  <div *ngIf="activeTab === 'grupuri'" class="tab-content">
+
+    <div class="panel">
+
+      <div class="panel-title-bar">
+        <span class="panel-title-icon">▤</span>
+        <span>Grupuri de lucru</span>
+      </div>
+
+      <div class="panel-toolbar">
+        <input type="text" class="search-input" [(ngModel)]="searchTextGrup" placeholder="Caută după grup sau user...">
+        <button class="btn btn-primary" (click)="openAddFormGrupNou()">+ Adaugă grup nou</button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="legacy-table">
+          <thead>
+            <tr>
+              <th class="col-nr">Nr.</th>
+              <th (click)="setSortGrup('grup')" style="width: 250px;">
+                Nume Grup
+                <span class="sort-arrow" *ngIf="sortKeyGrup === 'grup'">{{ sortAscGrup ? '▲' : '▼' }}</span>
+              </th>
+              <th (click)="setSortGrup('membri')">
+                Useri PMB Alocați
+                <span class="sort-arrow" *ngIf="sortKeyGrup === 'membri'">{{ sortAscGrup ? '▲' : '▼' }}</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="isLoadingGrupuri">
+              <td colspan="3" class="empty-state">Se încarcă...</td>
+            </tr>
+
+            <tr *ngFor="let item of grupuriFiltrate; let i = index" [class.row-alt]="i % 2 === 1">
+              <td class="col-nr">{{ i + 1 }}</td>
+              <td class="cell-cod">{{ item.grup }}</td>
+              <td [style.font-style]="item.membri.length ? 'normal' : 'italic'"
+                  [style.color]="item.membri.length ? '#35424f' : '#999'"
+                  style="font-weight: 500;">
+                {{ item.membri.length ? item.membri.join(', ') : 'Fără utilizatori alocați' }}
+              </td>
+            </tr>
+
+            <tr *ngIf="!isLoadingGrupuri && grupuriFiltrate.length === 0">
+              <td colspan="3" class="empty-state">
+                Nu există grupuri. Apasă „+ Adaugă grup nou” pentru a crea primul grup.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="panel-bottom-bar">
+        <button class="btn btn-toolbar" (click)="listeazaGrup()">Listează</button>
+      </div>
+
+    </div>
+
+    <!-- Modal formular adaugare Grup nou -->
+    <div class="modal-overlay" *ngIf="showFormGrupNou" (click)="closeFormGrupNou()">
+      <div class="modal-box" (click)="$event.stopPropagation()">
+        <h3 class="modal-title">Adaugă grup nou</h3>
+
+        <div class="form-field">
+          <label>Nume Grup</label>
+          <input type="text" [(ngModel)]="formModelGrupNou.nume" placeholder="ex: mecanic, electric, TESA_PMB..." (keyup.enter)="saveFormGrupNou()">
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-cancel" (click)="closeFormGrupNou()">Anulează</button>
+          <button class="btn btn-primary" [disabled]="isSavingGrupNou" (click)="saveFormGrupNou()">
+            {{ isSavingGrupNou ? 'Se salvează...' : 'Salvează' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>

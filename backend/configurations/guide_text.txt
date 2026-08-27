@@ -1,0 +1,13 @@
+Welcome to the site!
+To navigate, use the menu above.
+You can reset your password or manage your account using the buttons in the settings section.
+
+<strong>User:</strong> {{username}}
+<strong>Your role:</strong> {{role}}
+
+Available features:
+• Reset password
+• Account management
+• Log out
+
+For additional assistance, contact your system administrator.

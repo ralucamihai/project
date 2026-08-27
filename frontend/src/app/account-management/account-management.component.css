@@ -1,0 +1,127 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+  outline: none;
+  border: none;
+}
+
+/* Center the entire page content */
+.page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* Container for the two columns */
+.split-container {
+  display: flex;
+  gap: 30px; /* space between columns */
+  width: 100%;
+  max-width: 1100px; /* limit max width for large screens */
+  flex-wrap: wrap; /* allow wrapping on small screens */
+}
+
+/* Style for each half container */
+.half {
+  flex: 1 1 45%; /* grow, shrink, basis */
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  padding: 30px;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Add a hover effect for a subtle lift */
+.half:hover {
+  box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+  transform: translateY(-5px);
+}
+
+/* Title styles */
+.card-title {
+  font-weight: 600;
+  color: #222;
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 22px;
+}
+
+/* Style for form inputs */
+.form-control {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+  margin-bottom: 15px;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus {
+  border-color: #fc8403;
+  box-shadow: 0 0 8px rgba(252, 132, 3, 0.3);
+  outline: none;
+}
+
+/* Style for buttons */
+.btn-custom {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  border: 2px solid #fc8403;
+  background-color: transparent;
+  color: #fc8403;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.btn-custom:hover {
+  background-color: #fc8403;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(252, 132, 3, 0.2);
+}
+
+/* Optional: add some spacing for labels if needed */
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  color: #333;
+}
+
+.split-container {
+  display: flex;
+  width: 100%; /* or any specific width */
+  height: auto; /* or fixed height if needed */
+}
+
+.half {
+  flex: 1; /* each takes equal space */
+  padding: 10px; /* optional padding */
+  box-sizing: border-box; /* include padding in width calculation */
+}
+
+.error-message {
+  color: #fff;
+  background-color: #e53935;
+  border: 1px solid #b71c1c;
+  border-radius: 8px;
+  padding: 12px 18px;
+  margin-bottom: 18px;
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(229,57,53,0.08);
+}

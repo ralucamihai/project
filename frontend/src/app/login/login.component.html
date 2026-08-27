@@ -1,0 +1,57 @@
+<div class="top-bar">
+  <div class="left-section">
+    <img src="assets/steinel_pmb_small.png" alt="Logo" class="logo-top-left" />
+  </div>
+  <div class="right-section">
+    <div class="version-container">
+      <span class="app-version">v{{ version }}</span>
+      <span class="app-version">Build: {{ buildDate }}</span>
+    </div>
+  </div>
+</div>
+
+<!-- <div class="language-section">
+  <select class="language-selector" (change)="changeLanguage($event)" [value]="language">
+    <option value="ro">RO</option>
+    <option value="en">EN</option>
+  </select>
+</div> -->
+
+<div class="page-container">
+  <div class="login-container">
+    <div class="card">
+      <h1 *ngIf="alreadyAuthenticated()" class="card-title mb-3">Already logged in as {{username}}!</h1>
+      <button *ngIf="alreadyAuthenticated()" type="submit" class="btn btn-custom" (click)="accessHomePage()">Go to main
+        page</button>
+      <h1 *ngIf="alreadyAuthenticated()" class="card-title mb-3">Log in with another user!</h1>
+      <h1 *ngIf="!alreadyAuthenticated()" class="card-title mb-3">Authentication</h1>
+
+      <!-- msj de eroare -->
+      <div *ngIf="error" class="error-message">
+        {{ error }}
+      </div>
+      <!--msj de incarcare -->
+      <div *ngIf="isLoading" class="loading-spinner">
+        Logging in...
+      </div>
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="form-centered">
+        <input formControlName="username" type="text" class="form-control" placeholder="Username" />
+        <input formControlName="password" type="password" class="form-control" placeholder="Password" />
+
+        <!-- <div class="form-check">
+          <input formControlName="remember" type="checkbox" />
+          <label>Ține-mă minte</label>
+        </div> -->
+
+
+
+        <button type="submit" class="btn-custom" [disabled]="isLoading">Log in</button>
+        <button type="button" class="btn-custom" (click)="onRegister()">Register</button>
+
+        <div class="forgot-password-container">
+          <span class="forgot-password" (click)="onForgotPassword()">Forgot password?</span>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,78 @@
+<div class="account-administration-container">
+  <div class="header">
+    <h1>Administrare Cont</h1>
+    <p class="subtitle">Gestionează setările contului și preferințele aplicației</p>
+  </div>
+
+  <!-- Success/Error Messages -->
+  <div *ngIf="successMessage" class="alert alert-success">
+    {{ successMessage }}
+  </div>
+  <div *ngIf="errorMessage" class="alert alert-error">
+    {{ errorMessage }}
+  </div>
+
+  <div class="admin-sections">
+    <!-- Account Information Section -->
+    <div class="admin-section">
+      <div class="section-header">
+        <h2>Date despre cont</h2>
+        <p>Informațiile tale personale</p>
+      </div>
+      <div class="section-content">
+        <div class="account-info-grid">
+          <div class="info-item">
+            <label>Nume:</label>
+            <span class="info-value">Popescu</span>
+          </div>
+          <div class="info-item">
+            <label>Prenume:</label>
+            <span class="info-value">Ion</span>
+          </div>
+          <div class="info-item">
+            <label>Utilizator:</label>
+            <span class="info-value">ipopescu</span>
+          </div>
+          <div class="info-item">
+            <label>Email:</label>
+            <span class="info-value">ipopescu&#64;email.com</span>
+          </div>
+          <div class="info-item">
+            <label>Număr Marcă:</label>
+            <span class="info-value">12345</span>
+          </div>
+          <div class="info-item">
+            <label>Rol Curent:</label>
+            <span class="info-value role-badge">Administrator</span>
+          </div>
+          <div class="info-item">
+            <label>Status Cont:</label>
+            <span class="info-value status-active">Activ</span>
+          </div>
+          <div class="info-item">
+            <label>Data Înregistrării:</label>
+            <span class="info-value">15 Ianuarie 2024</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+   
+    <!-- Account Actions Section -->
+    <div class="admin-section danger-section">
+      <div class="section-header">
+        <h2>Acțiuni Cont</h2>
+        <p>Gestionează statusul contului</p>
+      </div>
+      <div class="section-content">
+        <div class="action-buttons">
+          <button type="button" class="btn-custom danger">Logout</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button type="button" class="btn-custom" routerLink="/home">Înapoi</button>
+  </div>
+</div>

@@ -1,0 +1,52 @@
+/* You can add global styles to this file, and also import other style files */
+* {
+    font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* ===== Google Translate cleanup ===== */
+
+/* ascunde banner-ul de sus care împinge tot layout-ul în jos */
+.goog-te-banner-frame.skiptranslate,
+body > .skiptranslate {
+  display: none !important;
+}
+
+/* previne padding-ul pe care Google îl injectează pe <body> */
+body {
+  top: 0 !important;
+  position: static !important;
+}
+
+/* ascunde iframe-ul de highlight/tooltip la hover pe text tradus */
+.goog-tooltip,
+.goog-tooltip:hover {
+  display: none !important;
+}
+.goog-text-highlight {
+  background: none !important;
+  box-shadow: none !important;
+}
+
+/*
+ * Ascunde widget-ul default Google Translate (folosim propriul buton din
+ * meniul de sus). IMPORTANT: NU folosim display:none aici — pe unele
+ * browsere (in special Chrome) elementul select.goog-te-combo nu se mai
+ * initializeaza corect daca parintele lui e display:none, ceea ce face
+ * schimbarea de limba nefunctionala. In schimb il scoatem vizual din
+ * ecran, dar il lasam "randat".
+ */
+#google_translate_element {
+  position: fixed !important;
+  top: -9999px !important;
+  left: -9999px !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+}
+
+/* ascunde complet iframe-ul dropdown care apare uneori peste conținut */
+iframe.goog-te-menu-frame {
+  box-shadow: none !important;
+}

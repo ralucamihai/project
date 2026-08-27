@@ -1,0 +1,132 @@
+<div *ngIf="shouldShowNav()" class="sidebar">
+  <div class="sidebar-container">
+    <div class="left-section">
+      <img src="assets/steinel_pmb_small.png" alt="Logo" class="logo-top-left">
+    </div>
+
+    <nav class="center-section">
+      <ul class="nav-left-links">
+        <li><a routerLink="/home" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Acasă</a></li>
+
+        <!-- Mentenanta -->
+        <li class="dropdown"
+            (mouseenter)="openHoverDropdown('maintenance')"
+            (mouseleave)="closeHoverDropdown('maintenance')">
+          <a class="dropdown-toggle"
+             routerLink="/maintenance"
+             routerLinkActive="active-link">
+            Mentenanță
+            <span class="dropdown-arrow" [class.rotated]="isHoverMenuOpen('maintenance')">▼</span>
+          </a>
+          <ul class="dropdown-menu" [class.show]="isHoverMenuOpen('maintenance')">
+            <li><a routerLink="/maintenance" [queryParams]="{ tab: 'echipamente' }">Echipamente</a></li>
+            <li><a routerLink="/maintenance" [queryParams]="{ tab: 'activitati' }">Activități</a></li>
+          </ul>
+        </li>
+
+        <!-- Testing -->
+        <li class="dropdown"
+            (mouseenter)="openHoverDropdown('testing')"
+            (mouseleave)="closeHoverDropdown('testing')">
+          <a class="dropdown-toggle"
+             routerLink="/testing"
+             routerLinkActive="active-link">
+            Testare
+            <span class="dropdown-arrow" [class.rotated]="isHoverMenuOpen('testing')">▼</span>
+          </a>
+          <ul class="dropdown-menu" [class.show]="isHoverMenuOpen('testing')">
+            <li><a routerLink="/testing" [queryParams]="{ tab: 'pmb_dashboard' }">PMB Dashboard</a></li>
+            <li><a routerLink="/testing" [queryParams]="{ tab: 'pmb_details' }">PMB Detalii</a></li>
+        
+            <li *ngIf="isAdmin"><a routerLink="/ips_monitoring" routerLinkActive="active-link" (click)="closeClickDropdown()">Monitorizare IP</a></li>
+          </ul>
+        </li>
+
+        <!-- Nomenclatura -->
+        <li class="dropdown"
+            (mouseenter)="openHoverDropdown('nomenclature')"
+            (mouseleave)="closeHoverDropdown('nomenclature')">
+          <a class="dropdown-toggle"
+             routerLink="/nomenclature"
+             routerLinkActive="active-link">
+            Nomenclator
+            <span class="dropdown-arrow" [class.rotated]="isHoverMenuOpen('nomenclature')">▼</span>
+          </a>
+          <ul class="dropdown-menu" [class.show]="isHoverMenuOpen('nomenclature')">
+            <li><a routerLink="/nomenclature" [queryParams]="{ tab: 'tip_echipament' }">Tipuri Echipamente</a></li>
+            <li><a routerLink="/nomenclature" [queryParams]="{ tab: 'utilizatori_pmb' }">Responsabili PMB</a></li>
+            <li><a routerLink="/nomenclature" [queryParams]="{ tab: 'grupuri' }">Grupuri Intervenție</a></li>
+            <li><a routerLink="/nomenclature" [queryParams]="{ tab: 'tip_interventie' }">Tipuri Intervenții</a></li>
+            <li><a routerLink="/nomenclature" [queryParams]="{ tab: 'categorie_defect' }">Categorii Defecte</a></li>
+            <li><a routerLink="/nomenclature" [queryParams]="{ tab: 'piese_schimb' }">Piese de Schimb</a></li>
+            <li><a routerLink="/nomenclature" [queryParams]="{ tab: 'operatii' }">Operații</a></li>
+          </ul>
+        </li>
+
+        <!-- Customer Support -->
+        <li class="dropdown"
+            (mouseenter)="openHoverDropdown('customer_support')"
+            (mouseleave)="closeHoverDropdown('customer_support')">
+          <a class="dropdown-toggle"
+             routerLink="/customer_support"
+             routerLinkActive="active-link">
+            Suport
+            <span class="dropdown-arrow" [class.rotated]="isHoverMenuOpen('customer_support')">▼</span>
+          </a>
+          <ul class="dropdown-menu" [class.show]="isHoverMenuOpen('customer_support')">
+            <li><a routerLink="/customer_support" [queryParams]="{ tab: 'tickets' }">Tichete</a></li>
+            <li><a routerLink="/customer_support" [queryParams]="{ tab: 'orders' }">Comenzi</a></li>
+            <li><a routerLink="/customer_support" [queryParams]="{ tab: 'suggestions' }">Sugestii </a></li>
+           
+          </ul>
+        </li>
+      </ul>
+
+      <ul class="nav-right-links">
+        <!-- Language Dropdown (Google Translate) -->
+        <li class="dropdown">
+          <a class="dropdown-toggle"
+             [class.active]="isClickMenuOpen('lang')"
+             (click)="toggleClickDropdown($event, 'lang')">
+            🌐 {{ language.toUpperCase() }}
+            <span class="dropdown-arrow" [class.rotated]="isClickMenuOpen('lang')">▼</span>
+          </a>
+          <ul class="dropdown-menu" [class.show]="isClickMenuOpen('lang')">
+            <li><a (click)="changeLanguage('ro'); closeClickDropdown()">Română</a></li>
+            <li><a (click)="changeLanguage('en'); closeClickDropdown()">English</a></li>
+            <li><a (click)="changeLanguage('fr'); closeClickDropdown()">Français</a></li>
+            <li><a (click)="changeLanguage('de'); closeClickDropdown()">Deutsch</a></li>
+            <li><a (click)="changeLanguage('it'); closeClickDropdown()">Italiano</a></li>
+            <li><a (click)="changeLanguage('es'); closeClickDropdown()">Español</a></li>
+          </ul>
+        </li>
+
+        <!-- Settings Dropdown -->
+        <li class="dropdown">
+          <a class="dropdown-toggle"
+             [class.active]="isClickMenuOpen('settings')"
+             (click)="toggleClickDropdown($event, 'settings')">
+            Setări
+            <span class="dropdown-arrow" [class.rotated]="isClickMenuOpen('settings')">▼</span>
+          </a>
+          <ul class="dropdown-menu" [class.show]="isClickMenuOpen('settings')">
+            <li><a routerLink="/login" routerLinkActive="active-link" (click)="closeClickDropdown()">Login</a></li>
+            <li *ngIf="isAdmin"><a routerLink="/user_management" routerLinkActive="active-link" (click)="closeClickDropdown()">Managementul utilizatorilor</a></li>
+            <li><a routerLink="/account_management" routerLinkActive="active-link" (click)="closeClickDropdown()">Managementul contului</a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="right-section">
+      <div class="version-container">
+        <span class="app-version">v{{ version }}</span>
+        <span class="app-version">Build: {{ buildDate }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <router-outlet></router-outlet>
+</div>

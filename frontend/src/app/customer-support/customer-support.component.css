@@ -1,0 +1,705 @@
+.support-page {
+  padding: 24px;
+  background-color: #f4f5f7;
+  min-height: calc(100vh - 70px);
+  box-sizing: border-box;
+}
+
+.tab-switcher {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid #e0e0e0;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #555;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  color: #fc8403;
+}
+
+.tab-btn.active {
+  color: #fc8403;
+  border-bottom-color: #fc8403;
+}
+
+.tab-content {
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===================== FILTER PANEL — tema Nomenclator (bleumarin) ===================== */
+.filter-panel {
+  background: #ffffff;
+  border: 1px solid #b9c2cc;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.filter-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background: #35424f;
+  border-bottom: 1px solid #26303a;
+  cursor: pointer;
+  user-select: none;
+}
+
+.filter-panel-header h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #f0f2f4;
+  letter-spacing: 0.2px;
+}
+
+.toggle-icon {
+  font-size: 12px;
+  color: #fc8403;
+}
+
+.filter-panel-body {
+  padding: 18px 20px;
+}
+
+/* ---- layout tip aplicatie veche: 3 coloane, checkbox + camp ---- */
+.legacy-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-bottom: 16px;
+}
+
+.legacy-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.legacy-col-highlight {
+  background: #eaf3fb;
+  border: 1px solid #cfe0ee;
+  border-radius: 8px;
+  padding: 12px;
+  gap: 10px;
+}
+
+.legacy-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legacy-chk {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 130px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #35424f;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.legacy-chk input[type="checkbox"] {
+  accent-color: #fc8403;
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+}
+
+.legacy-field input[type="text"],
+.legacy-field input[type="date"],
+.legacy-field input[type="time"],
+.legacy-field select {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid #c3cad1;
+  border-radius: 6px;
+  padding: 6px 9px;
+  font-size: 12.5px;
+  color: #333;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.legacy-field input:focus,
+.legacy-field select:focus {
+  border-color: #fc8403;
+  box-shadow: 0 0 0 3px rgba(252, 132, 3, 0.12);
+}
+
+@media (max-width: 900px) {
+  .legacy-filter-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- filtre generice (Orders / Suggestions / Complaints) ---- */
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px 16px;
+  margin-bottom: 16px;
+}
+
+.f-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.f-field.full {
+  grid-column: 1 / -1;
+}
+
+.f-field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #777;
+}
+
+.f-field input,
+.f-field select,
+.f-field textarea {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-size: 13px;
+  color: #333;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.f-field textarea {
+  min-height: 60px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.f-field input:focus,
+.f-field select:focus,
+.f-field textarea:focus {
+  border-color: #fc8403;
+  box-shadow: 0 0 0 3px rgba(252, 132, 3, 0.12);
+}
+
+/* ---- camp needitabil (Numar / Initiator la tickete) ---- */
+.field-readonly {
+  background: #eceff1 !important;
+  color: #78838c !important;
+  border-color: #d5dade !important;
+  cursor: not-allowed;
+  font-style: italic;
+}
+
+.field-hint {
+  font-size: 10.5px;
+  color: #999;
+  font-style: italic;
+  margin-top: 2px;
+}
+
+.filter-row-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  align-items: center;
+  padding-top: 14px;
+  border-top: 1px dashed #eee;
+}
+
+/* ---- cutii portocalii, pastrate exact ca in poza ---- */
+.stare-box,
+.radio-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: #fff6ec;
+  border: 1px solid #f0d9bd;
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+.stare-label,
+.radio-label {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #b06a00;
+  white-space: nowrap;
+}
+
+.chk,
+.rad {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: #444;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.chk input,
+.rad input {
+  accent-color: #fc8403;
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+}
+
+.inline-date {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 12.5px;
+}
+
+.actions-box {
+  display: flex;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.btn-reset {
+  background: #fff;
+  border: 1px solid #ddd;
+  color: #666;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-reset:hover {
+  border-color: #fc8403;
+  color: #fc8403;
+}
+
+.btn-add {
+  background: #fc8403;
+  border: 1px solid #fc8403;
+  color: #fff;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.btn-add:hover {
+  background: #e07600;
+}
+
+/* ===================== SPLIT PAGE — Sugestii & Reclamații una lângă alta ===================== */
+.split-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.split-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+@media (max-width: 1100px) {
+  .split-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===================== TABLE — tema Nomenclator ===================== */
+.table-card {
+  background: #ffffff;
+  border: 1px solid #b9c2cc;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background: #35424f;
+  border-bottom: 1px solid #26303a;
+}
+
+.table-header h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #f0f2f4;
+  letter-spacing: 0.2px;
+}
+
+.results-count {
+  font-size: 12.5px;
+  color: #c9d1d8;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  max-height: 480px;
+  overflow-y: auto;
+}
+
+.support-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+.support-table thead th {
+  position: sticky;
+  top: 0;
+  background-color: #e4e9ee;
+  color: #33414d;
+  font-weight: 700;
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  text-align: left;
+  padding: 8px 12px;
+  border: 1px solid #c9d1d8;
+  white-space: nowrap;
+}
+
+.support-table tbody td {
+  padding: 8px 12px;
+  border: 1px solid #eaedf0;
+  color: #2a2a2a;
+}
+
+.support-table tbody tr:hover {
+  background-color: #fdeacb;
+}
+
+.denumire-cell {
+  font-weight: 600;
+  color: #111;
+}
+
+.actions-cell {
+  white-space: nowrap;
+  display: flex;
+  gap: 6px;
+}
+
+.btn-icon {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  color: #555;
+  font-size: 13px;
+  transition: all 0.15s ease;
+}
+
+.btn-icon:hover {
+  border-color: #fc8403;
+  color: #fc8403;
+}
+
+.btn-icon.danger:hover {
+  border-color: #c0332f;
+  color: #c0332f;
+}
+
+.no-results {
+  text-align: center;
+  padding: 24px !important;
+  color: #999;
+  font-style: italic;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge-success {
+  background-color: #e3f8ea;
+  color: #1e8e3e;
+}
+
+.badge-warning {
+  background-color: #fff4e0;
+  color: #b06a00;
+}
+
+.badge-info {
+  background-color: #e6f0fd;
+  color: #1a5fc4;
+}
+
+.badge-danger {
+  background-color: #fde8e8;
+  color: #c0332f;
+}
+
+/* ===================== MODAL FORM — tema Nomenclator ===================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-box {
+  background: #fff;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 820px;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  border-bottom: 1px solid #26303a;
+  background: #35424f;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 15px;
+  color: #f0f2f4;
+  text-transform: capitalize;
+}
+
+.modal-header .btn-icon {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #f0f2f4;
+}
+
+.modal-header .btn-icon:hover {
+  border-color: #fc8403;
+  color: #fc8403;
+}
+
+.modal-body {
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px 16px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 20px;
+  border-top: 1px solid #eee;
+  background: #fafafa;
+}
+
+/* Stiluri specifice pentru dropdown-urile de filtrare pe coloane (stil PMB Dashboard) */
+.styled-select-cell {
+  padding: 2px;
+  vertical-align: middle;
+  text-align: center;
+  overflow: visible;
+  background-color: #e4e9ee;
+}
+
+.filter-container {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  padding: 2px;
+  box-sizing: border-box;
+  overflow: visible;
+}
+
+.custom-select-wrapper {
+  position: relative;
+  width: 100%;
+  z-index: 100;
+  overflow: visible;
+}
+
+.custom-select-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 3px 6px;
+  border-radius: 6px;
+  background-color: #fff;
+  cursor: pointer;
+  min-height: 24px;
+  border: 1.5px solid #fc8403;
+  font-size: 11px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.custom-select-display:hover {
+  border-color: #e07600;
+  box-shadow: 0 0 6px rgba(252, 132, 3, 0.25);
+}
+
+.filter-display-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 10.5px;
+  color: #333;
+}
+
+.dropdown-arrow {
+  margin-left: 4px;
+  color: #555;
+  font-size: 9px;
+}
+
+.dropdown-panel {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  width: 200px;
+  background-color: white;
+  border: 2px solid #fc8403;
+  border-radius: 0 0 6px 6px;
+  z-index: 9999;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+  max-height: 300px;
+  overflow-y: auto;
+  text-align: left;
+}
+
+.dropdown-search,
+.dropdown-actions {
+  padding: 6px;
+  border-bottom: 1px solid #eee;
+}
+
+.dropdown-search-input {
+  width: 100%;
+  padding: 5px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
+.dropdown-actions {
+  text-align: right;
+}
+
+.clear-all-btn {
+  padding: 3px 6px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 10px;
+}
+
+.clear-all-btn:hover {
+  background-color: #d32f2f;
+}
+
+.clear-all-btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.dropdown-options-container {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.dropdown-option {
+  display: flex;
+  align-items: center;
+  padding: 5px 8px;
+  cursor: pointer;
+  transition: background-color 0.15s;
+  font-size: 11px;
+}
+
+.dropdown-option:hover {
+  background-color: #f5f5f5;
+}
+
+.dropdown-option.selected {
+  background-color: #fff4e0;
+}
+
+.checkbox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 12px;
+  height: 12px;
+  border: 1px solid #fc8403;
+  border-radius: 2px;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+
+.checkmark {
+  color: #fc8403;
+  font-weight: bold;
+  font-size: 9px;
+}
+
+.option-text {
+  flex: 1;
+  white-space: normal;
+  word-break: break-word;
+  color: #333;
+}

@@ -1,0 +1,101 @@
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+td, th {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+tr:hover {
+  background-color: #ddd;
+}
+
+
+.header {
+  background-color: #5e5851;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  user-select: none;
+}
+
+.header-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}
+
+.sort-indicator {
+  font-size: 12px;
+}
+
+.header:hover {
+  background-color: #4e4841;
+}
+
+
+.column-checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.column-checkboxes input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+  margin-right: 8px;
+  position: relative;
+}
+
+.column-checkboxes input[type="checkbox"]:checked {
+  background-color: #5e5851;
+  border-color: #5e5851;
+}
+
+.checkbox-label {
+  display: inline-flex;
+  align-items: center;
+}
+
+
+.status-dot {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+.green-dot {
+  background-color: green;
+}
+
+.red-dot {
+  background-color: red;
+}
+
+
+.selected-row {
+  background-color: #7caadf !important;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  th, td { font-size: 11px; padding: 4px; }
+}

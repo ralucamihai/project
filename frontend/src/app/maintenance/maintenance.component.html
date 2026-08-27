@@ -1,0 +1,629 @@
+<div class="maintenance-page">
+
+  <!-- Tab switcher -->
+  <div class="tab-switcher">
+    <button class="tab-btn" [class.active]="activeTab === 'echipamente'" (click)="setTab('echipamente')">
+      Echipamente
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'activitati'" (click)="setTab('activitati')">
+      Activități
+    </button>
+  </div>
+
+  <!-- ===================== TAB: ECHIPAMENTE (Partea ta) ===================== -->
+  <div *ngIf="activeTab === 'echipamente'" class="tab-content">
+
+    <div *ngIf="isLoadingEchipamente" class="state-box loading-box">
+      Se încarcă echipamentele...
+    </div>
+
+    <div *ngIf="!isLoadingEchipamente && errorEchipamente" class="state-box error-box">
+      {{ errorEchipamente }}
+      <button class="btn btn-retry" (click)="loadEchipamente()">Reîncearcă</button>
+    </div>
+
+    <div *ngIf="!isLoadingEchipamente && !errorEchipamente" class="panel">
+
+      <div class="panel-title-bar">
+        <span class="panel-title-icon">▤</span>
+        <span>Echipamente</span>
+      </div>
+
+      <div class="panel-toolbar">
+        <div class="search-filters-group">
+          <input type="text" class="search-input" [(ngModel)]="searchNumarEch" placeholder="Caută după nr. inventar...">
+          <input type="text" class="search-input" [(ngModel)]="searchDenumireEch" placeholder="Caută după denumire...">
+          <input type="text" class="search-input" [(ngModel)]="searchTipEch" placeholder="Caută după tip...">
+          <select class="search-input" [(ngModel)]="searchAutonomaEch">
+            <option value="">Autonoma: toate</option>
+            <option *ngFor="let o of autonomaOptions" [value]="o">{{ o }}</option>
+          </select>
+          <input type="text" class="search-input search-input-small" [(ngModel)]="searchPreventivaLunaEch" placeholder="Preventiva: luna (1-12)">
+          <input type="text" class="search-input search-input-small" [(ngModel)]="searchCalibrareLunaEch" placeholder="Calibrare: luna (1-12)">
+          <input type="text" class="search-input" [(ngModel)]="searchESDEch" placeholder="Caută ESD...">
+          <input type="text" class="search-input" [(ngModel)]="searchELSEch" placeholder="Caută ELS...">
+          <input type="text" class="search-input search-input-small" [(ngModel)]="searchBackupLunaEch" placeholder="Backup: luna (1-12)">
+        </div>
+        <button class="btn btn-primary" (click)="openAddFormEch()">+ Adaugă echipament</button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="legacy-table">
+          <thead>
+            <tr>
+              <th class="col-nr">Nr.</th>
+              <th>Nr inventar</th>
+              <th (click)="setSortEch('denumire')">
+                Denumire
+                <span class="sort-arrow" *ngIf="sortKeyEch === 'denumire'">{{ sortAscEch ? '▲' : '▼' }}</span>
+              </th>
+              <th (click)="setSortEch('tipEchipament')">
+                Tip echipament
+                <span class="sort-arrow" *ngIf="sortKeyEch === 'tipEchipament'">{{ sortAscEch ? '▲' : '▼' }}</span>
+              </th>
+              <th>Autonoma</th>
+              <th>Preventiva</th>
+              <th>Calibrare</th>
+              <th>ESD</th>
+              <th>ELS</th>
+              <th>Backup</th>
+              <th (click)="setSortEch('dataReceptie')">
+                Data recepție
+                <span class="sort-arrow" *ngIf="sortKeyEch === 'dataReceptie'">{{ sortAscEch ? '▲' : '▼' }}</span>
+              </th>
+              <th class="col-flag">Activ/Inactiv</th>
+              <th class="col-actions">Acțiuni</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let e of echipamenteFiltrate; let i = index"
+                [class.row-alt]="i % 2 === 1"
+                [class.row-selected]="selectedIndexEch === i"
+                [class.row-inactive]="!e.activ"
+                (click)="selectRowEch(i)"
+                (dblclick)="openEditFormEch(e, i)">
+              <td class="col-nr">{{ i + 1 }}</td>
+              <td>{{ e.numar }}</td>
+              <td class="denumire-cell">{{ e.denumire }}</td>
+              <td>{{ e.tipEchipament }}</td>
+              <td>{{ e.autonoma }}</td>
+              <td>{{ getPeriodDisplay(e, e.preventiva) }}</td>
+              <td>{{ getPeriodDisplay(e, e.calibrare) }}</td>
+              <td>{{ e.controlESD }}</td>
+              <td>{{ e.electrosecuritate }}</td>
+              <td>{{ getPeriodDisplay(e, e.backup) }}</td>
+              <td>{{ e.dataReceptie | date:'dd.MM.yyyy':'UTC' }}</td>
+              <td class="col-flag">
+                <span class="badge" [ngClass]="e.activ ? 'badge-success' : 'badge-danger'">
+                  {{ e.activ ? 'Activ' : 'Inactiv' }}
+                </span>
+              </td>
+              <td class="col-actions">
+                <button class="icon-btn" title="Editează" (click)="openEditFormEch(e, i); $event.stopPropagation()">✏️</button>
+                <button class="icon-btn icon-btn-danger" title="Șterge" (click)="deleteItemEch(e, i); $event.stopPropagation()">🗑️</button>
+              </td>
+            </tr>
+
+            <tr *ngIf="echipamenteFiltrate.length === 0">
+              <td colspan="13" class="empty-state">Nu există echipamente înregistrate.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="panel-bottom-bar">
+        <button class="btn btn-toolbar" (click)="listeazaEch()">Listează</button>
+        <button class="btn btn-toolbar" (click)="salveazaEch()">Salvează</button>
+      </div>
+
+    </div>
+
+    <!-- Modal formular adaugare / editare Echipament -->
+    <div class="modal-overlay" *ngIf="showFormEch" (click)="closeFormEch()">
+      <div class="modal-box modal-box-wide modal-box-no-padding" (click)="$event.stopPropagation()">
+        <div class="modal-header-bar">
+          <span>{{ isEditModeEch ? 'Editează echipament' : 'Adaugă echipament nou' }}</span>
+          <button class="modal-header-close" (click)="closeFormEch()">✕</button>
+        </div>
+
+        <div class="modal-box-content">
+
+        <div class="echipament-form-grid">
+
+          <!-- Coloana 1 -->
+          <div class="echipament-form-col">
+            <div class="echipament-form-col-header">&nbsp;</div>
+            <div class="form-field">
+              <label>Număr inventar echipament</label>
+              <input type="text" [(ngModel)]="formModelEch.numar">
+            </div>
+            <div class="form-field">
+              <label>Denumire</label>
+              <input type="text" [(ngModel)]="formModelEch.denumire" placeholder="ex: Presa hidraulica 3">
+              <span class="period-result period-result-hidden">&nbsp;</span>
+            </div>
+            <div class="form-field">
+              <label>Tip</label>
+              <select [(ngModel)]="formModelEch.tipEchipament">
+                <option value="">Selectează...</option>
+                <option *ngFor="let o of tipEchipamentOptions" [value]="o">{{ o }}</option>
+              </select>
+              <span class="period-result period-result-hidden">&nbsp;</span>
+            </div>
+            <div class="form-field">
+              <label>Secție</label>
+              <select [(ngModel)]="formModelEch.sectie">
+                <option value="">Selectează...</option>
+                <option *ngFor="let o of sectieOptions" [value]="o">{{ o }}</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Linie</label>
+              <select [(ngModel)]="formModelEch.linie">
+                <option value="">Selectează...</option>
+                <option *ngFor="let o of linieOptions" [value]="o">{{ o }}</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Lista oper.</label>
+              <input type="text" [(ngModel)]="formModelEch.listaOper">
+              <span class="period-result period-result-hidden">&nbsp;</span>
+            </div>
+            <div class="form-field">
+              <label>Lista piese</label>
+              <select [(ngModel)]="formModelEch.listaPiese">
+                <option value="">Selectează...</option>
+                <option *ngFor="let o of listaPieseOptions" [value]="o">{{ o }}</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Coloana 2 -->
+          <div class="echipament-form-col">
+            <div class="echipament-form-col-header">&nbsp;</div>
+            <div class="form-field">
+              <label>Autonoma</label>
+              <select [(ngModel)]="formModelEch.autonoma" (ngModelChange)="updateExecutantForAutonoma()">
+                <option *ngFor="let o of autonomaOptions" [value]="o">{{ o }}</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Preventiva</label>
+              <select [(ngModel)]="formModelEch.preventiva">
+                <option *ngFor="let o of periodOptions" [value]="o.value">{{ o.label }}</option>
+              </select>
+              <span class="period-result">{{ getPeriodMonths(formModelEch.preventiva) }}</span>
+            </div>
+            <div class="form-field">
+              <label>Calibrare</label>
+              <select [(ngModel)]="formModelEch.calibrare">
+                <option *ngFor="let o of periodOptions" [value]="o.value">{{ o.label }}</option>
+              </select>
+              <span class="period-result">{{ getPeriodMonths(formModelEch.calibrare) }}</span>
+            </div>
+            <div class="form-field">
+              <label>ESD</label>
+              <input type="text" [(ngModel)]="formModelEch.controlESD">
+            </div>
+            <div class="form-field">
+              <label>ELS</label>
+              <input type="text" [(ngModel)]="formModelEch.electrosecuritate">
+            </div>
+            <div class="form-field">
+              <label>Backup</label>
+              <select [(ngModel)]="formModelEch.backup">
+                <option *ngFor="let o of periodOptions" [value]="o.value">{{ o.label }}</option>
+              </select>
+              <span class="period-result">{{ getPeriodMonths(formModelEch.backup) }}</span>
+            </div>
+            <div class="form-field">
+              <label>IP addr.</label>
+              <input type="text" [(ngModel)]="formModelEch.ipAddr">
+            </div>
+          </div>
+
+          <!-- Coloana 3 -->
+          <div class="echipament-form-col">
+            <div class="echipament-form-col-header">&nbsp;</div>
+            <div class="form-field">
+              <label>Responsabil</label>
+              <input type="text" [ngModel]="formModelEch.executant" disabled>
+            </div>
+            <div class="form-field">
+              <label>Responsabil</label>
+              <select [(ngModel)]="formModelEch.responsabil" [disabled]="isPeriodNA(formModelEch.preventiva)">
+                <option value="">Selectează...</option>
+                <option *ngFor="let o of responsabilOptions" [value]="o">{{ o }}</option>
+              </select>
+              <span class="period-result period-result-hidden">&nbsp;</span>
+            </div>
+            <div class="form-field">
+              <label>Responsabil</label>
+              <select [(ngModel)]="formModelEch.respCalibr" [disabled]="isPeriodNA(formModelEch.calibrare)">
+                <option value="">Selectează...</option>
+                <option *ngFor="let o of respCalibrOptions" [value]="o">{{ o }}</option>
+              </select>
+              <span class="period-result period-result-hidden">&nbsp;</span>
+            </div>
+            <div class="form-field">
+              <label>Responsabil</label>
+              <select [(ngModel)]="formModelEch.respESD" [disabled]="isNA(formModelEch.controlESD)">
+                <option value="">Selectează...</option>
+                <option *ngFor="let o of respESDOptions" [value]="o">{{ o }}</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Responsabil</label>
+              <select [(ngModel)]="formModelEch.respELS" [disabled]="isNA(formModelEch.electrosecuritate)">
+                <option value="">Selectează...</option>
+                <option *ngFor="let o of respELSOptions" [value]="o">{{ o }}</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Responsabil</label>
+              <select [(ngModel)]="formModelEch.respBCK" [disabled]="isPeriodNA(formModelEch.backup)">
+                <option value="">Selectează...</option>
+                <option *ngFor="let o of respBCKOptions" [value]="o">{{ o }}</option>
+              </select>
+              <span class="period-result period-result-hidden">&nbsp;</span>
+            </div>
+            <div class="form-field">
+              <label>Data de recepție</label>
+              <input type="date"
+                     *ngIf="!isEditModeEch"
+                     [(ngModel)]="formModelEch.dataReceptie">
+              <input type="text"
+                     *ngIf="isEditModeEch"
+                     [value]="formModelEch.dataReceptie | date:'dd.MM.yyyy':'UTC'"
+                     disabled>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="form-field form-field-checkbox">
+          <label>
+            <input type="checkbox" [(ngModel)]="formModelEch.activ">
+            Activ
+          </label>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-cancel" (click)="closeFormEch()">Anulează</button>
+          <button class="btn btn-primary" (click)="saveFormEch()">Salvează</button>
+        </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===================== TAB: ACTIVITATI (Sectiunea ta conectata) ===================== -->
+  <div *ngIf="activeTab === 'activitati'" class="tab-content">
+    <div class="panel table-panel-wrap">
+      <div class="panel-title-bar">
+        <span class="panel-title-icon">▤</span>
+        <span>Activități PMB / CBT</span>
+        <span class="results-count">{{ randuriActivitati.length }} rezultate</span>
+      </div>
+
+      <div *ngIf="errorActivitati" class="state-box error-box">
+        {{ errorActivitati }}
+        <button class="btn btn-retry" (click)="loadActivitati()">Reîncearcă</button>
+      </div>
+
+      <div *ngIf="errorTickets" class="state-box error-box">
+        {{ errorTickets }}
+        <button class="btn btn-retry" (click)="loadTickets()">Reîncearcă</button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="legacy-table activitati-grid">
+          <thead>
+            <tr>
+              <!-- 1. Identificare -->
+              <th>Data</th>
+              <th>Ticket</th>
+              <th>Inițiator</th>
+              
+              <!-- 2. Echipament & Locație -->
+              <th>Nr. Inventar</th>
+              <th>Echipament</th>
+              <th>Secție</th>
+              <th>Linie</th>
+              <th>Cod afectat</th>
+              <th>Denumire prod.</th>
+              
+              <!-- 3. Problemă -->
+              <th>Prioritate</th>
+              <th>Tip interv.</th>
+              <th>Simptom / Defect</th>
+              <th>Cauză interv.</th>
+              
+              <!-- 4. Intervenție -->
+              <th>Executant</th>
+              <th>Interval orar</th>
+              <th>Piese înlocuite</th>
+              <th>Explicație</th>
+              <th>Oper. supl.</th>
+              
+              <!-- 5. Status & SLA -->
+              <th>Termen inițiat</th>
+              <th>Termen cerut</th>
+              <th>Status</th>
+              
+              <!-- 6. Validare -->
+              <th>Validat ca</th>
+              <th>Validat de</th>
+              <th>Expl. valid.</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="isLoadingActivitati || isLoadingTickets">
+              <td colspan="24" class="empty-state">Se încarcă...</td>
+            </tr>
+
+            <tr *ngFor="let r of randuriActivitati; let i = index; trackBy: trackByRowId"
+                [class.row-alt]="i % 2 === 1"
+                [class.row-from-ticket]="r.sursaTicket"
+                [class.row-active]="rowSelectat?.rowId === r.rowId"
+                class="row-clickable unselectable"
+                (click)="onRowClick(r)"
+                (dblclick)="onRowDblClick(r)"
+                title="Dublu-click pentru detalii">
+                
+              <!-- Identificare -->
+              <td>{{ r.data | date:'yyyy-MM-dd' }}</td>
+              <td class="denumire-cell">{{ r.ticket }}</td>
+              <td>{{ r.initiator }}</td>
+              
+              <!-- Echipament & Locație -->
+              <td>{{ r.tipEchipament }}</td>
+              <td>{{ r.echipa }}</td>
+              <td>{{ r.sectie }}</td>
+              <td>{{ r.linie }}</td>
+              <td class="cell-pmb">{{ r.codAfectat }}</td>
+              <td>{{ r.denumireProdus }}</td>
+              
+              <!-- Problemă -->
+              <td><span [ngClass]="prioritateClass(r.prioritate)">{{ r.prioritate }}</span></td>
+              <td>{{ r.tipInterventie }}</td>
+              <td>{{ r.descriereSimptom }}</td>
+              <td>{{ r.cauzaInterventie }}</td>
+              
+              <!-- Intervenție -->
+              <td>{{ r.responsabil }}</td>
+              <td style="white-space: nowrap;">
+                <span *ngIf="r.deLaOra || r.panaLaOra">{{ r.deLaOra || '--:--' }} - {{ r.panaLaOra || '--:--' }}</span>
+              </td>
+              <td>{{ r.piese }}</td>
+              <td>{{ r.explicatie }}</td>
+              <td>{{ r.operSupl }}</td>
+              
+              <!-- Status & SLA -->
+              <td>{{ formatOra(r.termenInitiat) }}</td>
+              <td>{{ r.termenCerut }}</td>
+              <td><span [ngClass]="statusClassActivitati(r.status)">{{ r.status }}</span></td>
+              
+              <!-- Validare -->
+              <td>{{ r.validatCa }}</td>
+              <td>{{ r.validatDe }}</td>
+              <td>{{ r.explValid }}</td>
+            </tr>
+
+            <tr *ngIf="!isLoadingActivitati && !isLoadingTickets && randuriActivitati.length === 0">
+              <td colspan="24" class="empty-state">
+                Nu există activități sau tickete de afișat.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== POPUP-URI: TICKET + DETALII ===================== -->
+  <div class="modal-overlay-v2" *ngIf="showTicketPopup || showDetaliiPopup" (click)="closeAllPopups()">
+    <div class="modal-pair-wrap" (click)="$event.stopPropagation()">
+
+      <!-- POPUP 1: EDITARE TICKET / ACTIVITATE -->
+      <div class="modal-box-v2" *ngIf="showTicketPopup && randEdit">
+        <div class="modal-header-v2">
+          <span>Detalii rând{{ rowSelectat?.codAfectat ? ' - PMB ' + rowSelectat?.codAfectat : '' }}</span>
+          <button type="button" class="modal-close-v2" (click)="closeTicketPopup()">✕</button>
+        </div>
+
+        <div class="modal-body-v2">
+          
+          <!-- CÂMPURI NEMODIFICABILE (Disabled) -->
+          <div class="field-v2">
+            <label>Data (Read-only)</label>
+            <input type="date" [(ngModel)]="randEdit.data" disabled style="background-color: #e9ecef; color: #6c757d; font-weight: bold; border-color: #d5d9dd; cursor: not-allowed;">
+          </div>
+
+          <div class="field-v2">
+            <label>Ticket (Read-only)</label>
+            <input type="text" [(ngModel)]="randEdit.ticket" disabled style="background-color: #e9ecef; color: #6c757d; font-weight: bold; border-color: #d5d9dd; cursor: not-allowed;">
+          </div>
+
+          <div class="field-v2">
+            <label>Inițiator (Read-only)</label>
+            <input type="text" [(ngModel)]="randEdit.initiator" disabled style="background-color: #e9ecef; color: #6c757d; font-weight: bold; border-color: #d5d9dd; cursor: not-allowed;">
+          </div>
+
+          <div class="field-v2">
+            <label>Echipament</label>
+            <input type="text" [(ngModel)]="randEdit.echipa" placeholder="Introdu echipamentul...">
+          </div>
+
+          <div class="field-v2">
+            <label>Secție</label>
+            <input type="text" [(ngModel)]="randEdit.sectie" placeholder="Introdu secția...">
+          </div>
+
+          <div class="field-v2">
+            <label>Linie</label>
+            <input type="text" [(ngModel)]="randEdit.linie" placeholder="Introdu linia...">
+          </div>
+
+          <div class="field-v2">
+            <label>Cod afectat</label>
+            <input type="text" [(ngModel)]="randEdit.codAfectat" placeholder="Introdu codul afectat...">
+          </div>
+
+          
+          <!-- ================================== -->
+
+          <!-- CÂMPURI MODIFICABILE CU AUTOCOMPLETARE CONECTATA -->
+          <div class="field-v2">
+            <label>Nr. Inventar Echipament</label>
+            <input type="text" [(ngModel)]="randEdit.tipEchipament" (input)="onTipEchipamentChange()" placeholder="Tastați Nr. Inventar...">
+          </div>
+
+          <div class="field-v2">
+            <label>Tip Interv.</label>
+            <select [(ngModel)]="randEdit.tipInterventie">
+              <option value="">-- Alege --</option>
+              <option *ngFor="let ti of tipuriInterventie" [value]="ti">{{ ti }}</option>
+            </select>
+          </div>
+
+          <div class="field-v2">
+            <label>Grup Intervenție</label>
+            <select [(ngModel)]="randEdit.grup" (change)="onGrupChange()">
+              <option value="">-- Alege grupul --</option>
+              <option *ngFor="let g of grupOptions" [value]="g">{{ g | uppercase }}</option>
+            </select>
+          </div>
+
+          <div class="field-v2" *ngIf="randEdit.grup">
+            <label>Responsabil / Executant</label>
+            <select [(ngModel)]="randEdit.responsabil" style="border-color: #fc8403; border-width: 2px;">
+              <option value="">-- Alege membrul --</option>
+              <option *ngFor="let om of responsabiliCurenti" [value]="om">{{ om }}</option>
+            </select>
+          </div>
+          
+          <div class="field-v2" *ngIf="!randEdit.grup">
+            <label>Responsabil / Executant</label>
+            <input type="text" [(ngModel)]="randEdit.responsabil" placeholder="Selectează întâi un grup...">
+          </div>
+
+          <div class="field-v2">
+            <label>Descr. simptom</label>
+            <input type="text" [(ngModel)]="randEdit.descriereSimptom">
+          </div>
+
+          <div class="field-v2">
+            <label>Denumire produs</label>
+            <input type="text" [(ngModel)]="randEdit.denumireProdus">
+          </div>
+
+          <div class="field-v2">
+            <label>Prioritate</label>
+            <select [(ngModel)]="randEdit.prioritate">
+              <option *ngFor="let p of ticketPrioritateOptions" [value]="p">{{ p }}</option>
+            </select>
+          </div>
+          <div class="field-v2">
+            <label>Termen inițiat (Read-only)</label>
+            <input type="text" [value]="formatOra(randEdit.termenInitiat)" disabled style="background-color: #e9ecef; color: #6c757d; font-weight: bold; border-color: #d5d9dd; cursor: not-allowed;">
+          </div>
+
+          <div class="field-v2">
+            <label>Termen cerut</label>
+            <input type="time" step="1" [(ngModel)]="randEdit.termenCerut">
+          </div>
+        </div>
+
+        <div class="modal-footer-v2">
+          <button type="button" class="btn btn-cancel" (click)="closeTicketPopup()">Anulează</button>
+          <button type="button" class="btn btn-primary" [disabled]="isSavingTicket" (click)="saveTicket()">
+            {{ isSavingTicket ? 'Se salvează...' : 'Salvează' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- POPUP 2: DETALII SUPLIMENTARE (Mentenanta) -->
+      <div class="modal-box-v2 modal-box-v2-narrow" *ngIf="showDetaliiPopup && detaliiEdit && randEdit">
+        <div class="modal-header-v2">
+          <span>Detalii suplimentare</span>
+          <button type="button" class="modal-close-v2" (click)="closeDetaliiPopup()">✕</button>
+        </div>
+
+        <div class="modal-body-v2 modal-body-v2-narrow">
+          
+          <!-- MUTAT AICI DIN PRIMUL POPUP -->
+          <div class="field-v2">
+            <label style="color: #fc8403;">Status Ticket/Interv.</label>
+            <select [(ngModel)]="randEdit.status" style="border: 2px solid #fc8403; font-weight: bold;">
+              <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
+            </select>
+          </div>
+          <!-- ============================ -->
+
+          <div class="field-v2">
+            <label>Piese înlocuite</label>
+            <input type="text" [(ngModel)]="detaliiEdit.piese">
+          </div>
+
+          <div class="field-v2">
+            <label>De la oră</label>
+            <input type="time" [(ngModel)]="detaliiEdit.deLaOra">
+          </div>
+
+          <div class="field-v2">
+            <label>Până la oră</label>
+            <input type="time" [(ngModel)]="detaliiEdit.panaLaOra">
+          </div>
+
+          <div class="field-v2">
+            <label>Cauza interv.</label>
+            <select [(ngModel)]="detaliiEdit.cauzaInterventie">
+              <option value="">Toate</option>
+              <option *ngFor="let c of cauzaInterventieOptions" [value]="c">{{ c }}</option>
+            </select>
+          </div>
+
+          <div class="field-v2">
+            <label>Explicație</label>
+            <input type="text" [(ngModel)]="detaliiEdit.explicatie">
+          </div>
+
+          <div class="field-v2">
+            <label>Oper. supl.</label>
+            <input type="text" [(ngModel)]="detaliiEdit.operSupl">
+          </div>
+
+          <div class="field-v2">
+            <label>Validat de</label>
+            <input type="text" [(ngModel)]="detaliiEdit.validatDe">
+          </div>
+
+          <div class="field-v2">
+            <label>Validat ca</label>
+            <select [(ngModel)]="detaliiEdit.validatCa">
+              <option value="">Toate</option>
+              <option *ngFor="let v of validatCaOptions" [value]="v">{{ v }}</option>
+            </select>
+          </div>
+
+          <div class="field-v2">
+            <label>Expl. valid.</label>
+            <input type="text" [(ngModel)]="detaliiEdit.explValid">
+          </div>
+        </div>
+
+        <div class="modal-footer-v2">
+          <button type="button" class="btn btn-cancel" (click)="closeDetaliiPopup()">Anulează</button>
+          <button type="button" class="btn btn-primary" [disabled]="isSavingDetalii" (click)="saveDetalii()">
+            {{ isSavingDetalii ? 'Se salvează...' : 'Salvează' }}
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
