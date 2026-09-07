@@ -36,13 +36,19 @@ export class AppComponent {
         this.currentRoute = event.urlAfterRedirects;
       });
 
-    this.api_caller.getUser().subscribe(response => {
-      if (response["role"] === "Admin") {
-        this.isAdmin = true;
+    // Reacționează instant la login/logout fără să mai fie nevoie de refresh
+    this.api_caller.currentUser$.subscribe(user => {
+      if (user && user.role) {
+        this.isAdmin = user.role.toLowerCase() === 'admin';
       } else {
         this.isAdmin = false;
       }
     });
+
+    // Inițializează utilizatorul la prima deschidere / refresh dacă există token
+    if (this.api_caller.getToken()) {
+      this.api_caller.getUser().subscribe();
+    }
   }
 
   getEnvironmentVersion() {

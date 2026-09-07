@@ -42,6 +42,24 @@ export interface Order {
   dataComanda: string;
   termenData: string;
   termenOra: string;
+  // ---- Câmpuri noi, formular extins "Comenzi autoutilare" (coloanele 2 și 3 din formular) ----
+  centruCost?: string;
+  nrInventar?: string;
+  descriere?: string;
+  desenDoc?: string;
+  termenSolicitat?: string;
+  prioritateNumar?: number;
+  receptie?: string;
+  dataRec?: string;
+  user?: string;
+  aprobatDeviz?: string;
+  documentatie?: string;
+  materiale?: string;
+  disponibilitate?: string;
+  deviz?: string;
+  executant?: string;
+  timpExecutie?: string;
+  termenConfirmat?: string;
 }
 
 export interface Sugestie {
@@ -54,6 +72,7 @@ export interface Sugestie {
   prioritate: string;
   initiator: string;
   sectie: string;
+  linie: string;
   locatie: string;
   responsabil: string;
   kpi: string;
@@ -71,6 +90,7 @@ export interface Reclamatie {
   status: string;
   initiator: string;
   sectie: string;
+  linie: string;
   locatie: string;
   responsabil: string;
   cauzaInterventie: string;

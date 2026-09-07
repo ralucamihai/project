@@ -1,6 +1,6 @@
-from datetime import datetime
+from datetime import datetime, date
 from datetime import time as dtime
-from typing import Optional
+from typing import Optional, Union
 
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -16,18 +16,48 @@ from customer_support.models import Ticket, Order, Suggestion, Complaint
 class TicketCreate(BaseModel):
     echipa: Optional[str] = None
     tipInterventie: Optional[str] = None
+    grup: Optional[str] = None
+    responsabil: Optional[str] = None
     descriereSimptom: Optional[str] = None
     sectie: Optional[str] = None
     linie: Optional[str] = None
     codAfectat: Optional[str] = None
     denumireProdus: Optional[str] = None
     prioritate: Optional[str] = None
-    # AICI ERA PROBLEMA: Python astepta 'dtime' (doar ora). Acum accepta 'datetime' (data+ora)
     termenCerut: Optional[datetime] = None  
     status: Optional[str] = "Deschis"
 
 
 class TicketUpdate(TicketCreate):
+    id: int
+
+
+class OrderCreate(BaseModel):
+    numarComanda: Optional[str] = None
+    dataComanda: Optional[Union[date, str]] = None
+    sectie: Optional[str] = None
+    centruCost: Optional[str] = None
+    nrInventar: Optional[str] = None
+    descriere: Optional[str] = None
+    cantitate: Optional[int] = 1
+    desenDoc: Optional[str] = None
+    termenSolicitat: Optional[Union[date, str]] = None
+    prioritateNumar: Optional[int] = 1
+    receptie: Optional[str] = None
+    dataRec: Optional[Union[date, str]] = None
+    user: Optional[str] = None
+    aprobatDeviz: Optional[str] = None
+    documentatie: Optional[str] = None
+    materiale: Optional[str] = None
+    disponibilitate: Optional[str] = None
+    deviz: Optional[str] = None
+    executant: Optional[str] = None
+    timpExecutie: Optional[str] = None
+    status: Optional[str] = "In procesare"
+    termenConfirmat: Optional[str] = None
+
+
+class OrderUpdate(OrderCreate):
     id: int
 
 
@@ -41,11 +71,18 @@ def _iso_time(t):
     return t.strftime("%H:%M") if t else None
 
 
-def _iso_time_full(t):
-    return t.strftime("%H:%M:%S") if t else None
+def _parse_date(val):
+    if not val or val == "":
+        return None
+    if isinstance(val, date):
+        return val
+    try:
+        return datetime.strptime(str(val)[:10], "%Y-%m-%d").date()
+    except Exception:
+        return None
 
 
-# ---- Serializare: rând DB (snake_case) -> dict (camelCase, exact ca in Angular) ----
+# ---- Serializare: rând DB (snake_case) -> dict (camelCase, conform Angular) ----
 
 def serialize_ticket(t: Ticket):
     return {
@@ -53,6 +90,8 @@ def serialize_ticket(t: Ticket):
         "initiator": t.initiator,
         "echipa": t.echipa,
         "tipInterventie": t.tip_interventie,
+        "grup": t.grup,
+        "responsabil": t.responsabil,
         "descriereSimptom": t.descriere_simptom,
         "sectie": t.sectie,
         "linie": t.linie,
@@ -60,7 +99,6 @@ def serialize_ticket(t: Ticket):
         "denumireProdus": t.denumire_produs,
         "prioritate": t.prioritate,
         "termenInitiat": t.termen_initiat.isoformat() if t.termen_initiat else None,
-        # Acum trimitem data intreaga inapoi la frontend, nu doar ora
         "termenCerut": t.termen_cerut.isoformat() if t.termen_cerut else None, 
         "status": t.status,
     }
@@ -69,31 +107,28 @@ def serialize_ticket(t: Ticket):
 def serialize_order(o: Order):
     return {
         "id": o.id,
-        "numarComanda": o.numar_comanda,
-        "client": o.client,
-        "produs": o.produs,
-        "cantitate": o.cantitate,
-        "status": o.status,
+        "numarComanda": o.numar_comanda or "",
         "dataComanda": _iso_date(o.data_comanda),
-
-        "categorieProdus": o.categorie_produs,
-        "furnizor": o.furnizor,
-        "prioritate": o.prioritate,
-
-        "numarIntern": o.numar_intern,
-        "initiator": o.initiator,
-        "sectie": o.sectie,
-        "linie": o.linie,
-        "locatie": o.locatie,
-        "responsabil": o.responsabil,
-        "cauzaInterventie": o.cauza_interventie,
-        "explicatie": o.explicatie,
-        "operatiiSuplimentare": o.operatii_suplimentare,
-        "termenData": _iso_date(o.termen_data),
-        "termenOra": _iso_time(o.termen_ora),
-        "kpi": o.kpi,
-        "deLaOra": _iso_time(o.de_la_ora),
-        "panaLaOra": _iso_time(o.pana_la_ora),
+        "sectie": o.sectie or "",
+        "centruCost": o.centru_cost or "",
+        "nrInventar": o.nr_inventar or "",
+        "descriere": o.descriere or "",
+        "cantitate": o.cantitate or 1,
+        "desenDoc": o.desen_doc or "",
+        "termenSolicitat": _iso_date(o.termen_solicitat),
+        "prioritateNumar": o.prioritate_numar or 1,
+        "receptie": o.receptie or "",
+        "dataRec": _iso_date(o.data_rec),
+        "user": o.user or "",
+        "aprobatDeviz": o.aprobat_deviz or "",
+        "documentatie": o.documentatie or "",
+        "materiale": o.materiale or "",
+        "disponibilitate": o.disponibilitate or "",
+        "deviz": o.deviz or "",
+        "executant": o.executant or "",
+        "timpExecutie": o.timp_executie or "",
+        "status": o.status or "In procesare",
+        "termenConfirmat": o.termen_confirmat or "",
     }
 
 
@@ -106,9 +141,7 @@ def serialize_suggestion(s: Suggestion):
         "categorie": s.categorie,
         "status": s.status,
         "dataTrimitere": _iso_date(s.data_trimitere),
-
         "prioritate": s.prioritate,
-
         "numarIntern": s.numar_intern,
         "initiator": s.initiator,
         "sectie": s.sectie,
@@ -135,7 +168,6 @@ def serialize_complaint(c: Complaint):
         "severitate": c.severitate,
         "status": c.status,
         "dataTrimitere": _iso_date(c.data_trimitere),
-
         "numarIntern": c.numar_intern,
         "initiator": c.initiator,
         "sectie": c.sectie,
@@ -171,6 +203,8 @@ def create_ticket(db: Session, payload: TicketCreate, initiator: str, termen_ini
             initiator=initiator,
             echipa=payload.echipa,
             tip_interventie=payload.tipInterventie,
+            grup=payload.grup,
+            responsabil=payload.responsabil,
             descriere_simptom=payload.descriereSimptom,
             sectie=payload.sectie,
             linie=payload.linie,
@@ -192,9 +226,10 @@ def update_ticket(db: Session, payload: TicketUpdate):
     if not obj:
         return None
 
-    # initiator si termen_initiat NU se modifica niciodata la update.
     obj.echipa = payload.echipa
     obj.tip_interventie = payload.tipInterventie
+    obj.grup = payload.grup
+    obj.responsabil = payload.responsabil
     obj.descriere_simptom = payload.descriereSimptom
     obj.sectie = payload.sectie
     obj.linie = payload.linie
@@ -224,20 +259,37 @@ def get_all_orders(db: Session):
     return [serialize_order(o) for o in db.query(Order).order_by(Order.id.desc()).all()]
 
 
-def create_order(db: Session, payload):
+def create_order(db: Session, payload: OrderCreate, current_username: str = None):
+    numar_comanda = payload.numarComanda
+    if not numar_comanda or numar_comanda.strip() == "":
+        count_orders = db.query(Order).count() + 1
+        numar_comanda = f"CMD-{datetime.now().year}-{count_orders:03d}"
+
+    data_cmd = _parse_date(payload.dataComanda) or date.today()
+
     obj = Order(
-        numar_comanda=payload.numarComanda, client=payload.client, produs=payload.produs,
-        cantitate=payload.cantitate, status=payload.status, data_comanda=payload.dataComanda,
-
-        categorie_produs=payload.categorieProdus, furnizor=payload.furnizor,
-        prioritate=payload.prioritate,
-
-        numar_intern=payload.numarIntern, initiator=payload.initiator,
-        sectie=payload.sectie, linie=payload.linie, locatie=payload.locatie,
-        responsabil=payload.responsabil, cauza_interventie=payload.cauzaInterventie,
-        explicatie=payload.explicatie, operatii_suplimentare=payload.operatiiSuplimentare,
-        termen_data=payload.termenData, termen_ora=payload.termenOra, kpi=payload.kpi,
-        de_la_ora=payload.deLaOra, pana_la_ora=payload.panaLaOra,
+        numar_comanda=numar_comanda,
+        data_comanda=data_cmd,
+        sectie=payload.sectie,
+        centru_cost=payload.centruCost,
+        nr_inventar=payload.nrInventar,
+        descriere=payload.descriere,
+        cantitate=payload.cantitate or 1,
+        desen_doc=payload.desenDoc,
+        termen_solicitat=_parse_date(payload.termenSolicitat),
+        prioritate_numar=payload.prioritateNumar or 1,
+        receptie=payload.receptie,
+        data_rec=_parse_date(payload.dataRec),
+        user=payload.user or current_username,
+        aprobat_deviz=payload.aprobatDeviz,
+        documentatie=payload.documentatie,
+        materiale=payload.materiale,
+        disponibilitate=payload.disponibilitate,
+        deviz=payload.deviz,
+        executant=payload.executant,
+        timp_executie=payload.timpExecutie,
+        status=payload.status or "In procesare",
+        termen_confirmat=payload.termenConfirmat,
     )
     db.add(obj)
     db.commit()
@@ -245,35 +297,38 @@ def create_order(db: Session, payload):
     return serialize_order(obj)
 
 
-def update_order(db: Session, payload):
+def update_order(db: Session, payload: OrderUpdate):
     obj = db.query(Order).filter(Order.id == payload.id).first()
     if not obj:
         return None
-    obj.numar_comanda = payload.numarComanda
-    obj.client = payload.client
-    obj.produs = payload.produs
-    obj.cantitate = payload.cantitate
-    obj.status = payload.status
-    obj.data_comanda = payload.dataComanda
 
-    obj.categorie_produs = payload.categorieProdus
-    obj.furnizor = payload.furnizor
-    obj.prioritate = payload.prioritate
+    if payload.numarComanda:
+        obj.numar_comanda = payload.numarComanda
+    if payload.dataComanda:
+        obj.data_comanda = _parse_date(payload.dataComanda)
 
-    obj.numar_intern = payload.numarIntern
-    obj.initiator = payload.initiator
     obj.sectie = payload.sectie
-    obj.linie = payload.linie
-    obj.locatie = payload.locatie
-    obj.responsabil = payload.responsabil
-    obj.cauza_interventie = payload.cauzaInterventie
-    obj.explicatie = payload.explicatie
-    obj.operatii_suplimentare = payload.operatiiSuplimentare
-    obj.termen_data = payload.termenData
-    obj.termen_ora = payload.termenOra
-    obj.kpi = payload.kpi
-    obj.de_la_ora = payload.deLaOra
-    obj.pana_la_ora = payload.panaLaOra
+    obj.centru_cost = payload.centruCost
+    obj.nr_inventar = payload.nrInventar
+    obj.descriere = payload.descriere
+    obj.cantitate = payload.cantitate or 1
+    obj.desen_doc = payload.desenDoc
+    obj.termen_solicitat = _parse_date(payload.termenSolicitat)
+    obj.prioritate_numar = payload.prioritateNumar or 1
+    obj.receptie = payload.receptie
+    obj.data_rec = _parse_date(payload.dataRec)
+    obj.aprobat_deviz = payload.aprobatDeviz
+    obj.documentatie = payload.documentatie
+    obj.materiale = payload.materiale
+    obj.disponibilitate = payload.disponibilitate
+    obj.deviz = payload.deviz
+    obj.executant = payload.executant
+    obj.timp_executie = payload.timpExecutie
+    obj.status = payload.status or "In procesare"
+    obj.termen_confirmat = payload.termenConfirmat
+
+    if payload.user:
+        obj.user = payload.user
 
     db.commit()
     db.refresh(obj)
@@ -299,9 +354,7 @@ def create_suggestion(db: Session, payload):
     obj = Suggestion(
         titlu=payload.titlu, descriere=payload.descriere, autor=payload.autor,
         categorie=payload.categorie, status=payload.status, data_trimitere=payload.dataTrimitere,
-
         prioritate=payload.prioritate,
-
         numar_intern=payload.numarIntern, initiator=payload.initiator,
         sectie=payload.sectie, linie=payload.linie, locatie=payload.locatie,
         responsabil=payload.responsabil, cauza_interventie=payload.cauzaInterventie,
@@ -325,9 +378,7 @@ def update_suggestion(db: Session, payload):
     obj.categorie = payload.categorie
     obj.status = payload.status
     obj.data_trimitere = payload.dataTrimitere
-
     obj.prioritate = payload.prioritate
-
     obj.numar_intern = payload.numarIntern
     obj.initiator = payload.initiator
     obj.sectie = payload.sectie
@@ -367,7 +418,6 @@ def create_complaint(db: Session, payload):
     obj = Complaint(
         titlu=payload.titlu, descriere=payload.descriere, client=payload.client,
         severitate=payload.severitate, status=payload.status, data_trimitere=payload.dataTrimitere,
-
         numar_intern=payload.numarIntern, initiator=payload.initiator,
         sectie=payload.sectie, linie=payload.linie, locatie=payload.locatie,
         responsabil=payload.responsabil, cauza_interventie=payload.cauzaInterventie,
@@ -391,7 +441,6 @@ def update_complaint(db: Session, payload):
     obj.severitate = payload.severitate
     obj.status = payload.status
     obj.data_trimitere = payload.dataTrimitere
-
     obj.numar_intern = payload.numarIntern
     obj.initiator = payload.initiator
     obj.sectie = payload.sectie

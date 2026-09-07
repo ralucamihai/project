@@ -23,6 +23,18 @@ export class RegisterComponent {
     { name: 'Editor', value: 'Editare' },
     { name: 'Admin', value: 'Admin' }
   ];
+
+  departamente = [
+    'Administrativ',
+    'Aprovizionare',
+    'Calitate',
+    'Clădiri',
+    'Depozit',
+    'Logistic',
+    'Mentenanță',
+    'Producție',
+    'Tehnic'
+  ];
   
   constructor(private fb: FormBuilder, private router: Router, private api_caller: ApiCallerService) {
     this.registerForm = this.fb.group({
@@ -31,6 +43,7 @@ export class RegisterComponent {
       username: [{ value: '', disabled: true }, Validators.required],
       email: ['', [Validators.required, Validators.email, this.steinelEmailValidator]],
       numarMarca: ['', [Validators.required, Validators.pattern(/^[0-9]+$/)]],
+      departament: ['', Validators.required],
       rol: this.fb.array([], Validators.required),
       parola: ['', [Validators.required, Validators.minLength(6)]],
       confirmareParola: ['', Validators.required],
@@ -123,9 +136,9 @@ export class RegisterComponent {
       this.error = '';
 
       const formValues = this.registerForm.getRawValue();
-      const { nume, prenume, username, parola, email, numarMarca, rol } = formValues;
+      const { nume, prenume, username, parola, email, numarMarca, departament, rol } = formValues;
 
-      this.api_caller.register(nume, prenume, username, parola, email, numarMarca, rol[0]).subscribe({
+      this.api_caller.register(nume, prenume, username, parola, email, numarMarca, departament, rol[0]).subscribe({
         next: () => {
           this.error = '';
           this.router.navigate(['/login']);

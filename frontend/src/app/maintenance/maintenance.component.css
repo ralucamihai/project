@@ -114,7 +114,26 @@
   letter-spacing: 0.2px;
 }
 .panel-title-icon { font-size: 12px; opacity: 0.8; }
-.results-count { margin-left: auto; font-size: 11.5px; font-weight: 500; color: #cfd6dc; }
+.results-count { margin-left: 12px; font-size: 11.5px; font-weight: 500; color: #cfd6dc; }
+
+/* ---- Buton adăugare activitate pe bara albastră ---- */
+.btn-header-add-activitate {
+  background-color: #fc8403;
+  color: #ffffff;
+  border: 1px solid #fc8403;
+  padding: 4px 12px;
+  font-size: 11.5px;
+  font-weight: 600;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 15px;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+.btn-header-add-activitate:hover {
+  background-color: #e07600;
+  border-color: #e07600;
+}
 
 /* Toolbar specific echipamente */
 .panel-toolbar {
@@ -154,7 +173,7 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 12px;
-  table-layout: fixed; /* Pentru echipamente, celulele au marimi fixe si textul care depaseste se taie */
+  table-layout: fixed;
 }
 .legacy-table thead th {
   position: sticky;
@@ -227,12 +246,12 @@
 
 /* -------- OVERRIDE PENTRU GRILA DE ACTIVITATI (Rânduri Subțiri) -------- */
 .legacy-table.activitati-grid {
-  table-layout: auto; /* Lăsăm tabelul să se adapteze la conținut */
+  table-layout: auto;
   font-size: 12px !important;
 }
 
 .legacy-table.activitati-grid thead th {
-  padding: 5px 8px !important; /* Padding redus */
+  padding: 5px 8px !important;
   white-space: nowrap;
   overflow: visible;
   text-overflow: clip;
@@ -243,8 +262,8 @@
 }
 
 .legacy-table.activitati-grid tbody td {
-  padding: 4px 8px !important; /* PADDING FOARTE REDUS PENTRU RÂNDURI SUBȚIRI */
-  white-space: normal !important; /* Textul are voie sa coboare pe alt rand */
+  padding: 4px 8px !important;
+  white-space: normal !important;
   overflow: visible;
   text-overflow: clip;
   vertical-align: middle;

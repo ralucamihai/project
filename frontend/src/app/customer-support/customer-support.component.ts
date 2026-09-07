@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import {
   CustomerSupportService,
@@ -20,7 +20,7 @@ type Limita = '100' | '500' | '1000' | 'ALL';
   styleUrl: './customer-support.component.css',
   standalone: false
 })
-export class CustomerSupportComponent implements OnInit {
+export class CustomerSupportComponent implements OnInit, OnDestroy {
 
   activeTab: string = 'tickets';
 
@@ -44,6 +44,8 @@ export class CustomerSupportComponent implements OnInit {
 
   grupuriMunca: GrupMunca[] = [];
   isLoadingGrupuri: boolean = false;
+
+  clockInterval: any;
 
   get grupOptions(): string[] {
     return this.grupuriMunca.map(g => g.grup);
@@ -84,11 +86,23 @@ export class CustomerSupportComponent implements OnInit {
   ticketFilteredOptions: Record<string, any[]> = {};
   ticketShowDropdown: Record<string, boolean> = {};
 
+  ticketSortColumn: string = 'id';
+  ticketSortDirection: 'asc' | 'desc' = 'asc';
+
   ticketDisplayedColumns: string[] = [
     'id', 'initiator', 'echipa', 'tipInterventie', 'grup', 'responsabil', 
     'descriereSimptom', 'sectie', 'linie', 'codAfectat', 'denumireProdus', 
     'prioritate', 'status'
   ];
+
+  sortTicketsBy(column: string) {
+    if (this.ticketSortColumn === column) {
+      this.ticketSortDirection = this.ticketSortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.ticketSortColumn = column;
+      this.ticketSortDirection = 'asc';
+    }
+  }
 
   getTicketUniqueValues(column: string): any[] {
     return Array.from(
@@ -154,18 +168,20 @@ export class CustomerSupportComponent implements OnInit {
   }
 
   onTipEchipamentChange() {
+    if (!this.formModel) return;
     const inventarTastat = this.formModel.tipEchipament?.trim();
-    const echipamentGasit = this.echipamenteFizice.find((e: any) => e.inventar === inventarTastat);
+    const echipamentGasit = this.echipamenteFizice.find((e: any) => e.inventar.toLowerCase() === inventarTastat?.toLowerCase());
 
     if (echipamentGasit) {
       this.formModel.echipa = echipamentGasit.nume;
       this.formModel.sectie = echipamentGasit.sectie;
       this.formModel.linie = echipamentGasit.linie;
       this.formModel.codAfectat = echipamentGasit.codAfectat;
-    } else {
+    } else if (!inventarTastat) {
       this.formModel.echipa = '';
       this.formModel.sectie = '';
       this.formModel.linie = '';
+      this.formModel.codAfectat = '';
     }
   }
 
@@ -186,6 +202,30 @@ export class CustomerSupportComponent implements OnInit {
 
   orderStatusOptions = ['In procesare', 'Expediat', 'Livrat', 'Anulat'];
   orderCategorieProdusOptions = ['Componente', 'Consumabile', 'Echipamente', 'Altele'];
+  orderReceptieOptions: string[] = ['Aprobat', 'Refuzat', 'În așteptare'];
+  orderSectieOptions: string[] = [
+    'Activitate productie', 'Senzori si lampi', 'Sectia 1 - direct productie', 'Sectia 1 - indirect productie', 
+    'Sectia 1 - CQW', 'Sectia 1 - personal auxiliar', 'Sectia 1 - personal TESA', 'LP - electronica', 
+    'Sectia LP SEHO 1 - direct productie', 'Sectia LP SEHO 2 - direct productie', 'Sectia 2 - indirect productie', 
+    'Sectia 2 - CQW', 'Sectia 2 - personal auxiliar', 'Sectia 2 - personal TESA', 'Tools', 'Sectia HL', 
+    'Sectia 3 - direct productie', 'Sectia 3 - indirect productie', 'Sectia 3 - CQW', 'Sectia 3 - personal auxiliar', 
+    'Sectia 3 - personal TESA', 'Solutions', 'Sectia 5 - direct productie', 'Sectia 5 - indirect productie', 
+    'Sectia 5 - CQW', 'Sectia 5 - personal auxiliar', 'Sectia 5 - personal TESA', 'Tampo', 'Tampo - direct productie', 
+    'Atelier - SMT', 'SMT - direct productie', 'Atelier lite', 'Lite - direct productie', 'Atelier lacuire', 
+    'Lacuire - direct productie', 'Etichete', 'Alte activitati productive', 'Auxiliare', 'Alte categorii'
+  ];
+
+  orderSortColumn: string = '';
+  orderSortDirection: 'asc' | 'desc' = 'asc';
+
+  sortOrdersBy(column: string) {
+    if (this.orderSortColumn === column) {
+      this.orderSortDirection = this.orderSortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.orderSortColumn = column;
+      this.orderSortDirection = 'asc';
+    }
+  }
 
   sugestieStatusOptions = ['Nou', 'In analiză', 'Acceptat', 'Respins'];
   sugestieCategorieOptions = ['Funcționalitate', 'UI/UX', 'Performanță', 'Altele'];
@@ -217,9 +257,8 @@ export class CustomerSupportComponent implements OnInit {
   };
 
   orderFiltre = {
-    search: '', categorieProdus: '', sectie: '', linie: '', locatie: '', responsabil: '',
-    initiator: '', kpi: '', perioada: 'Total' as Perioada, laData: '', limita: '100' as Limita,
-    stare: { 'In procesare': true, Expediat: true, Livrat: true, Anulat: false } as Record<string, boolean>
+    descriere: '', sectie: '', centruCost: '', nrInventar: '',
+    perioada: 'Total' as Perioada, laData: '', limita: 'ALL' as Limita
   };
 
   sugestieFiltre = {
@@ -243,6 +282,11 @@ export class CustomerSupportComponent implements OnInit {
   isLoading: boolean = false;
   errorMessage: string | null = null;
 
+  selectedTicketIndex: number | null = null;
+  selectedOrderIndex: number | null = null;
+  selectedSuggestionIndex: number | null = null;
+  selectedComplaintIndex: number | null = null;
+
   constructor(
     private route: ActivatedRoute,
     private supportService: CustomerSupportService,
@@ -263,6 +307,12 @@ export class CustomerSupportComponent implements OnInit {
     });
     this.loadAll();
     this.loadGrupuriMunca();
+  }
+
+  ngOnDestroy(): void {
+    if (this.clockInterval) {
+      clearInterval(this.clockInterval);
+    }
   }
 
   loadAll() {
@@ -290,6 +340,10 @@ export class CustomerSupportComponent implements OnInit {
 
   setTab(tab: string) {
     this.activeTab = tab;
+    this.selectedTicketIndex = null;
+    this.selectedOrderIndex = null;
+    this.selectedSuggestionIndex = null;
+    this.selectedComplaintIndex = null;
   }
 
   toggleAdvanced(tab: string) {
@@ -344,28 +398,27 @@ export class CustomerSupportComponent implements OnInit {
       this.matchField(item, f, 'kpi');
   }
 
-  // --- Funcția de afișare corectă pentru Dată și Oră ---
   formatDataOra(iso: string | undefined): string {
     if (!iso) return '';
     const d = new Date(iso);
-    if (isNaN(d.getTime())) return iso; // Daca e invalid, il lasa asa
+    if (isNaN(d.getTime())) return iso;
     const data = d.toLocaleDateString('ro-RO', { day: '2-digit', month: '2-digit', year: 'numeric' });
     const ora = d.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     return `${data} ${ora}`;
   }
 
   get nextTicketId(): number {
-    const usedIds = new Set(this.tickets.map(t => (t as any).id));
-    let n = 1;
-    while (usedIds.has(n)) n++;
-    return n;
+    const numere = this.tickets
+      .map(t => parseInt(String((t as any).id), 10))
+      .filter(n => !isNaN(n));
+    return numere.length > 0 ? Math.max(...numere) + 1 : 1;
   }
 
   get ticketsFiltrate(): Ticket[] {
     const term = this.ticketFiltre.search.trim().toLowerCase();
     const doarDeschise = this.ticketFiltre.doarDeschise;
     
-    return this.tickets.filter(t => {
+    let rezultat = this.tickets.filter(t => {
       const tAny = t as any;
       
       if (doarDeschise && tAny.status !== 'Deschis') {
@@ -403,17 +456,50 @@ export class CustomerSupportComponent implements OnInit {
 
       return true;
     });
+
+    if (this.ticketSortColumn) {
+      const col = this.ticketSortColumn;
+      const dir = this.ticketSortDirection === 'asc' ? 1 : -1;
+      rezultat = [...rezultat].sort((a: any, b: any) => {
+        const av = a[col];
+        const bv = b[col];
+        if (av == null && bv == null) return 0;
+        if (av == null) return -1 * dir;
+        if (bv == null) return 1 * dir;
+        if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * dir;
+        return String(av).localeCompare(String(bv), undefined, { numeric: true, sensitivity: 'base' }) * dir;
+      });
+    }
+
+    return rezultat;
   }
+  
   get ordersFiltrate(): Order[] {
     const f = this.orderFiltre;
-    const term = f.search.trim().toLowerCase();
-    const rezultat = this.orders.filter(o =>
-      (!term || o.numarComanda.toLowerCase().includes(term) || o.client.toLowerCase().includes(term)) &&
-      (!f.categorieProdus || o.categorieProdus === f.categorieProdus) &&
-      (f.stare[o.status] !== false) &&
-      this.inPerioada(o.dataComanda, f.perioada, f.laData) &&
-      this.matchCommon(o, f)
-    );
+    const termDesc = f.descriere.trim().toLowerCase();
+    let rezultat = this.orders.filter(o => {
+      const oAny = o as any;
+      return (!termDesc || (oAny.descriere || '').toLowerCase().includes(termDesc)) &&
+        (!f.sectie || oAny.sectie === f.sectie) &&
+        (!f.centruCost || (oAny.centruCost || '').toLowerCase().includes(f.centruCost.trim().toLowerCase())) &&
+        (!f.nrInventar || (oAny.nrInventar || '').toLowerCase().includes(f.nrInventar.trim().toLowerCase())) &&
+        this.inPerioada(o.dataComanda, f.perioada, f.laData);
+    });
+
+    if (this.orderSortColumn) {
+      const col = this.orderSortColumn;
+      const dir = this.orderSortDirection === 'asc' ? 1 : -1;
+      rezultat = [...rezultat].sort((a: any, b: any) => {
+        const av = a[col];
+        const bv = b[col];
+        if (av == null && bv == null) return 0;
+        if (av == null) return -1 * dir;
+        if (bv == null) return 1 * dir;
+        if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * dir;
+        return String(av).localeCompare(String(bv), undefined, { numeric: true, sensitivity: 'base' }) * dir;
+      });
+    }
+
     return this.applyLimita(rezultat, f.limita);
   }
 
@@ -445,12 +531,16 @@ export class CustomerSupportComponent implements OnInit {
 
   resetFiltre() {
     this.ticketFiltre = { search: '', limita: 'ALL', doarDeschise: false };
+    this.ticketSortColumn = 'id';
+    this.ticketSortDirection = 'asc';
 
     this.orderFiltre = {
-      search: '', categorieProdus: '', sectie: '', linie: '', locatie: '', responsabil: '',
-      initiator: '', kpi: '', perioada: 'Total', laData: '', limita: '100',
-      stare: { 'In procesare': true, Expediat: true, Livrat: true, Anulat: false }
+      descriere: '', sectie: '', centruCost: '', nrInventar: '',
+      perioada: 'Total', laData: '', limita: 'ALL'
     };
+    this.orderSortColumn = '';
+    this.orderSortDirection = 'asc';
+    
     this.sugestieFiltre = {
       search: '', categorie: '', sectie: '', linie: '', locatie: '', responsabil: '',
       initiator: '', kpi: '', perioada: 'Total', laData: '', limita: '100',
@@ -463,6 +553,18 @@ export class CustomerSupportComponent implements OnInit {
     };
   }
 
+  selectRow(entity: 'tickets' | 'orders' | 'suggestions' | 'complaints', index: number) {
+    if (entity === 'tickets') {
+      this.selectedTicketIndex = this.selectedTicketIndex === index ? null : index;
+    } else if (entity === 'orders') {
+      this.selectedOrderIndex = this.selectedOrderIndex === index ? null : index;
+    } else if (entity === 'suggestions') {
+      this.selectedSuggestionIndex = this.selectedSuggestionIndex === index ? null : index;
+    } else if (entity === 'complaints') {
+      this.selectedComplaintIndex = this.selectedComplaintIndex === index ? null : index;
+    }
+  }
+
   openAddForm(entity: 'tickets' | 'orders' | 'suggestions' | 'complaints') {
     this.formEntity = entity;
     this.isEditMode = false;
@@ -470,8 +572,10 @@ export class CustomerSupportComponent implements OnInit {
     const nowTime = new Date().toTimeString().slice(0, 5);
 
     if (entity === 'tickets') {
-      let tzOffset = (new Date()).getTimezoneOffset() * 60000;
-      let localISOTime = (new Date(Date.now() - tzOffset)).toISOString().slice(0, 19);
+      const setTime = () => {
+        let tzOffset = (new Date()).getTimezoneOffset() * 60000;
+        this.formModel.termenInitiat = (new Date(Date.now() - tzOffset)).toISOString().slice(0, 19);
+      };
 
       this.formModel = {
         id: null,
@@ -487,16 +591,40 @@ export class CustomerSupportComponent implements OnInit {
         codAfectat: '',
         denumireProdus: '',
         prioritate: 'Medie',
-        termenInitiat: localISOTime,
-        termenCerut: '', // resetăm vizual ca să fie curat
+        termenInitiat: '', 
+        termenCerut: null,
         status: 'Deschis'
       };
+
+      setTime();
+      this.clockInterval = setInterval(() => {
+        setTime();
+      }, 1000);
+
     } else if (entity === 'orders') {
       this.formModel = {
-        numarComanda: '', client: '', produs: '', cantitate: 1, status: 'In procesare', dataComanda: today,
-        categorieProdus: '', furnizor: '', prioritate: 'Medie', numarIntern: '', initiator: '',
-        sectie: '', linie: '', locatie: '', responsabil: '', cauzaInterventie: '', explicatie: '',
-        operatiiSuplimentare: '', termenData: today, termenOra: nowTime, kpi: '', deLaOra: nowTime, panaLaOra: nowTime
+        numarComanda: '',
+        dataComanda: today,
+        sectie: '',
+        centruCost: '',
+        nrInventar: '',
+        descriere: '',
+        cantitate: 1,
+        desenDoc: '',
+        termenSolicitat: today,
+        prioritateNumar: 1,
+        receptie: '',
+        dataRec: '',
+        user: this.currentUsername,
+        aprobatDeviz: '',
+        documentatie: '',
+        materiale: '',
+        disponibilitate: '',
+        deviz: '',
+        executant: '',
+        timpExecutie: '',
+        status: this.orderStatusOptions[0],
+        termenConfirmat: ''
       };
     } else if (entity === 'suggestions') {
       this.formModel = {
@@ -534,48 +662,56 @@ export class CustomerSupportComponent implements OnInit {
 
   closeForm() {
     this.showForm = false;
+    if (this.clockInterval) {
+      clearInterval(this.clockInterval);
+    }
   }
 
   saveForm() {
+    if (this.clockInterval) {
+      clearInterval(this.clockInterval);
+    }
+
     let payloadToSave = { ...this.formModel };
 
     if (this.formEntity === 'tickets') {
-      // Validare de bază
       if (!payloadToSave.descriereSimptom || payloadToSave.descriereSimptom.trim() === '') {
         alert('Te rog completează "Descr. Simptom"! Fără el nu poți salva.');
         return; 
       }
       
-      // Curățăm câmpul dacă e lăsat gol, ca să nu respingă Python
+      if (!this.isEditMode) {
+        let tzOffset = (new Date()).getTimezoneOffset() * 60000;
+        payloadToSave.termenInitiat = (new Date(Date.now() - tzOffset)).toISOString().slice(0, 19);
+      }
+
       if (!payloadToSave.termenCerut || payloadToSave.termenCerut === '') {
-        delete payloadToSave.termenCerut;
+        payloadToSave.termenCerut = null;
+      } else {
+        const d = new Date(payloadToSave.termenCerut);
+        if (!isNaN(d.getTime())) {
+          payloadToSave.termenCerut = d.toISOString();
+        }
       }
     }
 
-    const onDone = () => { this.loadAll(); this.closeForm(); };
+    const onDone = () => { 
+      this.loadAll(); 
+      this.closeForm(); 
+    };
 
-    // ==========================================
-    // CAPTURAREA DETALIATĂ A ERORII 422
-    // ==========================================
     const onError = (err: any) => { 
       console.error(err); 
       let msg = 'Eroare la salvare.';
-      
-      // Dacă backend-ul trimite detalii de validare (Pydantic), le extragem și le afișăm
       if (err.error && err.error.detail) {
         msg = 'Baza de date a respins informația deoarece un câmp este incorect:\n\n';
         msg += JSON.stringify(err.error.detail, null, 2);
-      } else {
-        msg += '\n(Nu există detalii în eroare, verifică terminalul cu Uvicorn)';
       }
-      
       alert(msg); 
     };
 
     if (this.formEntity === 'tickets') {
-      // Tăiem câmpurile pe care Python oricum le generează automat (id, initiator, termenInitiat)
-      // ca să nu declanșăm vreo protecție "extra inputs are not permitted"
-      const { id, initiator, termenInitiat, ...payloadForCreate } = payloadToSave;
+      const { id, initiator, ...payloadForCreate } = payloadToSave;
 
       if (this.isEditMode) {
         this.supportService.updateTicket(payloadToSave).subscribe({ next: onDone, error: onError });
@@ -584,24 +720,68 @@ export class CustomerSupportComponent implements OnInit {
       }
 
     } else if (this.formEntity === 'orders') {
-      const obs = this.isEditMode ? this.supportService.updateOrder(this.formModel) : this.supportService.createOrder(this.formModel);
+      const obs = this.isEditMode 
+        ? this.supportService.updateOrder(payloadToSave) 
+        : this.supportService.createOrder(payloadToSave);
       obs.subscribe({ next: onDone, error: onError });
     } else if (this.formEntity === 'suggestions') {
-      const obs = this.isEditMode ? this.supportService.updateSuggestion(this.formModel) : this.supportService.createSuggestion(this.formModel);
+      const obs = this.isEditMode 
+        ? this.supportService.updateSuggestion(payloadToSave) 
+        : this.supportService.createSuggestion(payloadToSave);
       obs.subscribe({ next: onDone, error: onError });
     } else if (this.formEntity === 'complaints') {
-      const obs = this.isEditMode ? this.supportService.updateComplaint(this.formModel) : this.supportService.createComplaint(this.formModel);
+      const obs = this.isEditMode 
+        ? this.supportService.updateComplaint(payloadToSave) 
+        : this.supportService.createComplaint(payloadToSave);
       obs.subscribe({ next: onDone, error: onError });
     }
   }
 
   deleteItem(entity: 'tickets' | 'orders' | 'suggestions' | 'complaints', id: number) {
-    if (!confirm('Sigur vrei să ștergi această înregistrare?')) return;
+    const mesaj = entity === 'tickets' 
+      ? `Sigur vrei să ștergi ticketul #${id}? Toate tichetele următoare vor fi decrementate cu -1 pentru a umple golul.`
+      : 'Sigur vrei să ștergi această înregistrare?';
+
+    if (!confirm(mesaj)) return;
 
     const onDone = () => this.loadAll();
-    const onError = (err: any) => { console.error(err); alert('Eroare la ștergere.'); };
+    const onError = (err: any) => {
+      console.error('Eroare la ștergere:', err);
+      const detalii = err?.error?.detail || err?.message || 'Eroare necunoscută';
+      alert(`Ștergerea a eșuat:\n\n${detalii}`);
+    };
 
-    if (entity === 'tickets') this.supportService.deleteTicket(id).subscribe({ next: onDone, error: onError });
+    if (entity === 'tickets') {
+      this.supportService.deleteTicket(id).subscribe({
+        next: () => {
+          const deActualizat = this.tickets.filter(t => (t as any).id > id);
+          
+          if (deActualizat.length === 0) {
+            this.loadAll();
+            return;
+          }
+
+          let procesate = 0;
+          deActualizat.forEach(t => {
+            const nouTicketId = (t as any).id - 1;
+            const payload = { ...t, id: nouTicketId };
+            
+            this.supportService.updateTicket(payload).subscribe({
+              next: () => {
+                procesate++;
+                if (procesate === deActualizat.length) this.loadAll();
+              },
+              error: (err) => {
+                console.error(`Eroare la decrementare ticket ${(t as any).id}:`, err);
+                procesate++;
+                if (procesate === deActualizat.length) this.loadAll();
+              }
+            });
+          });
+        },
+        error: onError
+      });
+    }
     else if (entity === 'orders') this.supportService.deleteOrder(id).subscribe({ next: onDone, error: onError });
     else if (entity === 'suggestions') this.supportService.deleteSuggestion(id).subscribe({ next: onDone, error: onError });
     else if (entity === 'complaints') this.supportService.deleteComplaint(id).subscribe({ next: onDone, error: onError });

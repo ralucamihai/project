@@ -10,7 +10,7 @@
     </button>
   </div>
 
-  <!-- ===================== TAB: ECHIPAMENTE (Partea ta) ===================== -->
+  <!-- ===================== TAB: ECHIPAMENTE ===================== -->
   <div *ngIf="activeTab === 'echipamente'" class="tab-content">
 
     <div *ngIf="isLoadingEchipamente" class="state-box loading-box">
@@ -27,6 +27,7 @@
       <div class="panel-title-bar">
         <span class="panel-title-icon">▤</span>
         <span>Echipamente</span>
+        <button class="btn btn-primary" (click)="openAddFormEch()">+ Adaugă echipament</button>
       </div>
 
       <div class="panel-toolbar">
@@ -44,7 +45,7 @@
           <input type="text" class="search-input" [(ngModel)]="searchELSEch" placeholder="Caută ELS...">
           <input type="text" class="search-input search-input-small" [(ngModel)]="searchBackupLunaEch" placeholder="Backup: luna (1-12)">
         </div>
-        <button class="btn btn-primary" (click)="openAddFormEch()">+ Adaugă echipament</button>
+        
       </div>
 
       <div class="table-wrap">
@@ -53,11 +54,11 @@
             <tr>
               <th class="col-nr">Nr.</th>
               <th>Nr inventar</th>
-              <th (click)="setSortEch('denumire')">
+              <th (click)="setSortEch('denumire')" style="cursor: pointer;">
                 Denumire
                 <span class="sort-arrow" *ngIf="sortKeyEch === 'denumire'">{{ sortAscEch ? '▲' : '▼' }}</span>
               </th>
-              <th (click)="setSortEch('tipEchipament')">
+              <th (click)="setSortEch('tipEchipament')" style="cursor: pointer;">
                 Tip echipament
                 <span class="sort-arrow" *ngIf="sortKeyEch === 'tipEchipament'">{{ sortAscEch ? '▲' : '▼' }}</span>
               </th>
@@ -67,7 +68,7 @@
               <th>ESD</th>
               <th>ELS</th>
               <th>Backup</th>
-              <th (click)="setSortEch('dataReceptie')">
+              <th (click)="setSortEch('dataReceptie')" style="cursor: pointer;">
                 Data recepție
                 <span class="sort-arrow" *ngIf="sortKeyEch === 'dataReceptie'">{{ sortAscEch ? '▲' : '▼' }}</span>
               </th>
@@ -144,7 +145,7 @@
             </div>
             <div class="form-field">
               <label>Tip</label>
-              <select [(ngModel)]="formModelEch.tipEchipament">
+              <select [(ngModel)]="formModelEch.tipEchipament" (ngModelChange)="aplicaSablonNomenclator()">
                 <option value="">Selectează...</option>
                 <option *ngFor="let o of tipEchipamentOptions" [value]="o">{{ o }}</option>
               </select>
@@ -299,12 +300,16 @@
 
   </div>
 
-  <!-- ===================== TAB: ACTIVITATI (Sectiunea ta conectata) ===================== -->
+  <!-- ===================== TAB: ACTIVITATI ===================== -->
   <div *ngIf="activeTab === 'activitati'" class="tab-content">
     <div class="panel table-panel-wrap">
+      
+      <!-- BARA ALBASTRĂ CU BUTOANELE DE ADAUGARE ȘI ELIMINARE -->
       <div class="panel-title-bar">
         <span class="panel-title-icon">▤</span>
         <span>Activități PMB / CBT</span>
+        <button class="btn-header-add-activitate" (click)="openAddActivitateForm()">+ Adaugă activitate</button>
+        <button class="btn-header-delete-activitate" [disabled]="!rowSelectat" (click)="deleteSelectedActivitate()">Elimină activitate</button>
         <span class="results-count">{{ randuriActivitati.length }} rezultate</span>
       </div>
 
@@ -322,38 +327,27 @@
         <table class="legacy-table activitati-grid">
           <thead>
             <tr>
-              <!-- 1. Identificare -->
-              <th>Data</th>
-              <th>Ticket</th>
+              <th style="cursor: pointer;" (click)="sortActivitatiBy('data')">Data {{ activitatiSortColumn === 'data' ? (activitatiSortDirection === 'asc' ? '▲' : '▼') : '' }}</th>
+              <th style="cursor: pointer;" (click)="sortActivitatiBy('ticket')">Ticket {{ activitatiSortColumn === 'ticket' ? (activitatiSortDirection === 'asc' ? '▲' : '▼') : '' }}</th>
               <th>Inițiator</th>
-              
-              <!-- 2. Echipament & Locație -->
               <th>Nr. Inventar</th>
               <th>Echipament</th>
               <th>Secție</th>
               <th>Linie</th>
               <th>Cod afectat</th>
               <th>Denumire prod.</th>
-              
-              <!-- 3. Problemă -->
               <th>Prioritate</th>
               <th>Tip interv.</th>
               <th>Simptom / Defect</th>
               <th>Cauză interv.</th>
-              
-              <!-- 4. Intervenție -->
               <th>Executant</th>
               <th>Interval orar</th>
               <th>Piese înlocuite</th>
               <th>Explicație</th>
               <th>Oper. supl.</th>
-              
-              <!-- 5. Status & SLA -->
               <th>Termen inițiat</th>
               <th>Termen cerut</th>
               <th>Status</th>
-              
-              <!-- 6. Validare -->
               <th>Validat ca</th>
               <th>Validat de</th>
               <th>Expl. valid.</th>
@@ -373,26 +367,19 @@
                 (dblclick)="onRowDblClick(r)"
                 title="Dublu-click pentru detalii">
                 
-              <!-- Identificare -->
               <td>{{ r.data | date:'yyyy-MM-dd' }}</td>
               <td class="denumire-cell">{{ r.ticket }}</td>
               <td>{{ r.initiator }}</td>
-              
-              <!-- Echipament & Locație -->
               <td>{{ r.tipEchipament }}</td>
               <td>{{ r.echipa }}</td>
               <td>{{ r.sectie }}</td>
               <td>{{ r.linie }}</td>
               <td class="cell-pmb">{{ r.codAfectat }}</td>
               <td>{{ r.denumireProdus }}</td>
-              
-              <!-- Problemă -->
               <td><span [ngClass]="prioritateClass(r.prioritate)">{{ r.prioritate }}</span></td>
               <td>{{ r.tipInterventie }}</td>
               <td>{{ r.descriereSimptom }}</td>
               <td>{{ r.cauzaInterventie }}</td>
-              
-              <!-- Intervenție -->
               <td>{{ r.responsabil }}</td>
               <td style="white-space: nowrap;">
                 <span *ngIf="r.deLaOra || r.panaLaOra">{{ r.deLaOra || '--:--' }} - {{ r.panaLaOra || '--:--' }}</span>
@@ -400,13 +387,9 @@
               <td>{{ r.piese }}</td>
               <td>{{ r.explicatie }}</td>
               <td>{{ r.operSupl }}</td>
-              
-              <!-- Status & SLA -->
               <td>{{ formatOra(r.termenInitiat) }}</td>
-              <td>{{ r.termenCerut }}</td>
+              <td>{{ formatOra(r.termenCerut) }}</td>
               <td><span [ngClass]="statusClassActivitati(r.status)">{{ r.status }}</span></td>
-              
-              <!-- Validare -->
               <td>{{ r.validatCa }}</td>
               <td>{{ r.validatDe }}</td>
               <td>{{ r.explValid }}</td>
@@ -436,7 +419,6 @@
 
         <div class="modal-body-v2">
           
-          <!-- CÂMPURI NEMODIFICABILE (Disabled) -->
           <div class="field-v2">
             <label>Data (Read-only)</label>
             <input type="date" [(ngModel)]="randEdit.data" disabled style="background-color: #e9ecef; color: #6c757d; font-weight: bold; border-color: #d5d9dd; cursor: not-allowed;">
@@ -472,10 +454,6 @@
             <input type="text" [(ngModel)]="randEdit.codAfectat" placeholder="Introdu codul afectat...">
           </div>
 
-          
-          <!-- ================================== -->
-
-          <!-- CÂMPURI MODIFICABILE CU AUTOCOMPLETARE CONECTATA -->
           <div class="field-v2">
             <label>Nr. Inventar Echipament</label>
             <input type="text" [(ngModel)]="randEdit.tipEchipament" (input)="onTipEchipamentChange()" placeholder="Tastați Nr. Inventar...">
@@ -554,14 +532,12 @@
 
         <div class="modal-body-v2 modal-body-v2-narrow">
           
-          <!-- MUTAT AICI DIN PRIMUL POPUP -->
           <div class="field-v2">
             <label style="color: #fc8403;">Status Ticket/Interv.</label>
             <select [(ngModel)]="randEdit.status" style="border: 2px solid #fc8403; font-weight: bold;">
               <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
             </select>
           </div>
-          <!-- ============================ -->
 
           <div class="field-v2">
             <label>Piese înlocuite</label>
@@ -610,7 +586,7 @@
           </div>
 
           <div class="field-v2">
-            <label>Expl. valid.</label>
+            <label>Deviz/Expl. valid.</label>
             <input type="text" [(ngModel)]="detaliiEdit.explValid">
           </div>
         </div>

@@ -10,10 +10,14 @@ export class ApiCallerService {
   private apiUrl = environment.apiUrlIP;
   private loggedIn = new BehaviorSubject<boolean>(!!this.getToken());
 
+  // Subject pentru utilizatorul curent logat (reține datele și rolul)
+  private currentUserSubject = new BehaviorSubject<any>(null);
+  public currentUser$ = this.currentUserSubject.asObservable();
+
   constructor(private http: HttpClient) { }
 
-  register(firstName: string, lastName: string, username: string, password: string, email:string, employeeNo:string, role: string): Observable<any> {
-    const body = {firstName, lastName, username, password, email, employeeNo, role};
+  register(firstName: string, lastName: string, username: string, password: string, email:string, employeeNo:string, department: string, role: string): Observable<any> {
+    const body = {firstName, lastName, username, password, email, employeeNo, department, role};
     return this.http.post(`${this.apiUrl}/register`, body);
   }
 
@@ -34,11 +38,14 @@ export class ApiCallerService {
           localStorage.setItem(environment.accessTokenKey, res.access_token);
           localStorage.setItem(environment.usernameKey, username);
           this.loggedIn.next(true);
+
+          // Preluăm datele utilizatorului imediat după login pentru a actualiza rolul fără refresh
+          this.getUser().subscribe();
         }
       })
     );
-    
   }
+
   // --- Metodă nouă pentru sincronizarea util. aprobat în Nomenclator PMB ---
   saveOperatorPmb(operatorData: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/nomenclature/utilizatori_pmb`, operatorData);
@@ -63,6 +70,7 @@ export class ApiCallerService {
     localStorage.removeItem(environment.accessTokenKey);
     localStorage.removeItem(environment.usernameKey);
     this.loggedIn.next(false);
+    this.currentUserSubject.next(null);
   }
 
   getToken(): string | null {
@@ -77,8 +85,15 @@ export class ApiCallerService {
     return this.loggedIn.asObservable();
   }
 
+  // Actualizează automat currentUserSubject de fiecare dată când este cerut utilizatorul
   getUser(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/user`);
+    return this.http.get(`${this.apiUrl}/user`).pipe(
+      tap(user => this.currentUserSubject.next(user)),
+      catchError(err => {
+        this.currentUserSubject.next(null);
+        return of(null);
+      })
+    );
   }
 
   getAllUsers(): Observable<any> {
@@ -147,7 +162,6 @@ export class ApiCallerService {
     .pipe(
       catchError(error => {
         console.error('Error fetching guide text:', error);
-        // Return default text instead of error
         return of(`Bine ai venit pe site!
           Pentru a naviga, folosește meniul de sus.
           Poți reseta parola sau administra contul folosind butoanele din secțiunea principală.

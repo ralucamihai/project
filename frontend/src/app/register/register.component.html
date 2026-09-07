@@ -10,13 +10,6 @@
   </div>
 </div>
 
-<!-- <div class="language-section">
-  <select class="language-selector" (change)="changeLanguage($event)">
-    <option value="ro" [selected]="language === 'ro'">RO</option>
-    <option value="en" [selected]="language === 'en'">EN</option>
-  </select>
-</div> -->
-
 <div class="page-container">
   <div class="login-container">
     <div class="card shadow text-center login-card">
@@ -32,22 +25,18 @@
           <div class="mb-3">
             <label for="nume" class="form-label">Last Name</label>
             <input type="text" formControlName="nume" id="nume" class="form-control" required>
-            <div *ngIf="(registerForm.get('nume')?.touched || submitted) && registerForm.get('nume')?.invalid"
-              class="error-message">
+            <div *ngIf="(registerForm.get('nume')?.touched || submitted) && registerForm.get('nume')?.invalid" class="error-message">
               <div *ngIf="registerForm.get('nume')?.errors?.['required']">Last name is required.</div>
-              <div *ngIf="registerForm.get('nume')?.errors?.['pattern']">Last name cannot contain numbers or special
-                characters.</div>
+              <div *ngIf="registerForm.get('nume')?.errors?.['pattern']">Last name cannot contain numbers or special characters.</div>
             </div>
           </div>
 
           <div class="mb-3">
             <label for="prenume" class="form-label">First Name</label>
             <input type="text" formControlName="prenume" id="prenume" class="form-control" required>
-            <div *ngIf="(registerForm.get('prenume')?.touched || submitted) && registerForm.get('prenume')?.invalid"
-              class="error-message">
+            <div *ngIf="(registerForm.get('prenume')?.touched || submitted) && registerForm.get('prenume')?.invalid" class="error-message">
               <div *ngIf="registerForm.get('prenume')?.errors?.['required']">First name is required.</div>
-              <div *ngIf="registerForm.get('prenume')?.errors?.['pattern']">First name cannot contain numbers or special
-                characters.</div>
+              <div *ngIf="registerForm.get('prenume')?.errors?.['pattern']">First name cannot contain numbers or special characters.</div>
             </div>
           </div>
 
@@ -59,19 +48,13 @@
           <div class="mb-3">
             <label for="email" class="form-label">Email</label>
             <input type="email" formControlName="email" id="email" class="form-control" required>
-            <div
-              *ngIf="(registerForm.get('email')?.touched || submitted) && registerForm.get('email')?.errors?.['invalidSteinelEmail']"
-              class="error-message">
+            <div *ngIf="(registerForm.get('email')?.touched || submitted) && registerForm.get('email')?.errors?.['invalidSteinelEmail']" class="error-message">
               Please enter a valid email address ending with &#64;steinel.ro.
             </div>
-            <div
-              *ngIf="(registerForm.get('email')?.touched || submitted) && registerForm.get('email')?.errors?.['required']"
-              class="error-message">
+            <div *ngIf="(registerForm.get('email')?.touched || submitted) && registerForm.get('email')?.errors?.['required']" class="error-message">
               Email is required.
             </div>
-            <div
-              *ngIf="(registerForm.get('email')?.touched || submitted) && registerForm.get('email')?.errors?.['email']"
-              class="error-message">
+            <div *ngIf="(registerForm.get('email')?.touched || submitted) && registerForm.get('email')?.errors?.['email']" class="error-message">
               Email is not valid.
             </div>
           </div>
@@ -79,12 +62,21 @@
           <div class="mb-3">
             <label for="numarMarca" class="form-label">Employee ID</label>
             <input type="text" formControlName="numarMarca" id="numarMarca" class="form-control" required>
-            <div
-              *ngIf="(registerForm.get('numarMarca')?.touched || submitted) && registerForm.get('numarMarca')?.invalid"
-              class="error-message">
+            <div *ngIf="(registerForm.get('numarMarca')?.touched || submitted) && registerForm.get('numarMarca')?.invalid" class="error-message">
               <div *ngIf="registerForm.get('numarMarca')?.errors?.['required']">Employee ID is required.</div>
-              <div *ngIf="registerForm.get('numarMarca')?.errors?.['pattern']">Employee ID must contain only numbers.
-              </div>
+              <div *ngIf="registerForm.get('numarMarca')?.errors?.['pattern']">Employee ID must contain only numbers.</div>
+            </div>
+          </div>
+
+          <!-- CÂMP NOU PENTRU DEPARTAMENT -->
+          <div class="mb-3">
+            <label for="departament" class="form-label">Department</label>
+            <select formControlName="departament" id="departament" class="form-control" required>
+              <option value="" disabled selected>Select department...</option>
+              <option *ngFor="let dep of departamente" [value]="dep">{{ dep }}</option>
+            </select>
+            <div *ngIf="(registerForm.get('departament')?.touched || submitted) && registerForm.get('departament')?.invalid" class="error-message">
+              <div *ngIf="registerForm.get('departament')?.errors?.['required']">Department is required.</div>
             </div>
           </div>
 
@@ -105,21 +97,16 @@
           <div class="mb-3">
             <label for="parola" class="form-label">Password</label>
             <input type="password" formControlName="parola" id="parola" class="form-control" required>
-            <div *ngIf="(registerForm.get('parola')?.touched || submitted) && registerForm.get('parola')?.invalid"
-              class="error-message">
+            <div *ngIf="(registerForm.get('parola')?.touched || submitted) && registerForm.get('parola')?.invalid" class="error-message">
               <div *ngIf="registerForm.get('parola')?.errors?.['required']">Password is required.</div>
-              <div *ngIf="registerForm.get('parola')?.errors?.['minlength']">Password must be at least 6 characters
-                long.</div>
+              <div *ngIf="registerForm.get('parola')?.errors?.['minlength']">Password must be at least 6 characters long.</div>
             </div>
           </div>
 
           <div class="mb-3">
             <label for="confirmareParola" class="form-label">Confirm Password</label>
-            <input type="password" formControlName="confirmareParola" id="confirmareParola" class="form-control"
-              required>
-            <div
-              *ngIf="(registerForm.get('confirmareParola')?.touched || submitted) && registerForm.hasError('passwordsMismatch')"
-              class="error-message">
+            <input type="password" formControlName="confirmareParola" id="confirmareParola" class="form-control" required>
+            <div *ngIf="(registerForm.get('confirmareParola')?.touched || submitted) && registerForm.hasError('passwordsMismatch')" class="error-message">
               Passwords do not match.
             </div>
           </div>

@@ -10,6 +10,7 @@ interface UserRow {
   utilizator: string;
   email: string;
   'numar marca': string;
+  departament: string;
   'rol cerut': string;
   'rol aprobat': string;
   'status cont': string;
@@ -34,6 +35,7 @@ export class UserManagementComponent {
     utilizator: '',
     email: '',
     'numar marca': '',
+    departament: '',
     'rol cerut': '',
     'rol aprobat': '',
     'status cont': ''
@@ -42,7 +44,6 @@ export class UserManagementComponent {
   selectedRowIndex: number | null = null;
   hoverIndex: number | null = null;
   
-
   getAllUsers() {
     this.api_caller.getAllUsers().subscribe(response => {   
       this.data = this.mapResponseToUserRows(response);   
@@ -69,6 +70,7 @@ export class UserManagementComponent {
       utilizator: user.username || '',
       email: user.email || '',
       'numar marca': user.employeeNo || '',
+      departament: user.department || '',
       'rol cerut': user.role || '', 
       'rol aprobat': user.role || '',
       'status cont': this.mapStatus(user.status)
@@ -87,12 +89,10 @@ export class UserManagementComponent {
   }
 
   approveUser(row: UserRow) {
-    // 1. Apelăm endpoint-ul existent de aprobare cont
     this.api_caller.approveUser(row.utilizator, row['rol aprobat'], row['status cont']).subscribe({
         next: () => {
           this.error = '';
 
-          // 2. Dacă statusul contului a devenit 'activ', îl sincronizăm automat și în Nomenclator (Utilizatori PMB)
           if (row['status cont'] === 'activ') {
             const operatorPmbData = {
               marca: row['numar marca'] || '0000',
@@ -106,7 +106,6 @@ export class UserManagementComponent {
               dataActiv: new Date().toISOString().slice(0, 10)
             };
 
-            // Apelăm serviciul API pentru a adăuga operatorul în lista PMB din Nomenclator
             this.api_caller.saveOperatorPmb(operatorPmbData).subscribe({
               next: () => console.log('Operator sincronizat cu succes în Nomenclator PMB!'),
               error: err => console.warn('Notă: Sincronizarea cu nomenclatorul PMB s-a făcut local sau necesită endpoint dedicat.', err)
@@ -124,8 +123,6 @@ export class UserManagementComponent {
         }
       });
   }
-
-  
 
   get filteredData(): UserRow[] {
     return this.data.filter(row => {

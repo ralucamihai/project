@@ -5,6 +5,23 @@ import { environment } from '../../environments/environment';
 
 export type NivelAcces = 'Admin' | 'Editare' | 'Vizualizare';
 
+export interface TipEchipament {
+  id?: number;
+  cod_line: string;
+  denumire: string;
+  mentenanta_ac: string;
+  mentenanta_prev: string;
+  calibrare: string;
+  esd: string;
+  electrosecuritate: string;
+  backup: string;
+  ssm: string;
+  isqw: string;
+  lista_piese: string;
+  lista_operatii: string;
+  responsabil: string;
+}
+
 export interface UtilizatorPMB {
   id?: number;
   marca: string;
@@ -62,6 +79,26 @@ export class NomenclatureService {
   private baseUrl = `${environment.apiUrlIP}/nomenclature`;
 
   constructor(private http: HttpClient) {}
+
+  // ==========================================
+  // ---------- TIP ECHIPAMENT ----------
+  // ==========================================
+  
+  getTipuriEchipament(): Observable<TipEchipament[]> { 
+    return this.http.get<TipEchipament[]>(`${this.baseUrl}/tip_echipament`); 
+  }
+  
+  createTipEchipament(t: Partial<TipEchipament>): Observable<TipEchipament> { 
+    return this.http.post<TipEchipament>(`${this.baseUrl}/tip_echipament`, t); 
+  }
+  
+  updateTipEchipament(t: TipEchipament): Observable<TipEchipament> { 
+    return this.http.put<TipEchipament>(`${this.baseUrl}/tip_echipament/${t.id}`, t); 
+  }
+  
+  deleteTipEchipament(id: number): Observable<void> { 
+    return this.http.delete<void>(`${this.baseUrl}/tip_echipament/${id}`); 
+  }
 
   // ==========================================
   // ---------- UTILIZATORI PMB ----------

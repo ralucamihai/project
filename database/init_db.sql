@@ -12,10 +12,11 @@ CREATE TABLE IF NOT EXISTS users (
   password_hash VARCHAR(128) NOT NULL,
   email VARCHAR(50) NOT NULL,
   "employeeNo" VARCHAR(50) NOT NULL,
+  department VARCHAR(100),
   role VARCHAR(25) NOT NULL,
   status VARCHAR(25) NOT NULL
 );
-
+ALTER TABLE users ADD COLUMN IF NOT EXISTS department VARCHAR(100);
 -- =====================
 -- PMB DASHBOARD DATA
 -- =====================

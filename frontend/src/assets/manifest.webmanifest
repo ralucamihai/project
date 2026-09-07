@@ -1,0 +1,15 @@
+{
+  "name": "PMB App",
+  "short_name": "PMB",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#fc8403",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "1254x1254",
+      "type": "image/png"
+    }
+  ]
+}

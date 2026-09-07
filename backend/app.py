@@ -2,6 +2,7 @@ import asyncio
 from datetime import datetime
 import os
 import traceback
+from types import SimpleNamespace
 from typing import List, Optional
 
 # Importuri module proprii
@@ -27,6 +28,7 @@ from fastapi import (
 )
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse
+from sqlalchemy import text
 
 VERSION = os.getenv("VERSION", "dev")
 BUILD = os.getenv("BUILD", "local")
@@ -39,7 +41,55 @@ _main_loop = None
 async def lifespan(app: FastAPI):
     global _main_loop
     _main_loop = asyncio.get_running_loop()
-    create_tables()   # <-- adaugat: creeaza orice tabela lipsa, e idempotent
+    
+    # --- AUTO-MIGRARE DIRECT PE BAZA DE DATE ACTIVĂ ---
+    try:
+        db = next(get_db())
+        try:
+            db.execute(text("SELECT centru_cost FROM cs_orders LIMIT 1;"))
+        except Exception:
+            db.rollback()
+            print("(!) Tabela veche 'cs_orders' detectata. Se recreeaza automat cu noile coloane...")
+            db.execute(text("DROP TABLE IF EXISTS cs_orders;"))
+            db.commit()
+        finally:
+            db.close()
+    except Exception as e:
+        print(f"Verificare schema cs_orders: {e}")
+
+    # --- Migrare aditiva: coloanele 'grup' si 'responsabil' pe cs_tickets ---
+    create_tables()   # Creează orice tabelă lipsă (inclusiv nom_tipuri_echipament)
+
+    try:
+        db = next(get_db())
+        try:
+            table_exists = db.execute(text(
+                "SELECT EXISTS (SELECT 1 FROM information_schema.tables "
+                "WHERE table_name = 'cs_tickets');"
+            )).scalar()
+
+            if table_exists:
+                try:
+                    db.execute(text("SELECT grup, responsabil FROM cs_tickets LIMIT 1;"))
+                except Exception:
+                    db.rollback()
+                    print("(!) Coloanele 'grup'/'responsabil' lipsesc din 'cs_tickets'. Se adauga automat...")
+                    try:
+                        db.execute(text("ALTER TABLE cs_tickets ADD COLUMN grup VARCHAR;"))
+                        db.commit()
+                    except Exception as e_col:
+                        db.rollback()
+                        print(f"    -> coloana 'grup': {e_col}")
+                    try:
+                        db.execute(text("ALTER TABLE cs_tickets ADD COLUMN responsabil VARCHAR;"))
+                        db.commit()
+                    except Exception as e_col:
+                        db.rollback()
+                        print(f"    -> coloana 'responsabil': {e_col}")
+        finally:
+            db.close()
+    except Exception as e:
+        print(f"Verificare schema cs_tickets: {e}")
     scheduler.start()
     yield
     scheduler.shutdown()
@@ -48,14 +98,14 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 # --- CORS -------------------------------------------------------------
-ALLOWED_ORIGINS = [
+origins = [
     "http://localhost:4200",
-    "http://10.60.10.71:4200",
+    "http://127.0.0.1:4200",
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS,
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -115,7 +165,6 @@ async def broadcast(message: str):
         try:
             await client.send_text(message)
         except Exception:
-            # În caz de deconectare neașteptată a unui client
             if client in clients:
                 clients.remove(client)
 
@@ -418,6 +467,144 @@ def delete_ticket_api(
 
 
 # ============================================================================
+# CUSTOMER SUPPORT: ORDERS
+# ============================================================================
+
+@app.get("/api/customer_support/orders")
+def get_orders_api(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    get_current_user(token, db)
+    return get_all_orders(db)
+
+
+@app.post("/api/customer_support/orders")
+def create_order_api(
+    payload: OrderCreate,
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db),
+):
+    user = get_current_user(token, db)
+    return create_order(db, payload, current_username=user.username)
+
+
+@app.put("/api/customer_support/orders")
+def update_order_api(
+    payload: OrderUpdate,
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db),
+):
+    get_current_user(token, db)
+    result = update_order(db, payload)
+    if result is None:
+        raise HTTPException(status_code=404, detail="Comanda inexistentă.")
+    return result
+
+
+@app.delete("/api/customer_support/orders/{order_id}")
+def delete_order_api(
+    order_id: int,
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db),
+):
+    get_current_user(token, db)
+    ok = delete_order(db, order_id)
+    if not ok:
+        raise HTTPException(status_code=404, detail="Comanda inexistentă.")
+    return {"message": "Comandă ștearsă."}
+
+
+# ============================================================================
+# CUSTOMER SUPPORT: SUGGESTIONS
+# ============================================================================
+
+@app.get("/api/customer_support/suggestions")
+def get_suggestions_api(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    get_current_user(token, db)
+    return get_all_suggestions(db)
+
+
+@app.post("/api/customer_support/suggestions")
+def create_suggestion_api(
+    payload: dict,
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db),
+):
+    get_current_user(token, db)
+    return create_suggestion(db, SimpleNamespace(**payload))
+
+
+@app.put("/api/customer_support/suggestions")
+def update_suggestion_api(
+    payload: dict,
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db),
+):
+    get_current_user(token, db)
+    result = update_suggestion(db, SimpleNamespace(**payload))
+    if result is None:
+        raise HTTPException(status_code=404, detail="Sugestie inexistentă.")
+    return result
+
+
+@app.delete("/api/customer_support/suggestions/{suggestion_id}")
+def delete_suggestion_api(
+    suggestion_id: int,
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db),
+):
+    get_current_user(token, db)
+    ok = delete_suggestion(db, suggestion_id)
+    if not ok:
+        raise HTTPException(status_code=404, detail="Sugestie inexistentă.")
+    return {"message": "Sugestie ștearsă."}
+
+
+# ============================================================================
+# CUSTOMER SUPPORT: COMPLAINTS
+# ============================================================================
+
+@app.get("/api/customer_support/complaints")
+def get_complaints_api(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    get_current_user(token, db)
+    return get_all_complaints(db)
+
+
+@app.post("/api/customer_support/complaints")
+def create_complaint_api(
+    payload: dict,
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db),
+):
+    get_current_user(token, db)
+    return create_complaint(db, SimpleNamespace(**payload))
+
+
+@app.put("/api/customer_support/complaints")
+def update_complaint_api(
+    payload: dict,
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db),
+):
+    get_current_user(token, db)
+    result = update_complaint(db, SimpleNamespace(**payload))
+    if result is None:
+        raise HTTPException(status_code=404, detail="Reclamație inexistentă.")
+    return result
+
+
+@app.delete("/api/customer_support/complaints/{complaint_id}")
+def delete_complaint_api(
+    complaint_id: int,
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db),
+):
+    get_current_user(token, db)
+    ok = delete_complaint(db, complaint_id)
+    if not ok:
+        raise HTTPException(status_code=404, detail="Reclamație inexistentă.")
+    return {"message": "Reclamație ștearsă."}
+
+
+# ============================================================================
 # BACKGROUND SCHEDULER: PMB DASHBOARD
 # ============================================================================
 
@@ -546,10 +733,38 @@ def get_nom_categorie_defect(token: str = Depends(oauth2_scheme), db: Session = 
     ]
 
 
-@app.get("/api/nomenclature/tip_echipament")
-def get_nom_tip_echipament(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+# ============================================================================
+# NOMENCLATOR: TIPURI ECHIPAMENT (Șabloane Master / CRUD complet)
+# ============================================================================
+
+@app.get("/api/nomenclature/tip_echipament", response_model=List[TipEchipamentResponse])
+def get_tipuri_echipamente_api(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     get_current_user(token, db)
-    return ["Cabina", "Dispozitiv", "Echipament", "Electro securitate", "ESD punct de măsurare"]
+    return get_all_tipuri_echipament(db)
+
+
+@app.post("/api/nomenclature/tip_echipament", response_model=TipEchipamentResponse)
+def create_tip_echipament_api(payload: TipEchipamentSchema, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    get_current_user(token, db)
+    return create_tip_echipament(db, payload)
+
+
+@app.put("/api/nomenclature/tip_echipament/{tip_id}", response_model=TipEchipamentResponse)
+def update_tip_echipament_api(tip_id: int, payload: TipEchipamentSchema, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    get_current_user(token, db)
+    result = update_tip_echipament(db, tip_id, payload)
+    if not result:
+        raise HTTPException(status_code=404, detail="Șablonul de echipament nu a fost găsit.")
+    return result
+
+
+@app.delete("/api/nomenclature/tip_echipament/{tip_id}")
+def delete_tip_echipament_api(tip_id: int, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    get_current_user(token, db)
+    ok = delete_tip_echipament(db, tip_id)
+    if not ok:
+        raise HTTPException(status_code=404, detail="Șablonul de echipament nu a fost găsit.")
+    return {"message": "Șablon șters cu succes."}
 
 
 # ============================================================================

@@ -5,11 +5,29 @@ from typing import Optional, List
 from datetime import datetime
 
 # Am schimbat importul pentru baza de date conform structurii tale
-from login.models import Base
+from database import Base
 
 # =====================================================================
 # MODELE BAZĂ DE DATE (SQLAlchemy)
 # =====================================================================
+
+class TipEchipamentEntity(Base):
+    __tablename__ = "nom_tipuri_echipament"
+    id = Column(Integer, primary_key=True, index=True)
+    cod_line = Column(String, nullable=True, default="")
+    denumire = Column(String, nullable=False)
+    mentenanta_ac = Column(String, default="NA")
+    mentenanta_prev = Column(String, default="na")
+    calibrare = Column(String, default="na")
+    esd = Column(String, default="NA")
+    electrosecuritate = Column(String, default="NA")
+    backup = Column(String, default="na")
+    ssm = Column(String, default="NA")
+    isqw = Column(String, default="NA")
+    lista_piese = Column(String, nullable=True, default="")
+    lista_operatii = Column(String, nullable=True, default="")
+    responsabil = Column(String, nullable=True, default="")
+
 class EchipamentPMBModel(Base):
     __tablename__ = "maintenance_echipamente"
     id = Column(Integer, primary_key=True, index=True)
@@ -77,6 +95,26 @@ class ActivitatePMBModel(Base):
 # =====================================================================
 # SCHEME VALIDARE (Pydantic)
 # =====================================================================
+
+class TipEchipamentSchema(BaseModel):
+    cod_line: Optional[str] = ""
+    denumire: str
+    mentenanta_ac: Optional[str] = "NA"
+    mentenanta_prev: Optional[str] = "na"
+    calibrare: Optional[str] = "na"
+    esd: Optional[str] = "NA"
+    electrosecuritate: Optional[str] = "NA"
+    backup: Optional[str] = "na"
+    ssm: Optional[str] = "NA"
+    isqw: Optional[str] = "NA"
+    lista_piese: Optional[str] = ""
+    lista_operatii: Optional[str] = ""
+    responsabil: Optional[str] = ""
+
+class TipEchipamentResponse(TipEchipamentSchema):
+    id: int
+    class Config:
+        from_attributes = True
 
 class EchipamentSchema(BaseModel):
     numar: Optional[str] = ""
@@ -152,6 +190,37 @@ class ActivitateResponse(ActivitateSchema):
 # OPERAȚIUNI CRUD
 # =====================================================================
 
+# ---- CRUD: Tipuri Echipament (Nomenclator) ----
+def get_all_tipuri_echipament(db: Session):
+    return db.query(TipEchipamentEntity).all()
+
+def create_tip_echipament(db: Session, tip: TipEchipamentSchema):
+    db_tip = TipEchipamentEntity(**tip.model_dump())
+    db.add(db_tip)
+    db.commit()
+    db.refresh(db_tip)
+    return db_tip
+
+def update_tip_echipament(db: Session, tip_id: int, tip: TipEchipamentSchema):
+    db_tip = db.query(TipEchipamentEntity).filter(TipEchipamentEntity.id == tip_id).first()
+    if not db_tip:
+        return None
+    for key, value in tip.model_dump(exclude_unset=True).items():
+        setattr(db_tip, key, value)
+    db.commit()
+    db.refresh(db_tip)
+    return db_tip
+
+def delete_tip_echipament(db: Session, tip_id: int):
+    db_tip = db.query(TipEchipamentEntity).filter(TipEchipamentEntity.id == tip_id).first()
+    if db_tip:
+        db.delete(db_tip)
+        db.commit()
+        return True
+    return False
+
+
+# ---- CRUD: Echipamente (Mentenanță) ----
 def get_all_echipamente(db: Session):
     return db.query(EchipamentPMBModel).all()
 
@@ -180,6 +249,8 @@ def delete_echipament(db: Session, ech_id: int):
         return True
     return False
 
+
+# ---- CRUD: Activități (Mentenanță) ----
 def get_all_activitati(db: Session, tipInterventie: str = None, status: str = None, activ: bool = None):
     query = db.query(ActivitatePMBModel)
     if tipInterventie:

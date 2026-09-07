@@ -162,7 +162,7 @@ def get_all_users_with_credentials(token: str = Depends(oauth2_scheme), db: Sess
         token_data = TokenData(username=username)
     except JWTError:
         raise credentials_exception
-    all_users = get_all_users(db, ['firstName', 'lastName', 'username', 'email', 'employeeNo', 'role', 'status'], )
+    all_users = get_all_users(db, ['firstName', 'lastName', 'username', 'email', 'employeeNo', 'department', 'role', 'status'], )
     if all_users is None:
         raise credentials_exception
     return all_users
@@ -197,6 +197,7 @@ def register_new_user(user: UserCreate, db: Session = Depends(get_db)):
         password_hash=get_password_hash(user.password),
         email=user.email,
         employeeNo=user.employeeNo,
+        department=user.department,
         role=user.role,
         status='not confirmed')
     db.add(user_obj)
@@ -209,6 +210,7 @@ def register_new_user(user: UserCreate, db: Session = Depends(get_db)):
         'username': user.username,
         'email': user.email,
         'employeeNo': user.employeeNo,
+        'department': user.department,
         'role': user.role
     }
 

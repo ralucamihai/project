@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime, Date, Time
-from login.models import Base  
+from database import Base 
 
 class Ticket(Base):
     __tablename__ = "cs_tickets"
@@ -8,6 +8,8 @@ class Ticket(Base):
     initiator = Column(String, nullable=False)
     echipa = Column(String, nullable=True)
     tip_interventie = Column(String, nullable=True)
+    grup = Column(String, nullable=True)
+    responsabil = Column(String, nullable=True)
     descriere_simptom = Column(String, nullable=True)
     sectie = Column(String, nullable=True)
     linie = Column(String, nullable=True)
@@ -25,32 +27,29 @@ class Ticket(Base):
 class Order(Base):
     __tablename__ = "cs_orders"
 
-    id = Column(Integer, primary_key=True, index=True)
-    numar_comanda = Column(String(100), unique=True, nullable=False)
-    client = Column(String(255), nullable=False)
-    produs = Column(String(255), nullable=False)
-    cantitate = Column(Integer, nullable=False, default=1)
-    status = Column(String(50), nullable=False, default="In procesare")
-    data_comanda = Column(Date, nullable=False)
-
-    categorie_produs = Column(String(100), nullable=True)
-    furnizor = Column(String(255), nullable=True)
-    prioritate = Column(String(50), nullable=True)
-
-    numar_intern = Column(String(100), nullable=True)
-    initiator = Column(String(255), nullable=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    numar_comanda = Column(String(100), nullable=True)
+    data_comanda = Column(Date, nullable=True)
     sectie = Column(String(255), nullable=True)
-    linie = Column(String(255), nullable=True)
-    locatie = Column(String(255), nullable=True)
-    responsabil = Column(String(255), nullable=True)
-    cauza_interventie = Column(Text, nullable=True)
-    explicatie = Column(Text, nullable=True)
-    operatii_suplimentare = Column(Text, nullable=True)
-    termen_data = Column(Date, nullable=True)
-    termen_ora = Column(Time, nullable=True)
-    kpi = Column(String(255), nullable=True)
-    de_la_ora = Column(Time, nullable=True)
-    pana_la_ora = Column(Time, nullable=True)
+    centru_cost = Column(String(100), nullable=True)
+    nr_inventar = Column(String(100), nullable=True)
+    descriere = Column(Text, nullable=True)
+    cantitate = Column(Integer, nullable=False, default=1)
+    desen_doc = Column(String(255), nullable=True)
+    termen_solicitat = Column(Date, nullable=True)
+    prioritate_numar = Column(Integer, nullable=True, default=1)
+    receptie = Column(String(100), nullable=True)
+    data_rec = Column(Date, nullable=True)
+    user = Column(String(100), nullable=True)
+    aprobat_deviz = Column(String(50), nullable=True)
+    documentatie = Column(String(255), nullable=True)
+    materiale = Column(String(255), nullable=True)
+    disponibilitate = Column(String(255), nullable=True)
+    deviz = Column(String(100), nullable=True)
+    executant = Column(String(255), nullable=True)
+    timp_executie = Column(String(100), nullable=True)
+    status = Column(String(50), nullable=False, default="In procesare")
+    termen_confirmat = Column(String(50), nullable=True)
 
 
 class Suggestion(Base):

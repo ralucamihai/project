@@ -22,6 +22,7 @@ export interface Order {
   numarComanda: string;
   client: string;
   produs: string;
+  descriere: string;        // <-- Adăugat aici pentru a elimina eroarea de compilare
   cantitate: number;
   furnizor: string;
   categorieProdus: string;

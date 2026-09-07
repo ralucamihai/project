@@ -16,6 +16,7 @@ class User(Base):
     password_hash = Column(String(128), nullable=False)
     email = Column(String(50), nullable=False)
     employeeNo = Column(String(50), nullable=False)
+    department = Column(String(50), nullable=True)
     role = Column(String(25), nullable=False)
     status = Column(String(25), nullable=False)
 
@@ -34,6 +35,7 @@ class UserCreate(BaseModel):
     password: str
     email: str
     employeeNo: str
+    department: str
     role: str
 
 class UserApprove(BaseModel):

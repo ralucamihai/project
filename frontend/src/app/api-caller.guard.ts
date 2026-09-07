@@ -1,4 +1,4 @@
-import { ActivatedRouteSnapshot, CanActivate, CanActivateFn, GuardResult, MaybeAsync, Router, RouterStateSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
 import { ApiCallerService } from './services/api-caller.service';
 import { catchError, map, Observable, of } from 'rxjs';
 import { Injectable } from '@angular/core';
@@ -14,6 +14,8 @@ export class apiCallerGuard implements CanActivate {
   ): Observable<boolean> {
     return this.api_caller.getUser().pipe(
       map((user: any) => {
+        console.log('User primit în Guard:', user);
+
         if (!user) {
           localStorage.removeItem(environment.accessTokenKey);
           localStorage.removeItem(environment.usernameKey);
@@ -21,18 +23,22 @@ export class apiCallerGuard implements CanActivate {
           return false;
         }
 
-        // Check if route requires admin role
+        // Verifică dacă ruta cere permisiuni de administrator
         const requiresAdmin = route.data?.['requiresAdmin'];
         
-        if (requiresAdmin && user.role !== 'Admin') {
-          // User is authenticated but not admin, redirect to home or show error
+        // Preluăm rolul și îl facem lowercase pentru a evita erorile de tip 'Admin' vs 'admin'
+        const userRole = (user.role || '').toLowerCase();
+
+        if (requiresAdmin && userRole !== 'admin') {
+          console.warn('Acces interzis: Utilizatorul nu este admin. Rol găsit:', user.role);
           this.router.navigate(['/home']);
           return false;
         }
 
         return true;
       }),
-      catchError(() => {
+      catchError((err) => {
+        console.error('Eroare în guard la preluarea utilizatorului:', err);
         localStorage.removeItem(environment.accessTokenKey);
         localStorage.removeItem(environment.usernameKey);
         this.router.navigate(['/login']);
@@ -40,4 +46,4 @@ export class apiCallerGuard implements CanActivate {
       })
     );
   }
-};
+}

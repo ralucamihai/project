@@ -225,7 +225,7 @@
 }
 
 .col-nr {
-  width: 40px;
+  width: 10%;
   text-align: center;
   color: #888;
   font-size: 11px;
@@ -596,7 +596,7 @@
 }
 
 .dual-panel .table-wrap {
-  max-height: 560px;
+  height: 560px;
 }
 
 .transfer-arrows {
@@ -828,3 +828,4 @@
     flex-direction: row;
   }
 }
+

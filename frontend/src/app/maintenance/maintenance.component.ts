@@ -10,32 +10,31 @@ import {
   CustomerSupportService,
   Ticket
 } from '../services/customer-support.service';
-import { NomenclatureService, GrupMunca } from '../services/nomenclature.service';
+import { NomenclatureService, GrupMunca, TipEchipament } from '../services/nomenclature.service';
+import { AuthService } from '../services/auth.service';
+import { ApiCallerService } from '../services/api-caller.service';
 
 type SortKeyEch = 'denumire' | 'tipEchipament' | 'dataReceptie';
 
-// ---- Forma unica de rand afisat in grila "Activitati PMB/CBT" aliniata la Tickete ----
 export interface RandActivitate {
   rowId: string;
   data: string;
   ticket: number | string;
   initiator: string;
-  tipEchipament: string; // Nr. Inventar
-  echipa: string; // Denumire Echipament
+  tipEchipament: string;
+  echipa: string;
   tipInterventie: string;
   grup: string;
-  responsabil: string; // Executant
-  descriereSimptom: string; // Defect enuntat
+  responsabil: string;
+  descriereSimptom: string;
   sectie: string;
   linie: string;
-  codAfectat: string; // PMB-Nr
+  codAfectat: string;
   denumireProdus: string;
   prioritate: string;
   termenInitiat: string;
   termenCerut: string;
   status: string;
-  
-  // --- Detalii suplimentare Mentenanta ---
   piese: string;
   deLaOra: string;
   panaLaOra: string;
@@ -48,7 +47,6 @@ export interface RandActivitate {
   sursaTicket: boolean;
 }
 
-// ---- POPUP 1: Toate coloanele Ticket ----
 export interface RandEditModel {
   data: string;
   ticket: number | string;
@@ -69,7 +67,6 @@ export interface RandEditModel {
   status: string;
 }
 
-// ---- POPUP 2: Detalii suplimentare ----
 export interface DetaliiActivitateEditModel {
   piese: string;
   deLaOra: string;
@@ -92,12 +89,11 @@ export class MaintenanceComponent implements OnInit {
 
   activeTab: string = 'echipamente';
 
-  // =========================================================
-  // ---- DATE COMUNE & INITIALIZARE ----
-  // =========================================================
   grupuriMunca: GrupMunca[] = [];
+  sabloaneNomenclator: TipEchipament[] = [];
   isLoadingGrupuri: boolean = false;
   isLoadingOptions: boolean = false;
+  currentUsername: string = '';
 
   get grupOptions(): string[] {
     return this.grupuriMunca.map(g => g.grup);
@@ -114,16 +110,28 @@ export class MaintenanceComponent implements OnInit {
     private route: ActivatedRoute,
     private maintenanceService: MaintenanceService,
     private supportService: CustomerSupportService,
-    private nomenclatureService: NomenclatureService
+    private nomenclatureService: NomenclatureService,
+    private authService: AuthService,
+    private apiCallerService: ApiCallerService
   ) {}
 
   ngOnInit(): void {
+    this.currentUsername =
+      this.authService.getUserInfo().username ||
+      this.apiCallerService.getUsername() ||
+      '';
+
     this.route.queryParams.subscribe(params => {
       this.activeTab = params['tab'] || 'echipamente';
       this.loadDataForActiveTab();
     });
     this.loadGrupuriMunca();
     this.loadFilterOptions();
+
+    this.nomenclatureService.getTipuriEchipament().subscribe((data: TipEchipament[]) => {
+      this.sabloaneNomenclator = data;
+      this.tipEchipamentOptions = data.map(t => t.denumire);
+    });
   }
 
   setTab(tab: string) {
@@ -135,6 +143,7 @@ export class MaintenanceComponent implements OnInit {
     if (this.activeTab === 'activitati') {
       if (this.activitati.length === 0) this.loadActivitati();
       if (this.tickets.length === 0) this.loadTickets();
+      if (this.echipamente.length === 0) this.loadEchipamente();
     }
     if (this.activeTab === 'echipamente' && this.echipamente.length === 0) {
       this.loadEchipamente();
@@ -144,8 +153,8 @@ export class MaintenanceComponent implements OnInit {
   loadGrupuriMunca() {
     this.isLoadingGrupuri = true;
     this.nomenclatureService.getGrupuriMunca().subscribe({
-      next: data => { this.grupuriMunca = data; this.isLoadingGrupuri = false; },
-      error: err => { console.error(err); this.isLoadingGrupuri = false; }
+      next: (data: GrupMunca[]) => { this.grupuriMunca = data; this.isLoadingGrupuri = false; },
+      error: (err: any) => { console.error(err); this.isLoadingGrupuri = false; }
     });
   }
 
@@ -163,14 +172,10 @@ export class MaintenanceComponent implements OnInit {
     });
   }
 
-  // =========================================================
-  // ---- LOGICĂ TAB: ECHIPAMENTE (Sectiunea ta) ----
-  // =========================================================
   echipamente: EchipamentPMB[] = [];
   isLoadingEchipamente: boolean = false;
   errorEchipamente: string | null = null;
 
-  // Optiuni dropdown-uri formular Echipament
   tipEchipamentOptions: string[] = [];
   sectieOptions: string[] = [];
   linieOptions: string[] = [];
@@ -182,7 +187,6 @@ export class MaintenanceComponent implements OnInit {
   respELSOptions: string[] = [];
   respBCKOptions: string[] = [];
 
-  // Definitii perioade Preventiva / Calibrare / Backup
   private periodDefs: { value: string; label: string; interval: number | null }[] = [
     { value: 'na', label: 'NA', interval: null },
     { value: 'lunar', label: 'Lunar', interval: 1 },
@@ -192,7 +196,6 @@ export class MaintenanceComponent implements OnInit {
     { value: 'anual', label: 'Anual', interval: 12 }
   ];
 
-  // Stari UI tab Echipamente
   searchNumarEch: string = '';
   searchDenumireEch: string = '';
   searchTipEch: string = '';
@@ -243,6 +246,25 @@ export class MaintenanceComponent implements OnInit {
       responsabil: '', respCalibr: '', respESD: '', respELS: '',
       respBCK: '', activ: true
     };
+  }
+
+  aplicaSablonNomenclator() {
+    const tipSelectat = this.formModelEch.tipEchipament;
+    const sablon = this.sabloaneNomenclator.find(s => s.denumire === tipSelectat);
+
+    if (sablon) {
+      this.formModelEch.autonoma = sablon.mentenanta_ac;
+      this.formModelEch.preventiva = sablon.mentenanta_prev;
+      this.formModelEch.calibrare = sablon.calibrare;
+      this.formModelEch.controlESD = sablon.esd;
+      this.formModelEch.electrosecuritate = sablon.electrosecuritate;
+      this.formModelEch.backup = sablon.backup;
+      this.formModelEch.listaPiese = sablon.lista_piese;
+      this.formModelEch.listaOper = sablon.lista_operatii;
+      this.formModelEch.responsabil = sablon.responsabil;
+
+      this.updateExecutantForAutonoma();
+    }
   }
 
   isNA(value: string): boolean {
@@ -373,10 +395,6 @@ export class MaintenanceComponent implements OnInit {
   closeFormEch() { this.showFormEch = false; }
 
   saveFormEch() {
-    if (!this.formModelEch.denumire.trim() || !this.formModelEch.tipEchipament.trim()) {
-      return;
-    }
-
     const payload: Partial<EchipamentPMB> = { ...this.formModelEch };
 
     if (this.isEditModeEch && this.editingIndexEch !== null) {
@@ -423,11 +441,6 @@ export class MaintenanceComponent implements OnInit {
   listeazaEch() { window.print(); }
   salveazaEch() { console.log('Salvare echipamente:', this.echipamente); }
 
-
-  // =========================================================
-  // ---- LOGICĂ TAB: ACTIVITĂȚI (Noile tale tickete/activitati) ----
-  // =========================================================
-
   tipuriInterventie: string[] = [
     'Accidentala', 'AEM', 'Ajustare parametrii', 'Backup', 'Cladiri',
     'Curatare_echip', 'Electric', 'Electrosecuritate', 'ESD', 'Imbunatatire',
@@ -473,13 +486,18 @@ export class MaintenanceComponent implements OnInit {
   isSavingTicket: boolean = false;
   isSavingDetalii: boolean = false;
 
-  echipamenteFizice = [
-    { inventar: 'INV-001', nume: 'Cabina 1', tip: 'Cabina', sectie: 'Testare Finală', linie: 'Linia 1', codAfectat: 'CAB-01' },
-    { inventar: 'INV-002', nume: 'Cabina 2', tip: 'Cabina', sectie: 'Testare Finală', linie: 'Linia 2', codAfectat: 'CAB-02' },
-    { inventar: 'INV-003', nume: 'Dispozitiv Lipire A', tip: 'Dispozitiv', sectie: 'Asamblare', linie: 'Linia 2', codAfectat: 'DISP-A' },
-    { inventar: 'INV-004', nume: 'Tester ESD Principal', tip: 'ESD punct de măsurare', sectie: 'Control Calitate', linie: 'Linia 1', codAfectat: 'ESD-01' },
-    { inventar: 'INV-005', nume: 'Robot Echipare 1', tip: 'Echipament', sectie: 'SMD', linie: 'Linia 3', codAfectat: 'ROB-01' }
-  ];
+  activitatiSortColumn: string = 'ticket';
+  activitatiSortDirection: 'asc' | 'desc' = 'asc';
+
+  sortActivitatiBy(column: string) {
+    if (this.activitatiSortColumn === column) {
+      this.activitatiSortDirection = this.activitatiSortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.activitatiSortColumn = column;
+      this.activitatiSortDirection = 'asc';
+    }
+    this.aplicaSortareActivitati();
+  }
 
   loadActivitati() {
     this.isLoadingActivitati = true;
@@ -529,6 +547,8 @@ export class MaintenanceComponent implements OnInit {
       tipInterventie: '', defEnuntat: '', piese: '', loc: '',
       executant: '', status: '', activ: '', filtruListare: 'total'
     };
+    this.activitatiSortColumn = 'ticket';
+    this.activitatiSortDirection = 'asc';
     this.loadActivitati();
   }
 
@@ -553,23 +573,28 @@ export class MaintenanceComponent implements OnInit {
 
   formatOra(iso: string | undefined): string {
     if (!iso) return '';
+    if (/^\d{2}:\d{2}(:\d{2})?$/.test(iso)) return iso;
     const d = new Date(iso);
     if (isNaN(d.getTime())) return iso;
     return d.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   }
 
-  // --- AUTO-COMPLETARE IN FORMULAR (Activitati/Tickete) ---
+  private getNextTicketNumber(): number {
+    return this.randuriActivitati.length + 1;
+  }
+
   onTipEchipamentChange() {
     if (!this.randEdit) return;
     const inventarTastat = this.randEdit.tipEchipament?.trim();
-    const echipamentGasit = this.echipamenteFizice.find((e: any) => e.inventar === inventarTastat);
+    
+    const echipamentGasit = this.echipamente.find((e) => e.numar?.toLowerCase() === inventarTastat?.toLowerCase());
 
     if (echipamentGasit) {
-      this.randEdit.echipa = echipamentGasit.nume;
+      this.randEdit.echipa = echipamentGasit.denumire;
       this.randEdit.sectie = echipamentGasit.sectie;
       this.randEdit.linie = echipamentGasit.linie;
-      this.randEdit.codAfectat = echipamentGasit.codAfectat;
-    } else {
+      this.randEdit.codAfectat = '';
+    } else if (!inventarTastat) {
       this.randEdit.echipa = '';
       this.randEdit.sectie = '';
       this.randEdit.linie = '';
@@ -651,12 +676,50 @@ export class MaintenanceComponent implements OnInit {
     };
   }
 
+  private extractRowNum(rowId: string): number {
+    return parseInt(rowId.split('-')[1], 10) || 0;
+  }
+
   private construiesteRanduri() {
     const dinActivitati = this.activitati.map((a, i) => this.mapActivitateToRand(a, i));
-    const dinTickete = this.tickets.map((t, i) => this.mapTicketToRand(t, i));
+    const ticketeValide = this.tickets.filter((t: any) => t.id !== 1024 && t.id !== 1025);
+    const dinTickete = ticketeValide.map((t, i) => this.mapTicketToRand(t, i));
 
-    this.randuriActivitati = [...dinActivitati, ...dinTickete].sort((a, b) => {
-      return (b.data || '').localeCompare(a.data || '');
+    const toateRandurile = [...dinActivitati, ...dinTickete];
+
+    const cronologic = [...toateRandurile].sort((a, b) => {
+      const dateA = a.data || '';
+      const dateB = b.data || '';
+      const dateComparison = dateA.localeCompare(dateB);
+      if (dateComparison !== 0) return dateComparison;
+      return this.extractRowNum(a.rowId) - this.extractRowNum(b.rowId);
+    });
+
+    cronologic.forEach((r, index) => {
+      r.ticket = index + 1;
+    });
+
+    this.randuriActivitati = cronologic;
+    this.aplicaSortareActivitati();
+  }
+
+  private aplicaSortareActivitati() {
+    const col = this.activitatiSortColumn as keyof RandActivitate;
+    const dir = this.activitatiSortDirection === 'asc' ? 1 : -1;
+
+    this.randuriActivitati.sort((a: any, b: any) => {
+      const av = a[col];
+      const bv = b[col];
+
+      if (av == null && bv == null) return 0;
+      if (av == null) return -1 * dir;
+      if (bv == null) return 1 * dir;
+
+      if (typeof av === 'number' && typeof bv === 'number') {
+        return (av - bv) * dir;
+      }
+      
+      return String(av).localeCompare(String(bv), undefined, { numeric: true, sensitivity: 'base' }) * dir;
     });
   }
 
@@ -668,7 +731,41 @@ export class MaintenanceComponent implements OnInit {
     this.rowSelectat = r;
   }
 
-  onRowDblClick(r: RandActivitate) {
+  onRowDblClick(r: RandActivitate | null) {
+    if (!r) {
+      const dataCurentaIso = new Date().toISOString();
+      r = {
+        rowId: 'new-' + Date.now(),
+        data: dataCurentaIso,
+        ticket: this.getNextTicketNumber(),
+        initiator: this.currentUsername,
+        tipEchipament: '',
+        echipa: '',
+        tipInterventie: '',
+        grup: '',
+        responsabil: '',
+        descriereSimptom: '',
+        sectie: '',
+        linie: '',
+        codAfectat: '',
+        denumireProdus: '',
+        prioritate: 'Medie',
+        termenInitiat: dataCurentaIso,
+        termenCerut: '',
+        status: 'Deschis',
+        piese: '',
+        deLaOra: '',
+        panaLaOra: '',
+        cauzaInterventie: '',
+        explicatie: '',
+        operSupl: '',
+        validatDe: '',
+        validatCa: '',
+        explValid: '',
+        sursaTicket: false
+      };
+    }
+
     this.rowSelectat = r;
 
     this.randEdit = {
@@ -707,6 +804,49 @@ export class MaintenanceComponent implements OnInit {
     this.showDetaliiPopup = true;
   }
 
+  openAddActivitateForm() {
+    this.onRowDblClick(null);
+  }
+
+  deleteSelectedActivitate() {
+    if (!this.rowSelectat) {
+      alert('Te rog selectează o activitate din tabel pe care dorești să o elimini.');
+      return;
+    }
+
+    if (!confirm(`Sigur dorești să ștergi activitatea / ticketul #${this.rowSelectat.ticket}?`)) {
+      return;
+    }
+
+    const isTicket = this.rowSelectat.sursaTicket;
+    const idPart = this.rowSelectat.rowId.split('-')[1];
+
+    if (this.rowSelectat.rowId.startsWith('new-')) {
+      this.randuriActivitati = this.randuriActivitati.filter(x => x.rowId !== this.rowSelectat?.rowId);
+      this.rowSelectat = null;
+      return;
+    }
+
+    let request$;
+    if (isTicket) {
+      request$ = this.supportService.deleteTicket(Number(idPart));
+    } else {
+      request$ = this.maintenanceService.deleteActivitate(Number(idPart));
+    }
+
+    request$.subscribe({
+      next: () => {
+        this.rowSelectat = null;
+        this.loadActivitati();
+        this.loadTickets();
+      },
+      error: (err: any) => {
+        console.error('Eroare la ștergerea înregistrării:', err);
+        alert('A apărut o eroare la ștergerea înregistrării din baza de date.');
+      }
+    });
+  }
+
   closeTicketPopup() {
     this.showTicketPopup = false;
     this.randEdit = null;
@@ -719,38 +859,94 @@ export class MaintenanceComponent implements OnInit {
     if (!this.showTicketPopup) this.rowSelectat = null;
   }
 
+  private buildSafePayload(): any {
+    const payload: any = {
+      ...this.randEdit,
+      ...(this.detaliiEdit || {})
+    };
+
+    payload.denumire = payload.denumire || (payload.echipa ? `Intervenție ${payload.echipa}` : 'Intervenție mentenanță');
+    payload.executant = payload.responsabil || '';
+    payload.defEnuntat = payload.descriereSimptom || '';
+    payload.pmbNr = payload.codAfectat || '';
+    payload.dataOra = payload.data || new Date().toISOString();
+    payload.activ = true;
+
+    if (payload.ticket !== undefined && payload.ticket !== null) {
+      payload.ticket = String(payload.ticket);
+    }
+
+    if (!payload.termenCerut) {
+      payload.termenCerut = null;
+    } else if (!payload.termenCerut.includes('T')) {
+      const azi = new Date().toISOString().split('T')[0];
+      payload.termenCerut = `${azi}T${payload.termenCerut}`;
+    }
+
+    if (!payload.termenInitiat) {
+      payload.termenInitiat = null;
+    }
+
+    if (!payload.deLaOra) {
+      payload.deLaOra = null;
+    } else if (payload.deLaOra.length === 5) {
+      payload.deLaOra += ':00';
+    }
+
+    if (!payload.panaLaOra) {
+      payload.panaLaOra = null;
+    } else if (payload.panaLaOra.length === 5) {
+      payload.panaLaOra += ':00';
+    }
+
+    return payload;
+  }
+
   saveTicket() {
     if (!this.randEdit || !this.rowSelectat) return;
+    
+    if (!this.randEdit.tipEchipament || this.randEdit.tipEchipament.trim() === '') {
+      alert('Te rog completează "Nr. Inventar Echipament"!');
+      return; 
+    }
+
     this.isSavingTicket = true;
 
     const isTicket = this.rowSelectat.sursaTicket;
     const idPart = this.rowSelectat.rowId.split('-')[1];
+    const payload = this.buildSafePayload();
 
-    let request$;
+    const onError = (err: any) => {
+      this.isSavingTicket = false;
+      console.error(err);
+      const detalii = err.error?.detail ? JSON.stringify(err.error.detail, null, 2) : err.message;
+      alert(`Backend-ul a respins datele (422):\n\n${detalii}`);
+    };
+
+    const onSuccess = () => {
+      this.isSavingTicket = false;
+      this.loadActivitati();
+      this.loadTickets();
+      this.closeAllPopups();
+    };
+
     if (isTicket) {
       const original = this.tickets.find(t => String((t as any).id) === String(idPart)) || {};
-      const payload = { ...original, ...this.randEdit, id: Number(idPart) };
-      request$ = (this.supportService as any).updateTicket?.(payload);
-    } else {
-      request$ = (this.maintenanceService as any).updateActivitate?.(idPart, this.randEdit);
-    }
-
-    if (!request$) {
-      console.warn('Metoda de update nu exista inca in service.');
-      this.isSavingTicket = false;
-      return;
-    }
-
-    request$
-      .pipe(finalize(() => this.isSavingTicket = false))
-      .subscribe({
-        next: () => {
-          this.loadActivitati();
-          this.loadTickets();
-          this.closeTicketPopup();
-        },
-        error: (err: any) => console.error('Eroare la salvare:', err)
+      const finalPayload = { ...original, ...payload, id: Number(idPart) };
+      (this.supportService as any).updateTicket?.(finalPayload).subscribe({
+        next: onSuccess, error: onError
       });
+    } else {
+      if (this.rowSelectat.rowId.startsWith('new-')) {
+        this.maintenanceService.createActivitate(payload).subscribe({
+          next: onSuccess, error: onError
+        });
+      } else {
+        this.maintenanceService.updateActivitate(Number(idPart), payload).subscribe({
+          next: onSuccess, error: onError
+        });
+      }
+    }
   }
 
   saveDetalii() {
@@ -759,37 +955,39 @@ export class MaintenanceComponent implements OnInit {
 
     const isTicket = this.rowSelectat.sursaTicket;
     const idPart = this.rowSelectat.rowId.split('-')[1];
+    const payload = this.buildSafePayload();
 
-    let request$;
+    const onError = (err: any) => {
+      this.isSavingDetalii = false;
+      console.error(err);
+      const detalii = err.error?.detail ? JSON.stringify(err.error.detail, null, 2) : err.message;
+      alert(`Backend-ul a respins datele detaliate (422):\n\n${detalii}`);
+    };
+
+    const onSuccess = () => {
+      this.isSavingDetalii = false;
+      this.loadActivitati();
+      this.loadTickets();
+      this.closeAllPopups();
+    };
+
     if (isTicket) {
       const original = this.tickets.find(t => String((t as any).id) === String(idPart)) || {};
-      const payload = { 
-        ...original, 
-        ...this.detaliiEdit, 
-        status: this.randEdit.status, 
-        id: Number(idPart) 
-      };
-      request$ = (this.supportService as any).updateTicket?.(payload);
-    } else {
-      request$ = (this.maintenanceService as any).updateDetaliiActivitate?.(idPart, { ...this.detaliiEdit, status: this.randEdit.status });
-    }
-
-    if (!request$) {
-      console.warn('Metoda updateDetaliiActivitate nu exista inca in service.');
-      this.isSavingDetalii = false;
-      return;
-    }
-
-    request$
-      .pipe(finalize(() => this.isSavingDetalii = false))
-      .subscribe({
-        next: () => {
-          this.loadActivitati();
-          this.loadTickets();
-          this.closeDetaliiPopup();
-        },
-        error: (err: any) => console.error('Eroare la salvarea detaliilor:', err)
+      const finalPayload = { ...original, ...payload, status: this.randEdit.status, id: Number(idPart) };
+      (this.supportService as any).updateTicket?.(finalPayload).subscribe({
+        next: onSuccess, error: onError
       });
+    } else {
+      if (this.rowSelectat.rowId.startsWith('new-')) {
+        this.maintenanceService.createActivitate(payload).subscribe({
+          next: onSuccess, error: onError
+        });
+      } else {
+        this.maintenanceService.updateDetaliiActivitate(Number(idPart), payload).subscribe({
+          next: onSuccess, error: onError
+        });
+      }
+    }
   }
 
   closeAllPopups() {

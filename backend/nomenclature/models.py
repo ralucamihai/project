@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 
 # Presupun ca Base e definit in login/models.py, la fel ca User (conform
 # conventiei tale). Daca Base e in alta parte, schimba doar linia de import.
-from login.models import Base
+from database import Base
 
 
 class UtilizatorPMB(Base):

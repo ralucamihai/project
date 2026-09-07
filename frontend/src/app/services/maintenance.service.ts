@@ -8,7 +8,7 @@ import { delay } from 'rxjs/operators';
 // Cand backend-ul e gata: pune USE_MOCK_DATA pe false si atat —
 // toate metodele revin automat la apelurile HttpClient reale de mai jos.
 // =========================================================
-const USE_MOCK_DATA = true;
+const USE_MOCK_DATA = false;
 
 // Interfata a fost extinsa pentru a sustine noul tabel unificat
 export interface ActivitatePMB {
@@ -91,7 +91,7 @@ export interface ActivitatiFiltre {
 })
 export class MaintenanceService {
 
-  private baseUrl = 'http://127.0.0.1:8000/api';
+  private baseUrl = 'http://127.0.0.1:8080/api'; // Corectat la 8080
 
   // ---- Date mock (folosite doar cat USE_MOCK_DATA = true) ----
   private mockEchipamente: EchipamentPMB[] = [
@@ -101,80 +101,8 @@ export class MaintenanceService {
   ];
   private mockNextIdEchipament = 4;
 
-  private mockActivitati: ActivitatePMB[] = [
-    {
-      id: 1,
-      ticket: 1024,
-      initiator: 'Admin PMB',
-      tipEchipament: 'INV-001',
-      echipa: 'Presa hidraulica 1',
-      denumire: 'Verificare presa hidraulica 1',
-      tipInterventie: 'Preventiva',
-      grup: 'Mecanici',
-      responsabil: 'Ion Popescu',
-      executant: 'Ion Popescu',
-      descriereSimptom: 'Verificare uzura garnitura conform plan',
-      defEnuntat: 'Uzura garnitura',
-      sectie: 'Asamblare',
-      linie: 'Linia 1',
-      codAfectat: 'CAB-01',
-      denumireProdus: 'Componente M1',
-      prioritate: 'Medie',
-      termenInitiat: '2026-01-10 08:00',
-      termenCerut: '10:00',
-      piese: 'Garnitura hidraulica',
-      loc: 'Hala 1',
-      deLaOra: '08:30',
-      panaLaOra: '09:15',
-      cauzaInterventie: 'Mentenanta lunara',
-      explicatie: 'S-a inlocuit si testat fara probleme.',
-      operSupl: 'Curatat senzor adiacent',
-      validatDe: 'Sef Tura',
-      validatCa: 'Corect',
-      explValid: 'Aprobat',
-      status: 'Finalizat',
-      activ: true,
-      dataCreareCont: '2026-01-10',
-      dataDezactivareCont: null,
-      dataOra: '2026-01-10 09:15'
-    },
-    {
-      id: 2,
-      ticket: 1025,
-      initiator: 'Operator Linie',
-      tipEchipament: 'INV-002',
-      echipa: 'Robot sudura 2',
-      denumire: 'Interventie robot sudura 2',
-      tipInterventie: 'Accidentala',
-      grup: 'Electricieni',
-      responsabil: 'Maria Ionescu',
-      executant: 'Maria Ionescu',
-      descriereSimptom: 'Robotul s-a blocat la pozitia 4',
-      defEnuntat: 'Eroare senzor',
-      sectie: 'Testare Finală',
-      linie: 'Linia 2',
-      codAfectat: 'CAB-02',
-      denumireProdus: 'Carcasa 220V',
-      prioritate: 'Ridicată',
-      termenInitiat: '2026-02-05 13:00',
-      termenCerut: '15:00',
-      piese: 'Senzor pozitie optic',
-      loc: 'Hala 2',
-      deLaOra: '13:10',
-      panaLaOra: '14:40',
-      cauzaInterventie: 'Scurtcircuit senzor',
-      explicatie: 'Senzorul vechi a ars, schimbat cu unul nou.',
-      operSupl: 'Verificat tot circuitul.',
-      validatDe: '',
-      validatCa: '',
-      explValid: '',
-      status: 'In lucru',
-      activ: true,
-      dataCreareCont: '2026-02-05',
-      dataDezactivareCont: null,
-      dataOra: '2026-02-05 14:40'
-    }
-  ];
+  // Curățat complet pentru a preveni datele mock nedorite
+  private mockActivitati: ActivitatePMB[] = [];
 
   private mockDefEnuntate: string[] = [
     'Uzura garnitura',
@@ -246,7 +174,6 @@ export class MaintenanceService {
     return this.http.put<ActivitatePMB>(`${this.baseUrl}/maintenance/activitati/${id}`, activitate);
   }
 
-  // ---- METODA NOUA PENTRU POPUP-UL DIN DREAPTA ----
   updateDetaliiActivitate(id: number, detalii: any): Observable<ActivitatePMB> {
     if (USE_MOCK_DATA) {
       const index = this.mockActivitati.findIndex(a => String(a.id) === String(id));
@@ -331,7 +258,6 @@ export class MaintenanceService {
     if (USE_MOCK_DATA) {
       const index = this.mockEchipamente.findIndex(e => e.id === id);
       if (index !== -1) {
-        // dataReceptie nu se modifica NICIODATA la editare
         const dataReceptieOriginala = this.mockEchipamente[index].dataReceptie;
         this.mockEchipamente[index] = { ...this.mockEchipamente[index], ...echipament, dataReceptie: dataReceptieOriginala };
       }
