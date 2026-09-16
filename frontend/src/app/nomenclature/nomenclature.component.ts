@@ -1,34 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { NomenclatureService, UtilizatorPMB, NivelAcces, GrupMunca, Piesa, ListaPiese, TipEchipament } from '../services/nomenclature.service';
-
-type SortKey = 'nr' | 'denumire';
-
-export interface TipInterventie {
-  denumire: string;
-}
+import { 
+  NomenclatureService, UtilizatorPMB, GrupMunca, Piesa, ListaPiese, 
+  TipEchipament, Sectie, TipInterventie, CategorieDefect,
+  OperatieMentenanta, ListaOperatii 
+} from '../services/nomenclature.service';
+import { ApiCallerService } from '../services/api-caller.service';
 
 type SortKeyInterv = 'nr' | 'denumire';
-
-export interface CategorieDefect {
-  idCategorie: string;
-  denumire: string;
-}
-
 type SortKeyCtg = 'nr' | 'idCategorie' | 'denumire';
-
-type SortKeyUtil = 'marca' | 'nume' | 'functie' | 'grup' | 'user' | 'nivelAcces' | 'activ' | 'dataActiv';
-
-export interface OperatieLogistica {
-  cod: string;
-  denumireRO: string;
-  denumireDE: string;
-}
-
-type SortKeyOp = 'nr' | 'cod' | 'denumireRO' | 'denumireDE';
-
-type SortKeyGrup = 'nr' | 'grup' | 'membri';
-
+type SortKeyUtil = 'marca' | 'nume' | 'functie' | 'grup' | 'user';
+type SortKeyGrup = 'nr' | 'grup' | 'membri' | 'departament';
 type SortKeyPiese = 'id' | 'denumire' | 'codSap' | 'pozitieRaft' | 'partNumber' | 'pretRon' | 'stocCurent' | 'stocMinim' | '';
 
 @Component({
@@ -43,17 +25,18 @@ export class NomenclatureComponent implements OnInit {
 
   tabs = [
     { key: 'tip_echipament', label: 'Tip Echipament' },
-    { key: 'utilizatori_pmb', label: 'Utilizatori PMB' },
     { key: 'tip_interventie', label: 'Tip Intervenție' },
     { key: 'categorie_defect', label: 'Categorie Defect' },
     { key: 'piese_schimb', label: 'Piese' },
     { key: 'operatii', label: 'Operații' },
-    { key: 'grupuri', label: 'Grupuri' }
+    { key: 'grupuri', label: 'Grupuri' },
+    { key: 'sectii', label: 'Secții' }
   ];
 
   constructor(
     private route: ActivatedRoute,
-    private nomenclatureService: NomenclatureService
+    private nomenclatureService: NomenclatureService,
+    private apiCaller: ApiCallerService
   ) {}
 
   ngOnInit(): void {
@@ -65,18 +48,40 @@ export class NomenclatureComponent implements OnInit {
     this.loadGrupuriMunca();
     this.loadPiese();
     this.loadListePiese();
+    this.loadSectii();
+    this.loadSefiDeLinie();
+    this.loadTipuriInterventie();
+    this.loadCategoriiDefect();
+    
+    // Incarcam datele pentru noile Operatii Mentenanta
+    this.loadOperatiiMentenanta();
+    this.loadListeOperatii();
   }
 
-  setTab(tab: string) {
-    this.activeTab = tab;
+  // =========================================================
+  // ---- ȘEFI DE LINIE ----
+  // =========================================================
+  sefiDeLinieOptions: string[] = [];
+  loadSefiDeLinie() {
+    this.apiCaller.getAllUsers().subscribe({
+      next: (response: any[]) => {
+        this.sefiDeLinieOptions = (response || [])
+          .filter(u => (u.department || '').trim() === 'Producție' && (u.functie || '').trim() === 'Șef de linie')
+          .map(u => `${u.firstName || ''} ${u.lastName || ''}`.trim())
+          .filter(nume => !!nume)
+          .sort((a, b) => a.localeCompare(b));
+      },
+      error: (err: any) => console.error('Eroare la încărcarea șefilor de linie:', err)
+    });
   }
+
+  setTab(tab: string) { this.activeTab = tab; }
 
   // =========================================================
   // ---- TIP ECHIPAMENT ----
   // =========================================================
   tipuriEchipament: TipEchipament[] = [];
   isLoadingTipEch: boolean = false;
-
   searchText: string = '';
   sortKey: string = 'denumire';
   sortAsc: boolean = true;
@@ -88,12 +93,15 @@ export class NomenclatureComponent implements OnInit {
 
   autonomaOptions: string[] = ['NA', 'Zilnic', 'Saptamanal', 'Start fabricatie'];
   periodOptions: { value: string; label: string }[] = [
-    { value: 'na', label: 'NA' },
-    { value: 'lunar', label: 'Lunar' },
-    { value: 'la_2_luni', label: 'La 2 luni' },
-    { value: 'la_3_luni', label: 'La 3 luni' },
-    { value: 'la_6_luni', label: 'La 6 luni' },
-    { value: 'anual', label: 'Anual' }
+    { value: 'na', label: 'NA' }, { value: 'lunar', label: 'Lunar' },
+    { value: 'la_2_luni', label: 'La 2 luni' }, { value: 'la_3_luni', label: 'La 3 luni' },
+    { value: 'la_6_luni', label: 'La 6 luni' }, { value: 'anual', label: 'Anual' }
+  ];
+  periodOptions1: { value: string; label: string }[] = [
+    { value: '1', label: '1' }, { value: '2', label: '2' }, { value: '3', label: '3' },
+    { value: '4', label: '4' }, { value: '5', label: '5' }, { value: '6', label: '6' },
+    { value: '7', label: '7' }, { value: '8', label: '8' }, { value: '9', label: '9' },
+    { value: '10', label: '10' }, { value: '11', label: '11' }, { value: '12', label: '12' }
   ];
 
   private tipEchipamentGol(): TipEchipament {
@@ -128,20 +136,8 @@ export class NomenclatureComponent implements OnInit {
 
   selectRow(index: number) { this.selectedIndex = index; }
   
-  openAddForm() {
-    this.isEditMode = false;
-    this.formModel = this.tipEchipamentGol();
-    this.editingIndex = null;
-    this.showForm = true;
-  }
-
-  openEditForm(item: TipEchipament, index: number) {
-    this.isEditMode = true;
-    this.formModel = { ...item };
-    this.editingIndex = index;
-    this.showForm = true;
-  }
-
+  openAddForm() { this.isEditMode = false; this.formModel = this.tipEchipamentGol(); this.editingIndex = null; this.showForm = true; }
+  openEditForm(item: TipEchipament, index: number) { this.isEditMode = true; this.formModel = { ...item }; this.editingIndex = index; this.showForm = true; }
   closeForm() { this.showForm = false; }
 
   saveForm() {
@@ -169,18 +165,8 @@ export class NomenclatureComponent implements OnInit {
   // =========================================================
   // ---- TIP INTERVENTIE ----
   // =========================================================
-
-  tipuriInterventie: TipInterventie[] = [
-    { denumire: 'Accidentala' }, { denumire: 'AEM' }, { denumire: 'Ajustare parametrii' },
-    { denumire: 'Backup' }, { denumire: 'Cladiri' }, { denumire: 'Curatare_echip' },
-    { denumire: 'Electric' }, { denumire: 'Electrosecuritate' }, { denumire: 'ESD' },
-    { denumire: 'Imbunatatire' }, { denumire: 'Instalare Echipament' }, { denumire: 'Masuratoare' },
-    { denumire: 'Pneumatic' }, { denumire: 'Pornire_fabricatie' }, { denumire: 'Predictiva' },
-    { denumire: 'Prelucrare mecanica repere' }, { denumire: 'Preventiva' }, { denumire: 'Produs_nou' },
-    { denumire: 'Reglaj echipament' }, { denumire: 'Reglaj stanta' }, { denumire: 'Schimb_echip' },
-    { denumire: 'Schimb_produs' }, { denumire: 'Schimb_recipient' }, { denumire: 'Schimb_stanta' },
-  ];
-
+  tipuriInterventie: TipInterventie[] = [];
+  isLoadingInterv: boolean = false;
   searchTextInterv: string = '';
   sortKeyInterv: SortKeyInterv = 'denumire';
   sortAscInterv: boolean = true;
@@ -189,6 +175,14 @@ export class NomenclatureComponent implements OnInit {
   isEditModeInterv: boolean = false;
   formModelInterv: TipInterventie = { denumire: '' };
   editingIndexInterv: number | null = null;
+
+  loadTipuriInterventie() {
+    this.isLoadingInterv = true;
+    this.nomenclatureService.getTipuriInterventie().subscribe({
+      next: (data: TipInterventie[]) => { this.tipuriInterventie = data; this.isLoadingInterv = false; },
+      error: (err: any) => { console.error(err); this.isLoadingInterv = false; }
+    });
+  }
 
   get tipuriInterventieFiltrate(): TipInterventie[] {
     const term = this.searchTextInterv.trim().toLowerCase();
@@ -215,30 +209,34 @@ export class NomenclatureComponent implements OnInit {
   
   saveFormInterv() {
     if (!this.formModelInterv.denumire.trim()) return;
-    if (this.isEditModeInterv && this.editingIndexInterv !== null) { this.tipuriInterventie[this.editingIndexInterv] = { ...this.formModelInterv }; } 
-    else { this.tipuriInterventie.push({ ...this.formModelInterv }); }
-    this.closeFormInterv();
+    if (this.isEditModeInterv && this.formModelInterv.id) {
+      this.nomenclatureService.updateTipInterventie(this.formModelInterv).subscribe({
+        next: () => { this.loadTipuriInterventie(); this.closeFormInterv(); },
+        error: (err: any) => alert(err?.error?.detail || 'Eroare.')
+      });
+    } else {
+      this.nomenclatureService.createTipInterventie(this.formModelInterv).subscribe({
+        next: () => { this.loadTipuriInterventie(); this.closeFormInterv(); },
+        error: (err: any) => alert(err?.error?.detail || 'Eroare.')
+      });
+    }
   }
 
-  deleteItemInterv(index: number) { this.tipuriInterventie.splice(index, 1); if (this.selectedIndexInterv === index) this.selectedIndexInterv = null; }
+  deleteItemInterv(item: TipInterventie, index: number) {
+    if (!confirm('Ștergi acest tip?')) return;
+    if (!item.id) return;
+    this.nomenclatureService.deleteTipInterventie(item.id).subscribe({
+      next: () => { this.loadTipuriInterventie(); if (this.selectedIndexInterv === index) this.selectedIndexInterv = null; },
+      error: (err: any) => alert(err?.error?.detail || 'Eroare.')
+    });
+  }
   listeazaInterv() { window.print(); }
-  salveazaInterv() { console.log('Salvare tipuri intervenție:', this.tipuriInterventie); }
 
   // =========================================================
-  // ---- PMB CATEGORII (Categorie Defect) ----
+  // ---- CATEGORIE DEFECT ----
   // =========================================================
-
-  categoriiDefect: CategorieDefect[] = [
-    { idCategorie: '001', denumire: 'Defect electronic' }, { idCategorie: '002', denumire: 'Defect mecanic' },
-    { idCategorie: '003', denumire: 'Defect electric' }, { idCategorie: '004', denumire: 'Defect de produs' },
-    { idCategorie: '005', denumire: 'Eroare operator' }, { idCategorie: '006', denumire: 'Calibrare echipament' },
-    { idCategorie: '007', denumire: 'Mentenanta preventiva' }, { idCategorie: '008', denumire: 'Defect software' },
-    { idCategorie: '009', denumire: 'Alte defecte' }, { idCategorie: '010', denumire: 'Schimbare echipament' },
-    { idCategorie: '011', denumire: 'Implementare produs nou' }, { idCategorie: '012', denumire: 'Imbunatatire' },
-    { idCategorie: '013', denumire: 'Prelucrare mecanica reper' }, { idCategorie: '014', denumire: 'Produs nou' },
-    { idCategorie: '015', denumire: 'Backup' },
-  ];
-
+  categoriiDefect: CategorieDefect[] = [];
+  isLoadingCtg: boolean = false;
   searchTextCtg: string = '';
   sortKeyCtg: SortKeyCtg = 'idCategorie';
   sortAscCtg: boolean = true;
@@ -247,6 +245,14 @@ export class NomenclatureComponent implements OnInit {
   isEditModeCtg: boolean = false;
   formModelCtg: CategorieDefect = { idCategorie: '', denumire: '' };
   editingIndexCtg: number | null = null;
+
+  loadCategoriiDefect() {
+    this.isLoadingCtg = true;
+    this.nomenclatureService.getCategoriiDefect().subscribe({
+      next: (data: CategorieDefect[]) => { this.categoriiDefect = data; this.isLoadingCtg = false; },
+      error: (err: any) => { console.error(err); this.isLoadingCtg = false; }
+    });
+  }
 
   get categoriiFiltrate(): CategorieDefect[] {
     const term = this.searchTextCtg.trim().toLowerCase();
@@ -273,46 +279,46 @@ export class NomenclatureComponent implements OnInit {
   
   saveFormCtg() {
     if (!this.formModelCtg.idCategorie.trim() || !this.formModelCtg.denumire.trim()) return;
-    if (this.isEditModeCtg && this.editingIndexCtg !== null) { this.categoriiDefect[this.editingIndexCtg] = { ...this.formModelCtg }; } 
-    else { this.categoriiDefect.push({ ...this.formModelCtg }); }
-    this.closeFormCtg();
+    if (this.isEditModeCtg && this.formModelCtg.id) {
+      this.nomenclatureService.updateCategorieDefect(this.formModelCtg).subscribe({
+        next: () => { this.loadCategoriiDefect(); this.closeFormCtg(); },
+        error: (err: any) => alert(err?.error?.detail || 'Eroare.')
+      });
+    } else {
+      this.nomenclatureService.createCategorieDefect(this.formModelCtg).subscribe({
+        next: () => { this.loadCategoriiDefect(); this.closeFormCtg(); },
+        error: (err: any) => alert(err?.error?.detail || 'Eroare.')
+      });
+    }
   }
 
-  deleteItemCtg(index: number) { this.categoriiDefect.splice(index, 1); if (this.selectedIndexCtg === index) this.selectedIndexCtg = null; }
+  deleteItemCtg(item: CategorieDefect, index: number) {
+    if (!confirm('Ștergi categoria?')) return;
+    if (!item.id) return;
+    this.nomenclatureService.deleteCategorieDefect(item.id).subscribe({
+      next: () => { this.loadCategoriiDefect(); if (this.selectedIndexCtg === index) this.selectedIndexCtg = null; },
+      error: (err: any) => alert(err?.error?.detail || 'Eroare.')
+    });
+  }
   listeazaCtg() { window.print(); }
-  salveazaCtg() { console.log('Salvare categorii defect:', this.categoriiDefect); }
 
   // =========================================================
-  // ---- UTILIZATORI PMB (conectat la backend) ----
+  // ---- UTILIZATORI PMB ----
   // =========================================================
-
   isAdmin: boolean = true;
   utilizatoriPMB: UtilizatorPMB[] = [];
   isLoadingUtilizatori: boolean = false;
-
   filtruMarca: string = '';
   filtruNume: string = '';
   filtruFunctie: string = '';
   filtruGrup: string = '';
   filtruUser: string = '';
-  filtruAccesPmb: boolean = false;
-  arataInactivi: boolean = false;
-
   sortKeyUtil: SortKeyUtil = 'nume';
   sortAscUtil: boolean = true;
   selectedIndexUtil: number | null = null;
   showFormUtil: boolean = false;
   isEditModeUtil: boolean = false;
-  formModelUtil: UtilizatorPMB = this.utilizatorGol();
-  nivelAccesOptions: NivelAcces[] = ['Admin', 'Editare', 'Vizualizare'];
-
-  private utilizatorGol(): UtilizatorPMB {
-    return {
-      marca: '', nume: '', functie: '', grup: '', acces: true,
-      user: '', nivelAcces: 'Vizualizare', activ: true,
-      dataActiv: new Date().toISOString().slice(0, 10)
-    };
-  }
+  formModelUtil: UtilizatorPMB = { marca: '', nume: '', functie: '', grup: '', user: '' };
 
   loadUtilizatoriPMB() {
     this.isLoadingUtilizatori = true;
@@ -330,19 +336,16 @@ export class NomenclatureComponent implements OnInit {
     const user = this.filtruUser.trim().toLowerCase();
 
     let lista = this.utilizatoriPMB.filter(u => {
-      if (!this.arataInactivi && !u.activ) return false;
       if (marca && !u.marca.toLowerCase().includes(marca)) return false;
       if (nume && !u.nume.toLowerCase().includes(nume)) return false;
       if (functie && !u.functie.toLowerCase().includes(functie)) return false;
       if (grup && !(u.grup || '').toLowerCase().includes(grup)) return false;
       if (user && !u.user.toLowerCase().includes(user)) return false;
-      if (this.filtruAccesPmb && !u.acces) return false;
       return true;
     });
 
     lista.sort((a, b) => {
-      let va: any = this.sortKeyUtil === 'acces' as any || this.sortKeyUtil === 'activ' ? (a[this.sortKeyUtil] ? 1 : 0) : a[this.sortKeyUtil];
-      let vb: any = this.sortKeyUtil === 'acces' as any || this.sortKeyUtil === 'activ' ? (b[this.sortKeyUtil] ? 1 : 0) : b[this.sortKeyUtil];
+      let va: any = a[this.sortKeyUtil]; let vb: any = b[this.sortKeyUtil];
       if (typeof va === 'string') va = va.toLowerCase();
       if (typeof vb === 'string') vb = vb.toLowerCase();
       if (va < vb) return this.sortAscUtil ? -1 : 1;
@@ -358,18 +361,14 @@ export class NomenclatureComponent implements OnInit {
   }
 
   selectRowUtil(index: number) { this.selectedIndexUtil = index; }
-  openAddFormUtil() { if (!this.isAdmin) return; this.isEditModeUtil = false; this.formModelUtil = this.utilizatorGol(); this.showFormUtil = true; }
+  openAddFormUtil() { if (!this.isAdmin) return; this.isEditModeUtil = false; this.formModelUtil = { marca: '', nume: '', functie: '', grup: '', user: '' }; this.showFormUtil = true; }
   openEditFormUtil(item: UtilizatorPMB, index: number) { this.isEditModeUtil = true; this.formModelUtil = { ...item }; this.selectedIndexUtil = index; this.showFormUtil = true; }
   closeFormUtil() { this.showFormUtil = false; }
 
   saveFormUtil() {
     if (!this.formModelUtil.nume.trim() || !this.formModelUtil.user.trim()) return;
-    const onDone = () => {
-      this.loadUtilizatoriPMB();
-      this.loadGrupuriMunca();
-      this.closeFormUtil();
-    };
-    const onError = (err: any) => { console.error(err); alert('Eroare la salvare. Verifică datele și încearcă din nou.'); };
+    const onDone = () => { this.loadUtilizatoriPMB(); this.loadGrupuriMunca(); this.closeFormUtil(); };
+    const onError = (err: any) => { console.error(err); alert('Eroare la salvare.'); };
 
     if (this.isEditModeUtil && this.formModelUtil.id) {
       this.nomenclatureService.updateUtilizatorPMB(this.formModelUtil).subscribe({ next: onDone, error: onError });
@@ -388,83 +387,18 @@ export class NomenclatureComponent implements OnInit {
     });
   }
 
-  toggleActivUtilizator(item: UtilizatorPMB) {
-    if (!this.isAdmin || !item.id) return;
-    this.nomenclatureService.toggleActivUtilizatorPMB(item.id).subscribe({
-      next: () => { this.loadUtilizatoriPMB(); this.loadGrupuriMunca(); },
-      error: (err: any) => { console.error(err); alert('Eroare la actualizare.'); }
-    });
-  }
-
-  listeazaUtil() { window.print(); }
-  salveazaUtil() { console.log('Utilizatori PMB persistați automat la fiecare salvare/ștergere.'); }
-
   // =========================================================
-  // ---- OPERAȚII (Nomenclator operații) ----
+  // ---- GRUPURI MUNCA ----
   // =========================================================
-
-  operatii: OperatieLogistica[] = [
-    { cod: '10010', denumireRO: 'Montaj', denumireDE: 'Montage' },
-    { cod: '10020', denumireRO: 'Lipire manuala', denumireDE: 'Handlöten' },
-    { cod: '10030', denumireRO: 'Insurubare', denumireDE: 'Verschrauben' },
-  ];
-
-  searchTextOp: string = '';
-  sortKeyOp: SortKeyOp = 'cod';
-  sortAscOp: boolean = true;
-  selectedIndexOp: number | null = null;
-  showFormOp: boolean = false;
-  isEditModeOp: boolean = false;
-  formModelOp: OperatieLogistica = { cod: '', denumireRO: '', denumireDE: '' };
-  editingIndexOp: number | null = null;
-
-  get operatiiFiltrate(): OperatieLogistica[] {
-    const term = this.searchTextOp.trim().toLowerCase();
-    let lista = !term ? [...this.operatii] : this.operatii.filter(o => o.cod.toLowerCase().includes(term) || o.denumireRO.toLowerCase().includes(term) || o.denumireDE.toLowerCase().includes(term));
-    lista.sort((a, b) => {
-      const va = a[this.sortKeyOp as 'cod' | 'denumireRO' | 'denumireDE'].toLowerCase();
-      const vb = b[this.sortKeyOp as 'cod' | 'denumireRO' | 'denumireDE'].toLowerCase();
-      if (va < vb) return this.sortAscOp ? -1 : 1;
-      if (va > vb) return this.sortAscOp ? 1 : -1;
-      return 0;
-    });
-    return lista;
-  }
-
-  setSortOp(key: SortKeyOp) {
-    if (this.sortKeyOp === key) { this.sortAscOp = !this.sortAscOp; } 
-    else { this.sortKeyOp = key; this.sortAscOp = true; }
-  }
-
-  selectRowOp(index: number) { this.selectedIndexOp = index; }
-  openAddFormOp() { this.isEditModeOp = false; this.formModelOp = { cod: '', denumireRO: '', denumireDE: '' }; this.editingIndexOp = null; this.showFormOp = true; }
-  openEditFormOp(item: OperatieLogistica, index: number) { this.isEditModeOp = true; this.formModelOp = { ...item }; this.editingIndexOp = index; this.showFormOp = true; }
-  closeFormOp() { this.showFormOp = false; }
-  
-  saveFormOp() {
-    if (!this.formModelOp.cod.trim() || !this.formModelOp.denumireRO.trim()) return;
-    if (this.isEditModeOp && this.editingIndexOp !== null) { this.operatii[this.editingIndexOp] = { ...this.formModelOp }; } 
-    else { this.operatii.push({ ...this.formModelOp }); }
-    this.closeFormOp();
-  }
-
-  deleteItemOp(index: number) { this.operatii.splice(index, 1); if (this.selectedIndexOp === index) this.selectedIndexOp = null; }
-  listeazaOp() { window.print(); }
-  salveazaOp() { console.log('Salvare operații:', this.operatii); }
-
-  // =========================================================
-  // ---- GRUPURI MUNCA (conectat la backend) ----
-  // =========================================================
-
   searchTextGrup: string = '';
+  filterDepartament: string = ''; 
   sortKeyGrup: SortKeyGrup = 'grup';
   sortAscGrup: boolean = true;
   isLoadingGrupuri: boolean = false;
   grupuriMuncaData: GrupMunca[] = [];
-
   showFormGrupNou: boolean = false;
   isSavingGrupNou: boolean = false;
-  formModelGrupNou: { nume: string } = { nume: '' };
+  formModelGrupNou: { nume: string, departament: string } = { nume: '', departament: '' };
 
   loadGrupuriMunca() {
     this.isLoadingGrupuri = true;
@@ -476,11 +410,26 @@ export class NomenclatureComponent implements OnInit {
 
   get grupuriFiltrate(): GrupMunca[] {
     const term = this.searchTextGrup.trim().toLowerCase();
-    const sursa = this.grupuriMuncaData;
-    let lista = !term ? [...sursa] : sursa.filter(g => g.grup.toLowerCase().includes(term) || g.membri.join(', ').toLowerCase().includes(term));
-    lista.sort((a, b) => {
-      const va = this.sortKeyGrup === 'membri' ? a.membri.join(', ').toLowerCase() : a.grup.toLowerCase();
-      const vb = this.sortKeyGrup === 'membri' ? b.membri.join(', ').toLowerCase() : b.grup.toLowerCase();
+    const dep = this.filterDepartament;
+    
+    let lista = this.grupuriMuncaData.filter((g: any) => {
+      const matchText = !term || g.grup.toLowerCase().includes(term) || (g.membri && g.membri.join(', ').toLowerCase().includes(term));
+      const matchDep = !dep || g.departament === dep;
+      return matchText && matchDep;
+    });
+
+    lista.sort((a: any, b: any) => {
+      let va = ''; let vb = '';
+      if (this.sortKeyGrup === 'membri') {
+        va = (a.membri || []).join(', ').toLowerCase();
+        vb = (b.membri || []).join(', ').toLowerCase();
+      } else if (this.sortKeyGrup === 'departament') {
+        va = (a.departament || '').toLowerCase();
+        vb = (b.departament || '').toLowerCase();
+      } else {
+        va = (a.grup || '').toLowerCase();
+        vb = (b.grup || '').toLowerCase();
+      }
       if (va < vb) return this.sortAscGrup ? -1 : 1;
       if (va > vb) return this.sortAscGrup ? 1 : -1;
       return 0;
@@ -493,19 +442,18 @@ export class NomenclatureComponent implements OnInit {
     else { this.sortKeyGrup = key; this.sortAscGrup = true; }
   }
 
-  openAddFormGrupNou() { this.formModelGrupNou = { nume: '' }; this.showFormGrupNou = true; }
+  filtreazaGrupuri(): void {}
+
+  openAddFormGrupNou() { this.formModelGrupNou = { nume: '', departament: '' }; this.showFormGrupNou = true; }
   closeFormGrupNou() { this.showFormGrupNou = false; }
 
   saveFormGrupNou() {
     const nume = this.formModelGrupNou.nume.trim();
     if (!nume) return;
     this.isSavingGrupNou = true;
-    this.nomenclatureService.createGrupMunca(nume).subscribe({
-      next: () => {
-        this.isSavingGrupNou = false;
-        this.closeFormGrupNou();
-        this.loadGrupuriMunca();
-      },
+    
+    this.nomenclatureService.createGrupMunca(this.formModelGrupNou as any).subscribe({
+      next: () => { this.isSavingGrupNou = false; this.closeFormGrupNou(); this.loadGrupuriMunca(); },
       error: (err: any) => {
         this.isSavingGrupNou = false;
         if (err?.status === 409) { alert('Există deja un grup cu acest nume.'); } 
@@ -517,47 +465,21 @@ export class NomenclatureComponent implements OnInit {
   get numeGrupuriDisponibile(): string[] {
     const nume = this.grupuriMuncaData.map(g => g.grup);
     const grupCurent = this.formModelUtil?.grup?.trim();
-    if (grupCurent && !nume.some(n => n.toLowerCase() === grupCurent.toLowerCase())) {
-      nume.push(grupCurent);
-    }
+    if (grupCurent && !nume.some(n => n.toLowerCase() === grupCurent.toLowerCase())) { nume.push(grupCurent); }
     return nume.sort((a, b) => a.localeCompare(b));
   }
 
-  // Getter pentru popularea automată a dropdown-ului de grup intervenție din șablonul master
   get grupuriInterventieOptions(): string[] {
     const nume = this.grupuriMuncaData.map(g => g.grup);
     const responsabilCurent = this.formModel?.responsabil?.trim();
-    if (responsabilCurent && !nume.some(n => n.toLowerCase() === responsabilCurent.toLowerCase())) {
-      nume.push(responsabilCurent);
-    }
+    if (responsabilCurent && !nume.some(n => n.toLowerCase() === responsabilCurent.toLowerCase())) { nume.push(responsabilCurent); }
     return nume.sort((a, b) => a.localeCompare(b));
   }
-  // Getter pentru Lista de Piese (preluat din tabul Piese)
-  get listaPieseOptions(): string[] {
-    const liste = this.listePiese.map(l => l.denumire);
-    const curent = this.formModel?.lista_piese?.trim();
-    if (curent && !liste.some(l => l.toLowerCase() === curent.toLowerCase())) {
-      liste.push(curent);
-    }
-    return liste.sort((a, b) => a.localeCompare(b));
-  }
-
-  // Getter pentru Lista de Operații (preluat din tabul Operații)
-  get listaOperatiiOptions(): string[] {
-    const ops = this.operatii.map(o => o.denumireRO);
-    const curent = this.formModel?.lista_operatii?.trim();
-    if (curent && !ops.some(o => o.toLowerCase() === curent.toLowerCase())) {
-      ops.push(curent);
-    }
-    return ops.sort((a, b) => a.localeCompare(b));
-  }
-
   listeazaGrup() { window.print(); }
 
   // =========================================================
-  // ---- PIESE (Liste de piese <-> Piese) ----
+  // ---- PIESE ----
   // =========================================================
-
   listePiese: ListaPiese[] = [];
   isLoadingListePiese: boolean = false;
   umOptions: string[] = ['m', 'l', 'kg', 'buc'];
@@ -565,6 +487,44 @@ export class NomenclatureComponent implements OnInit {
   frecventaOptions: string[] = ['foarte rar', 'rar', 'mediu', 'des', 'foarte des'];
   toatePiesele: Piesa[] = [];
   isLoadingPiese: boolean = false;
+  listaSelectataPiese: ListaPiese | null = null;
+  selectedLista: ListaPiese | null = null;
+  selectedLeftPieceIndex: number | null = null;
+  selectedRightPieceIndex: number | null = null;
+  filtruListaNr: string = '';
+  filtruListaDenumire: string = '';
+  conditieAprovOptions: string[] = ['Nu comanda', 'Avertisment', 'Comanda'];
+  filtruPiesaId: string = '';
+  filtruPiesaDenumire: string = '';
+  filtruPiesaCodSap: string = '';
+  filtruPiesaPozRaft: string = '';
+  filtruPiesaPartNr: string = '';
+  filtruPiesaStoc: string = '';
+  filtruPiesaConditie: string = '';
+  showFormLista: boolean = false;
+  isEditModeLista: boolean = false;
+  editingRefLista: ListaPiese | null = null;
+  formModelLista: any = { nrLista: '', denumire: '', pieseIds: [] };
+  showFormPiesa: boolean = false;
+  isEditModePiesa: boolean = false;
+  formModelPiesa: any = this.piesaGoala();
+
+  get listaPieseOptions(): string[] {
+    const liste = this.listePiese.map(l => l.denumire);
+    const curent = this.formModel?.lista_piese?.trim();
+    if (curent && !liste.some(l => l.toLowerCase() === curent.toLowerCase())) { liste.push(curent); }
+    return liste.sort((a, b) => a.localeCompare(b));
+  }
+
+  piesaGoala(): Piesa {
+    return {
+      id: 0, denumire: '', codSap: '', pretRon: '', um: '', magazie: '',
+      pozitieRaft: '', stocMinim: '', stocCurent: '', frecventa: '', producator: '', 
+      partNumber: '', moq: '', utilizare: '', dublura: '',
+      excludeDublate: false, excludeIesiteDinFabricatie: false,
+      furnizor: '', refFurnizor: '', furnizor1: '', refFurn1: '', furnizor2: '', refFurn2: ''
+    };
+  }
 
   loadPiese() {
     this.isLoadingPiese = true;
@@ -589,14 +549,6 @@ export class NomenclatureComponent implements OnInit {
     });
   }
 
-  listaSelectataPiese: ListaPiese | null = null;
-  selectedLista: ListaPiese | null = null;
-  selectedLeftPieceIndex: number | null = null;
-  selectedRightPieceIndex: number | null = null;
-
-  filtruListaNr: string = '';
-  filtruListaDenumire: string = '';
-
   get listePieseFiltrate(): ListaPiese[] {
     const nr = this.filtruListaNr.trim().toLowerCase();
     const den = this.filtruListaDenumire.trim().toLowerCase();
@@ -605,15 +557,6 @@ export class NomenclatureComponent implements OnInit {
       (!den || l.denumire.toLowerCase().includes(den))
     );
   }
-
-  conditieAprovOptions: string[] = ['Nu comanda', 'Avertisment', 'Comanda'];
-  filtruPiesaId: string = '';
-  filtruPiesaDenumire: string = '';
-  filtruPiesaCodSap: string = '';
-  filtruPiesaPozRaft: string = '';
-  filtruPiesaPartNr: string = '';
-  filtruPiesaStoc: string = '';
-  filtruPiesaConditie: string = '';
 
   get pieseDisponibileFiltrate(): Piesa[] {
     const id = this.filtruPiesaId.trim().toLowerCase();
@@ -624,7 +567,7 @@ export class NomenclatureComponent implements OnInit {
     const stoc = this.filtruPiesaStoc.trim().toLowerCase();
     const cond = this.filtruPiesaConditie;
 
-    return this.pieseDisponibile.filter(p => {
+    return this.pieseDisponibile.filter((p: any) => {
       if (id && !String(p.id).toLowerCase().includes(id)) return false;
       if (den && !p.denumire.toLowerCase().includes(den)) return false;
       if (cod && !p.codSap.toLowerCase().includes(cod)) return false;
@@ -634,25 +577,6 @@ export class NomenclatureComponent implements OnInit {
       if (cond && this.conditieAprovizionare(p).label !== cond) return false;
       return true;
     });
-  }
-
-  showFormLista: boolean = false;
-  isEditModeLista: boolean = false;
-  editingRefLista: ListaPiese | null = null;
-  formModelLista: ListaPiese = { nrLista: '', denumire: '', pieseIds: [] };
-
-  showFormPiesa: boolean = false;
-  isEditModePiesa: boolean = false;
-  formModelPiesa: Piesa = this.piesaGoala();
-
-  piesaGoala(): Piesa {
-    return {
-      id: 0, denumire: '', codSap: '', pretRon: '', um: '', magazie: '',
-      pozitieRaft: '', stocMinim: '', stocCurent: '',
-      frecventa: '', producator: '', partNumber: '', moq: '', utilizare: '', dublura: '',
-      excludeDublate: false, excludeIesiteDinFabricatie: false,
-      furnizor: '', refFurnizor: '', furnizor1: '', refFurn1: '', furnizor2: '', refFurn2: ''
-    };
   }
 
   get pieseInLista(): Piesa[] {
@@ -666,8 +590,7 @@ export class NomenclatureComponent implements OnInit {
   }
 
   conditieAprovizionare(p: Piesa): { label: string; cls: string } {
-    const curent = Number(p.stocCurent);
-    const minim = Number(p.stocMinim);
+    const curent = Number(p.stocCurent); const minim = Number(p.stocMinim);
     if (isNaN(curent) || isNaN(minim)) return { label: '—', cls: '' };
     const diff = curent - minim;
     if (diff >= 2) return { label: 'Nu comanda', cls: 'badge-aprov-verde' };
@@ -676,33 +599,17 @@ export class NomenclatureComponent implements OnInit {
   }
 
   selectLista(item: ListaPiese) { this.selectedLista = item; }
-
-  openAddFormLista() {
-    this.isEditModeLista = false;
-    this.editingRefLista = null;
-    this.formModelLista = { nrLista: '', denumire: '', pieseIds: [] };
-    this.showFormLista = true;
-  }
-
-  openEditFormLista(item: ListaPiese) {
-    this.isEditModeLista = true;
-    this.editingRefLista = item;
-    this.formModelLista = { ...item };
-    this.showFormLista = true;
-  }
-
+  openAddFormLista() { this.isEditModeLista = false; this.editingRefLista = null; this.formModelLista = { nrLista: '', denumire: '', pieseIds: [] }; this.showFormLista = true; }
+  openEditFormLista(item: ListaPiese) { this.isEditModeLista = true; this.editingRefLista = item; this.formModelLista = { ...item }; this.showFormLista = true; }
   closeFormLista() { this.showFormLista = false; }
 
   saveFormLista() {
     if (!this.formModelLista.denumire.trim()) return;
     const onDone = () => { this.loadListePiese(); this.closeFormLista(); };
-    const onError = (err: any) => { console.error(err); alert('Eroare la salvare listă.'); };
-
     if (this.isEditModeLista && this.editingRefLista && this.editingRefLista.id) {
-      this.nomenclatureService.updateListaPiese({ ...this.formModelLista, id: this.editingRefLista.id })
-        .subscribe({ next: onDone, error: onError });
+      this.nomenclatureService.updateListaPiese({ ...this.formModelLista, id: this.editingRefLista.id }).subscribe({ next: onDone });
     } else {
-      this.nomenclatureService.createListaPiese(this.formModelLista).subscribe({ next: onDone, error: onError });
+      this.nomenclatureService.createListaPiese(this.formModelLista).subscribe({ next: onDone });
     }
   }
 
@@ -710,24 +617,12 @@ export class NomenclatureComponent implements OnInit {
     if (!this.selectedLista || !this.selectedLista.id) return;
     if (!confirm('Sigur ștergi această listă?')) return;
     this.nomenclatureService.deleteListaPiese(this.selectedLista.id).subscribe({
-      next: () => { this.selectedLista = null; this.loadListePiese(); },
-      error: (err: any) => { console.error(err); alert('Eroare la ștergere listă.'); }
+      next: () => { this.selectedLista = null; this.loadListePiese(); }
     });
   }
 
-  deschideLista(item: ListaPiese) {
-    this.listaSelectataPiese = item;
-    this.selectedLeftPieceIndex = null;
-    this.selectedRightPieceIndex = null;
-  }
-
-  inapoiLaListe() {
-    this.listaSelectataPiese = null;
-    this.selectedLista = null;
-    this.selectedLeftPieceIndex = null;
-    this.selectedRightPieceIndex = null;
-  }
-
+  deschideLista(item: ListaPiese) { this.listaSelectataPiese = item; this.selectedLeftPieceIndex = null; this.selectedRightPieceIndex = null; }
+  inapoiLaListe() { this.listaSelectataPiese = null; this.selectedLista = null; this.selectedLeftPieceIndex = null; this.selectedRightPieceIndex = null; }
   selectPiesaStanga(index: number) { this.selectedLeftPieceIndex = index; this.selectedRightPieceIndex = null; }
   selectPiesaDreapta(index: number) { this.selectedRightPieceIndex = index; this.selectedLeftPieceIndex = null; }
 
@@ -736,8 +631,7 @@ export class NomenclatureComponent implements OnInit {
     const piesa = this.pieseDisponibile[this.selectedRightPieceIndex];
     if (!piesa) return;
     this.nomenclatureService.adaugaPiesaInLista(this.listaSelectataPiese.id, piesa.id).subscribe({
-      next: () => { this.selectedRightPieceIndex = null; this.loadListePiese(); },
-      error: (err: any) => { console.error(err); alert('Eroare la adăugarea piesei în listă.'); }
+      next: () => { this.selectedRightPieceIndex = null; this.loadListePiese(); }
     });
   }
 
@@ -746,34 +640,21 @@ export class NomenclatureComponent implements OnInit {
     const piesa = this.pieseInLista[this.selectedLeftPieceIndex];
     if (!piesa) return;
     this.nomenclatureService.scoatePiesaDinLista(this.listaSelectataPiese.id, piesa.id).subscribe({
-      next: () => { this.selectedLeftPieceIndex = null; this.loadListePiese(); },
-      error: (err: any) => { console.error(err); alert('Eroare la scoaterea piesei din listă.'); }
+      next: () => { this.selectedLeftPieceIndex = null; this.loadListePiese(); }
     });
   }
 
-  openAddFormPiesa() {
-    this.isEditModePiesa = false;
-    this.formModelPiesa = this.piesaGoala();
-    this.showFormPiesa = true;
-  }
-
-  openEditFormPiesa(item: Piesa) {
-    this.isEditModePiesa = true;
-    this.formModelPiesa = { ...item };
-    this.showFormPiesa = true;
-  }
-
+  openAddFormPiesa() { this.isEditModePiesa = false; this.formModelPiesa = this.piesaGoala(); this.showFormPiesa = true; }
+  openEditFormPiesa(item: Piesa) { this.isEditModePiesa = true; this.formModelPiesa = { ...item }; this.showFormPiesa = true; }
   closeFormPiesa() { this.showFormPiesa = false; }
 
   saveFormPiesa() {
-    if (!this.formModelPiesa.denumire.trim() || !this.formModelPiesa.codSap.trim()) return;
+    if (!this.formModelPiesa.denumire.trim()) return;
     const onDone = () => { this.loadPiese(); this.loadListePiese(); this.closeFormPiesa(); };
-    const onError = (err: any) => { console.error(err); alert('Eroare la salvare piesă.'); };
-
     if (this.isEditModePiesa && this.formModelPiesa.id) {
-      this.nomenclatureService.updatePiesa(this.formModelPiesa).subscribe({ next: onDone, error: onError });
+      this.nomenclatureService.updatePiesa(this.formModelPiesa).subscribe({ next: onDone });
     } else {
-      this.nomenclatureService.createPiesa(this.formModelPiesa).subscribe({ next: onDone, error: onError });
+      this.nomenclatureService.createPiesa(this.formModelPiesa).subscribe({ next: onDone });
     }
   }
 
@@ -781,35 +662,22 @@ export class NomenclatureComponent implements OnInit {
     if (this.selectedRightPieceIndex === null) return;
     const piesa = this.pieseDisponibileFiltrate[this.selectedRightPieceIndex];
     if (!piesa) return;
-    if (!confirm('Sigur ștergi această piesă?')) return;
+    if (!confirm('Sigur ștergi această înregistrare?')) return;
     this.nomenclatureService.deletePiesa(piesa.id).subscribe({
-      next: () => { this.selectedRightPieceIndex = null; this.loadPiese(); this.loadListePiese(); },
-      error: (err: any) => { console.error(err); alert('Eroare la ștergere piesă.'); }
+      next: () => { this.selectedRightPieceIndex = null; this.loadPiese(); this.loadListePiese(); }
     });
   }
 
   sortKeyPiese: SortKeyPiese = 'denumire';
   sortAscPiese: boolean = true;
-
   setSortPiese(key: SortKeyPiese) {
-    if (this.sortKeyPiese === key) {
-      this.sortAscPiese = !this.sortAscPiese;
-    } else {
-      this.sortKeyPiese = key;
-      this.sortAscPiese = true;
-    }
+    if (this.sortKeyPiese === key) { this.sortAscPiese = !this.sortAscPiese; } 
+    else { this.sortKeyPiese = key; this.sortAscPiese = true; }
     this.pieseDisponibile.sort((a: any, b: any) => {
-      const valA = a[key] ?? '';
-      const valB = b[key] ?? '';
-      const numA = Number(valA);
-      const numB = Number(valB);
-
-      if (!isNaN(numA) && !isNaN(numB) && valA !== '' && valB !== '') {
-        return this.sortAscPiese ? numA - numB : numB - numA;
-      }
-
-      const strA = String(valA).toLowerCase();
-      const strB = String(valB).toLowerCase();
+      const valA = a[key] ?? ''; const valB = b[key] ?? '';
+      const numA = Number(valA); const numB = Number(valB);
+      if (!isNaN(numA) && !isNaN(numB) && valA !== '' && valB !== '') { return this.sortAscPiese ? numA - numB : numB - numA; }
+      const strA = String(valA).toLowerCase(); const strB = String(valB).toLowerCase();
       if (strA < strB) return this.sortAscPiese ? -1 : 1;
       if (strA > strB) return this.sortAscPiese ? 1 : -1;
       return 0;
@@ -818,30 +686,219 @@ export class NomenclatureComponent implements OnInit {
 
   sortKeyListe: 'nrLista' | 'denumire' | '' = 'nrLista';
   sortAscListe: boolean = true;
-
   setSortListe(key: 'nrLista' | 'denumire') {
-    if (this.sortKeyListe === key) {
-      this.sortAscListe = !this.sortAscListe;
-    } else {
-      this.sortKeyListe = key;
-      this.sortAscListe = true;
-    }
-
+    if (this.sortKeyListe === key) { this.sortAscListe = !this.sortAscListe; } 
+    else { this.sortKeyListe = key; this.sortAscListe = true; }
     this.listePiese.sort((a: any, b: any) => {
-      const valA = a[key] ?? '';
-      const valB = b[key] ?? '';
-      const numA = Number(valA);
-      const numB = Number(valB);
-
-      if (!isNaN(numA) && !isNaN(numB) && valA !== '' && valB !== '') {
-        return this.sortAscListe ? numA - numB : numB - numA;
-      }
-
-      const strA = String(valA).toLowerCase();
-      const strB = String(valB).toLowerCase();
+      const valA = a[key] ?? ''; const valB = b[key] ?? '';
+      const numA = Number(valA); const numB = Number(valB);
+      if (!isNaN(numA) && !isNaN(numB) && valA !== '' && valB !== '') { return this.sortAscListe ? numA - numB : numB - numA; }
+      const strA = String(valA).toLowerCase(); const strB = String(valB).toLowerCase();
       if (strA < strB) return this.sortAscListe ? -1 : 1;
       if (strA > strB) return this.sortAscListe ? 1 : -1;
       return 0;
     });
   }
+
+  // =========================================================
+  // ---- OPERATII MENTENANTA (TABUL NOU COMPLET DECUPLAT) ----
+  // =========================================================
+  listeOperatii: ListaOperatii[] = [];
+  toateOperatiile: OperatieMentenanta[] = [];
+  listaSelectataOp: ListaOperatii | null = null;
+  selectedListaOp: ListaOperatii | null = null;
+  selectedLeftOpIndex: number | null = null;
+  selectedRightOpIndex: number | null = null;
+  filtruListaOpDenumire: string = '';
+  filtruOpDenumire: string = '';
+  showFormListaOp: boolean = false;
+  isEditModeListaOp: boolean = false;
+  editingRefListaOp: ListaOperatii | null = null;
+  formModelListaOp: any = { denumire: '', timp: '', operatiiIds: [] };
+  showFormOp: boolean = false;
+  isEditModeOp: boolean = false;
+  formModelOp: any = { denumire: '', instructiune: '', sculeSpeciale: '', prioritate: 'Medie', autonoma: false, preventiva: false };
+  prioritateOpOptions: string[] = ['Scăzută', 'Medie', 'Ridicată'];
+
+  get listaOperatiiOptions(): string[] {
+    const liste = this.listeOperatii.map(l => l.denumire);
+    const curent = this.formModel?.lista_operatii?.trim();
+    if (curent && !liste.some(l => l.toLowerCase() === curent.toLowerCase())) { liste.push(curent); }
+    return liste.sort((a, b) => a.localeCompare(b));
+  }
+
+  loadOperatiiMentenanta() {
+    this.nomenclatureService.getOperatiiMentenanta().subscribe(data => this.toateOperatiile = data);
+  }
+  
+  loadListeOperatii() {
+    this.nomenclatureService.getListeOperatii().subscribe(data => {
+      this.listeOperatii = data;
+      if (this.listaSelectataOp) {
+        this.listaSelectataOp = this.listeOperatii.find(l => l.id === this.listaSelectataOp!.id) || null;
+      }
+    });
+  }
+
+  get listeOpFiltrate(): ListaOperatii[] {
+    const den = this.filtruListaOpDenumire.toLowerCase();
+    return this.listeOperatii.filter(l => !den || l.denumire.toLowerCase().includes(den));
+  }
+
+  get opInLista(): OperatieMentenanta[] {
+    if (!this.listaSelectataOp) return [];
+    return this.toateOperatiile.filter(o => this.listaSelectataOp!.operatiiIds.includes(o.id!));
+  }
+
+  get opDisponibileFiltrate(): OperatieMentenanta[] {
+    const den = this.filtruOpDenumire.toLowerCase();
+    const disponibile = this.listaSelectataOp 
+      ? this.toateOperatiile.filter(o => !this.listaSelectataOp!.operatiiIds.includes(o.id!))
+      : this.toateOperatiile;
+    return disponibile.filter(o => !den || o.denumire.toLowerCase().includes(den));
+  }
+
+  openAddFormListaOp() { this.isEditModeListaOp = false; this.editingRefListaOp = null; this.formModelListaOp = { denumire: '', timp: '', operatiiIds: [] }; this.showFormListaOp = true; }
+  openEditFormListaOp(item: ListaOperatii) { this.isEditModeListaOp = true; this.editingRefListaOp = item; this.formModelListaOp = { ...item }; this.showFormListaOp = true; }
+  closeFormListaOp() { this.showFormListaOp = false; }
+  
+  saveFormListaOp() {
+    if (this.isEditModeListaOp && this.editingRefListaOp) {
+      this.nomenclatureService.updateListaOperatii(this.formModelListaOp).subscribe(() => { this.loadListeOperatii(); this.closeFormListaOp(); });
+    } else {
+      this.nomenclatureService.createListaOperatii(this.formModelListaOp).subscribe(() => { this.loadListeOperatii(); this.closeFormListaOp(); });
+    }
+  }
+  
+  deleteListaOp() {
+    if (!this.selectedListaOp || !this.selectedListaOp.id) return;
+    if (confirm('Sigur ștergi lista de operații?')) {
+      this.nomenclatureService.deleteListaOperatii(this.selectedListaOp.id).subscribe(() => { this.selectedListaOp = null; this.loadListeOperatii(); });
+    }
+  }
+
+  openAddFormOp() { this.isEditModeOp = false; this.formModelOp = { denumire: '', instructiune: '', sculeSpeciale: '', prioritate: 'Medie', autonoma: false, preventiva: false }; this.showFormOp = true; }
+  openEditFormOp(item: OperatieMentenanta) { this.isEditModeOp = true; this.formModelOp = { ...item }; this.showFormOp = true; }
+  closeFormOp() { this.showFormOp = false; }
+
+  saveFormOp() {
+    if (this.isEditModeOp && this.formModelOp.id) {
+      this.nomenclatureService.updateOperatieMentenanta(this.formModelOp).subscribe(() => { this.loadOperatiiMentenanta(); this.loadListeOperatii(); this.closeFormOp(); });
+    } else {
+      this.nomenclatureService.createOperatieMentenanta(this.formModelOp).subscribe(() => { this.loadOperatiiMentenanta(); this.loadListeOperatii(); this.closeFormOp(); });
+    }
+  }
+
+  deleteSelectedOp() {
+    if (this.selectedRightOpIndex === null) return;
+    if (confirm('Sigur ștergi operația?')) {
+      const op = this.opDisponibileFiltrate[this.selectedRightOpIndex];
+      if (op.id) {
+        this.nomenclatureService.deleteOperatieMentenanta(op.id).subscribe(() => { this.selectedRightOpIndex = null; this.loadOperatiiMentenanta(); this.loadListeOperatii(); });
+      }
+    }
+  }
+
+  deschideListaOp(item: ListaOperatii) { this.listaSelectataOp = item; this.selectedLeftOpIndex = null; this.selectedRightOpIndex = null; }
+  inapoiLaListeOp() { this.listaSelectataOp = null; this.selectedListaOp = null; this.selectedLeftOpIndex = null; this.selectedRightOpIndex = null; }
+  
+  mutaInListaOp() {
+    if (!this.listaSelectataOp || !this.listaSelectataOp.id || this.selectedRightOpIndex === null) return;
+    const op = this.opDisponibileFiltrate[this.selectedRightOpIndex];
+    if (op && op.id) {
+      this.nomenclatureService.adaugaOpInLista(this.listaSelectataOp.id, op.id).subscribe(() => { this.selectedRightOpIndex = null; this.loadListeOperatii(); });
+    }
+  }
+
+  scoateDinListaOp() {
+    if (!this.listaSelectataOp || !this.listaSelectataOp.id || this.selectedLeftOpIndex === null) return;
+    const op = this.opInLista[this.selectedLeftOpIndex];
+    if (op && op.id) {
+      this.nomenclatureService.scoateOpDinLista(this.listaSelectataOp.id, op.id).subscribe(() => { this.selectedLeftOpIndex = null; this.loadListeOperatii(); });
+    }
+  }
+
+  // =========================================================
+  // ---- SECȚII ----
+  // =========================================================
+  sectii: Sectie[] = [];
+  isLoadingSectii: boolean = false;
+  searchTextSectii: string = '';
+  sortKeySectii: string = 'sectie';
+  sortAscSectii: boolean = true;
+  selectedIndexSectii: number | null = null;
+  showFormSectie: boolean = false;
+  isEditModeSectie: boolean = false;
+  formModelSectie: Sectie = this.sectieGoala();
+  editingIndexSectie: number | null = null;
+
+  private sectieGoala(): Sectie {
+    return { sectie: '', sectieMiniBde: '', linia: '', liniaMiniBde: '', sefSectie: '', sefLinie1: '', sefLinie2: '', electrosecuritateLuna: 'na', electrosecuritateResponsabil: '', esdLuna: 'na', esdResponsabil: '' };
+  }
+
+  loadSectii() {
+    this.isLoadingSectii = true;
+    this.nomenclatureService.getSectii().subscribe({
+      next: (data: Sectie[]) => { this.sectii = data; this.isLoadingSectii = false; },
+      error: (err: any) => { console.error(err); this.isLoadingSectii = false; }
+    });
+  }
+
+  get sectiiFiltrate(): Sectie[] {
+    const term = this.searchTextSectii.trim().toLowerCase();
+    let lista = !term ? [...this.sectii] : this.sectii.filter(s => 
+      s.sectie.toLowerCase().includes(term) || 
+      (s.sectieMiniBde && s.sectieMiniBde.toLowerCase().includes(term)) || 
+      s.linia.toLowerCase().includes(term) || 
+      s.sefSectie.toLowerCase().includes(term)
+    );
+    lista.sort((a: any, b: any) => {
+      const va = (a[this.sortKeySectii] || '').toString().toLowerCase();
+      const vb = (b[this.sortKeySectii] || '').toString().toLowerCase();
+      if (va < vb) return this.sortAscSectii ? -1 : 1;
+      if (va > vb) return this.sortAscSectii ? 1 : -1;
+      return 0;
+    });
+    return lista;
+  }
+
+  setSortSectii(key: string) {
+    if (this.sortKeySectii === key) { this.sortAscSectii = !this.sortAscSectii; } 
+    else { this.sortKeySectii = key; this.sortAscSectii = true; }
+  }
+
+  selectRowSectii(index: number) { this.selectedIndexSectii = index; }
+  openAddFormSectie() { this.isEditModeSectie = false; this.formModelSectie = this.sectieGoala(); this.editingIndexSectie = null; this.showFormSectie = true; }
+  openEditFormSectie(item: Sectie, index: number) { this.isEditModeSectie = true; this.formModelSectie = { ...item }; this.editingIndexSectie = index; this.showFormSectie = true; this.updateResponsabiliDinSefi(); }
+  
+  updateResponsabiliDinSefi(): void {
+    const combinat = [this.formModelSectie.sefLinie1, this.formModelSectie.sefLinie2]
+      .filter(sef => !!sef && sef.trim() !== '')
+      .join(', ');
+    this.formModelSectie.esdResponsabil = combinat;
+  }
+
+  get electricieniOptions(): string[] {
+    const grup = this.grupuriMuncaData.find(g => (g.grup || '').trim().toLowerCase() === 'electric');
+    return grup ? [...(grup.membri || [])].sort((a, b) => a.localeCompare(b)) : [];
+  }
+
+  closeFormSectie() { this.showFormSectie = false; }
+  saveFormSectie() {
+    if (!this.formModelSectie.sectie.trim()) { alert('Completează câmpul "Secția" înainte de a salva.'); return; }
+    const onDone = () => { this.loadSectii(); this.closeFormSectie(); };
+    if (this.isEditModeSectie && this.formModelSectie.id) {
+      this.nomenclatureService.updateSectie(this.formModelSectie).subscribe({ next: onDone });
+    } else {
+      this.nomenclatureService.createSectie(this.formModelSectie).subscribe({ next: onDone });
+    }
+  }
+
+  deleteItemSectie(item: Sectie) {
+    if (!confirm('Ștergi această secție?')) return;
+    if (item.id) {
+      this.nomenclatureService.deleteSectie(Number(item.id)).subscribe(() => { this.loadSectii(); this.selectedIndexSectii = null; });
+    }
+  }
+  listeazaSectii() { window.print(); }
 }

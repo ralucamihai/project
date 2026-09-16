@@ -2,11 +2,11 @@
   <div class="split-container">
     <!-- User Info Card -->
     <div class="half split-container">
-      <h2 class="card-title">User Information</h2>
+      <h2 class="card-title">Informații Utilizator</h2>
       <form [formGroup]="userForm" (ngSubmit)="saveChanges()">
 
         <div class="mb-3">
-          <label>Username</label>
+          <label>Nume utilizator</label>
           <input type="text" formControlName="username" class="form-control" readonly />
         </div>
 
@@ -15,11 +15,11 @@
           <div class="half">
 
             <div class="mb-3">
-              <label>First Name</label>
+              <label>Prenume</label>
               <input type="text" formControlName="firstName" class="form-control" />
               <div *ngIf="(userForm.get('firstName')?.touched || submitted) && userForm.get('firstName')?.invalid" class="error-message">
-                <div *ngIf="userForm.get('firstName')?.errors?.['required']">First name is required.</div>
-                <div *ngIf="userForm.get('firstName')?.errors?.['pattern']">First name cannot contain numbers or special characters.</div>
+                <div *ngIf="userForm.get('firstName')?.errors?.['required']">Prenumele este obligatoriu.</div>
+                <div *ngIf="userForm.get('firstName')?.errors?.['pattern']">Prenumele nu poate conține numere sau caractere speciale.</div>
               </div>
             </div>
 
@@ -27,18 +27,29 @@
               <label>Email</label>
               <input type="email" formControlName="email" class="form-control" />
               <div *ngIf="(userForm.get('email')?.touched || submitted) && userForm.get('email')?.errors?.['invalidSteinelEmail']" class="error-message">
-                Please enter a valid email address ending with &#64;steinel.ro.
+                Vă rugăm să introduceți o adresă de email validă care se termină în &#64;steinel.ro.
               </div>
               <div *ngIf="(userForm.get('email')?.touched || submitted) && userForm.get('email')?.errors?.['required']" class="error-message">
-                Email is required.
+                Emailul este obligatoriu.
               </div>
               <div *ngIf="(userForm.get('email')?.touched || submitted) && userForm.get('email')?.errors?.['email']" class="error-message">
-                Email is not valid.
+                Emailul nu este valid.
               </div>
             </div>
 
             <div class="mb-3">
-              <label>Role</label>
+              <label>Departament</label>
+              <select formControlName="departament" class="form-control">
+                <option value="" disabled selected>Selectează departamentul...</option>
+                <option *ngFor="let dep of departamente" [value]="dep">{{ dep }}</option>
+              </select>
+              <div *ngIf="(userForm.get('departament')?.touched || submitted) && userForm.get('departament')?.invalid" class="error-message">
+                <div *ngIf="userForm.get('departament')?.errors?.['required']">Departamentul este obligatoriu.</div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label>Rol</label>
               <input type="text" formControlName="role" class="form-control" readonly />
             </div>
 
@@ -47,20 +58,31 @@
           <div class="half">
 
             <div class="mb-3">
-              <label>Last Name</label>
+              <label>Nume</label>
               <input type="text" formControlName="lastName" class="form-control" />
               <div *ngIf="(userForm.get('lastName')?.touched || submitted) && userForm.get('lastName')?.invalid" class="error-message">
-                <div *ngIf="userForm.get('lastName')?.errors?.['required']">Last name is required.</div>
-                <div *ngIf="userForm.get('lastName')?.errors?.['pattern']">Last name cannot contain numbers or special characters.</div>
+                <div *ngIf="userForm.get('lastName')?.errors?.['required']">Numele este obligatoriu.</div>
+                <div *ngIf="userForm.get('lastName')?.errors?.['pattern']">Numele nu poate conține numere sau caractere speciale.</div>
               </div>
             </div>
 
             <div class="mb-3">
-              <label>Employee Number</label>
+              <label>Număr marcă</label>
               <input type="text" formControlName="employeeNo" class="form-control" />
               <div *ngIf="(userForm.get('employeeNo')?.touched || submitted) && userForm.get('employeeNo')?.invalid" class="error-message">
-                <div *ngIf="userForm.get('employeeNo')?.errors?.['required']">Employee number is required.</div>
-                <div *ngIf="userForm.get('employeeNo')?.errors?.['pattern']">Employee number must contain only digits.</div>
+                <div *ngIf="userForm.get('employeeNo')?.errors?.['required']">Numărul de marcă este obligatoriu.</div>
+                <div *ngIf="userForm.get('employeeNo')?.errors?.['pattern']">Numărul de marcă trebuie să conțină doar cifre.</div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label>Funcție</label>
+              <select formControlName="functie" class="form-control">
+                <option value="" disabled selected>Selectează funcția...</option>
+                <option *ngFor="let fn of functii" [value]="fn">{{ fn }}</option>
+              </select>
+              <div *ngIf="(userForm.get('functie')?.touched || submitted) && userForm.get('functie')?.invalid" class="error-message">
+                <div *ngIf="userForm.get('functie')?.errors?.['required']">Funcția este obligatorie.</div>
               </div>
             </div>
 
@@ -68,39 +90,40 @@
               <label>Status</label>
               <input type="text" formControlName="status" class="form-control" readonly />
             </div>
+
           </div>
         </div>
 
-        <button type="submit" class="btn btn-custom">Save Changes</button>
+        <button type="submit" class="btn btn-custom">Salvează Modificările</button>
       </form>
     </div>
 
     <!-- Reset Password Card -->
     <div class="half">
-      <h2 class="card-title">Reset Password</h2>
+      <h2 class="card-title">Resetează Parola</h2>
       <form [formGroup]="resetForm" (ngSubmit)="resetPassword()">
         <div class="mb-3">
-          <input type="password" formControlName="currentPassword" placeholder="Current Password" class="form-control" required />
+          <input type="password" formControlName="currentPassword" placeholder="Parola actuală" class="form-control" required />
           <div *ngIf="(resetForm.get('currentPassword')?.touched || submitted) && resetForm.get('currentPassword')?.invalid" class="error-message">
-            <div *ngIf="resetForm.get('currentPassword')?.errors?.['required']">Password is required.</div>
-            <div *ngIf="resetForm.get('currentPassword')?.errors?.['minlength']">Password must be at least 6 characters long.</div>
+            <div *ngIf="resetForm.get('currentPassword')?.errors?.['required']">Parola este obligatorie.</div>
+            <div *ngIf="resetForm.get('currentPassword')?.errors?.['minlength']">Parola trebuie să aibă cel puțin 6 caractere.</div>
           </div>
         </div>
         <div class="mb-3">
-          <input type="password" formControlName="newPassword" placeholder="New Password" class="form-control" required />
+          <input type="password" formControlName="newPassword" placeholder="Parolă nouă" class="form-control" required />
           <div *ngIf="(resetForm.get('newPassword')?.touched || submitted) && resetForm.get('newPassword')?.invalid" class="error-message">
-            <div *ngIf="resetForm.get('newPassword')?.errors?.['required']">Password is required.</div>
-            <div *ngIf="resetForm.get('newPassword')?.errors?.['minlength']">Password must be at least 6 characters long.</div>
+            <div *ngIf="resetForm.get('newPassword')?.errors?.['required']">Parola este obligatorie.</div>
+            <div *ngIf="resetForm.get('newPassword')?.errors?.['minlength']">Parola trebuie să aibă cel puțin 6 caractere.</div>
           </div>
         </div>
         <div class="mb-3">
-          <input type="password" formControlName="confirmPassword" placeholder="Confirm Password" class="form-control" required />
+          <input type="password" formControlName="confirmPassword" placeholder="Confirmă parola" class="form-control" required />
           <div *ngIf="(resetForm.get('confirmPassword')?.touched || submitted) && resetForm.get('confirmPassword')?.invalid" class="error-message">
-            <div *ngIf="resetForm.get('confirmPassword')?.errors?.['required']">Password is required.</div>
-            <div *ngIf="resetForm.get('confirmPassword')?.errors?.['minlength']">Password must be at least 6 characters long.</div>
+            <div *ngIf="resetForm.get('confirmPassword')?.errors?.['required']">Parola este obligatorie.</div>
+            <div *ngIf="resetForm.get('confirmPassword')?.errors?.['minlength']">Parola trebuie să aibă cel puțin 6 caractere.</div>
           </div>
         </div>
-        <button type="submit" class="btn btn-custom">Reset Password</button>
+        <button type="submit" class="btn btn-custom">Resetează Parola</button>
         <div *ngIf="error" class="error-message" style="margin-bottom: 15px;">
             {{ error }}
           </div>

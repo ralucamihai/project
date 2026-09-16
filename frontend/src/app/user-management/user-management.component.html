@@ -1,8 +1,8 @@
 <div class="page-container">
   <div class="table-card">
     <div class="table-header">
-      <h3>User Management</h3>
-      <span class="results-count">Total: {{ filteredData.length }} users</span>
+      <h3>Gestionare Utilizatori</h3>
+      <span class="results-count">Total: {{ filteredData.length }} utilizatori</span>
     </div>
 
     <div class="table-scroll">
@@ -10,38 +10,42 @@
         <thead>
           <!-- Bara de secțiuni -->
           <tr class="section-header">
-            <th class="section-title" colspan="8">Request Section</th>
-            <th class="section-title" colspan="2">Approval Section</th>
+            <th class="section-title" colspan="10">Secțiune Solicitări</th>
+            <th class="section-title" colspan="2">Secțiune Aprobări</th>
             <th></th>
           </tr>
 
           <!-- Headere coloane -->
           <tr>
-            <th>No.</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Username</th>
+            <th>Nr.</th>
+            <th>Nume</th>
+            <th>Prenume</th>
+            <th>Nume utilizator</th>
             <th>Email</th>
-            <th>Employee No</th>
-            <th>Department</th>
-            <th class="border-right-strong">Requested Role</th>
-            <th>Approved Role</th>
-            <th>Account Status</th>
-            <th>Actions</th>
+            <th>Număr marcă</th>
+            <th>Departament</th>
+            <th>Funcție</th>
+            <th>Grup</th>
+            <th class="border-right-strong">Rol solicitat</th>
+            <th>Rol aprobat</th>
+            <th>Status cont</th>
+            <th>Acțiuni</th>
           </tr>
 
           <!-- Rând filtre -->
           <tr class="filter-row">
             <th></th>
-            <th><input class="filter-input" placeholder="Search First Name" [(ngModel)]="filters['nume']" /></th>
-            <th><input class="filter-input" placeholder="Search Last Name" [(ngModel)]="filters['prenume']" /></th>
-            <th><input class="filter-input" placeholder="Search Username" [(ngModel)]="filters['utilizator']" /></th>
-            <th><input class="filter-input" placeholder="Search Email" [(ngModel)]="filters['email']" /></th>
-            <th><input class="filter-input" placeholder="Search Employee No" [(ngModel)]="filters['numar marca']" /></th>
-            <th><input class="filter-input" placeholder="Search Department" [(ngModel)]="filters['departament']" /></th>
-            <th class="border-right-strong"><input class="filter-input" placeholder="Search Requested Role" [(ngModel)]="filters['rol cerut']" /></th>        
-            <th><input class="filter-input" placeholder="Search Approved Role" [(ngModel)]="filters['rol aprobat']" /></th>
-            <th><input class="filter-input" placeholder="Search Account Status" [(ngModel)]="filters['status cont']" /></th>
+            <th><input class="filter-input" placeholder="Caută Nume" [(ngModel)]="filters['nume']" /></th>
+            <th><input class="filter-input" placeholder="Caută Prenume" [(ngModel)]="filters['prenume']" /></th>
+            <th><input class="filter-input" placeholder="Caută Utilizator" [(ngModel)]="filters['utilizator']" /></th>
+            <th><input class="filter-input" placeholder="Caută Email" [(ngModel)]="filters['email']" /></th>
+            <th><input class="filter-input" placeholder="Caută Nr. Marcă" [(ngModel)]="filters['numar marca']" /></th>
+            <th><input class="filter-input" placeholder="Caută Departament" [(ngModel)]="filters['departament']" /></th>
+            <th><input class="filter-input" placeholder="Caută Funcție" [(ngModel)]="filters['functie']" /></th>
+            <th><input class="filter-input" placeholder="Caută Grup" [(ngModel)]="filters['grup']" /></th>
+            <th class="border-right-strong"><input class="filter-input" placeholder="Caută Rol solicitat" [(ngModel)]="filters['rol cerut']" /></th>        
+            <th><input class="filter-input" placeholder="Caută Rol aprobat" [(ngModel)]="filters['rol aprobat']" /></th>
+            <th><input class="filter-input" placeholder="Caută Status" [(ngModel)]="filters['status cont']" /></th>
             <th></th>
           </tr>
         </thead>
@@ -52,7 +56,8 @@
               [class.selected]="selectedRowIndex === i"
               (mouseenter)="hoverIndex = i"
               (mouseleave)="hoverIndex = null"
-              (click)="selectRow(i); $event.stopPropagation()">
+              (click)="selectRow(i); $event.stopPropagation()"
+              (dblclick)="openEditModal(row)">
             <td>{{ i + 1 }}</td>
             <td>{{ row['nume'] }}</td>
             <td>{{ row['prenume'] }}</td>
@@ -60,18 +65,26 @@
             <td [title]="row['email']">{{ row['email'] }}</td>
             <td>{{ row['numar marca'] }}</td>
             <td [title]="row['departament']">{{ row['departament'] }}</td>
-            
+            <td [title]="row['functie']">{{ row['functie'] }}</td>
+
+            <td>
+              <select [(ngModel)]="row['grup']" class="role-select" (click)="$event.stopPropagation()">
+                <option value="">-- Fără grup --</option>
+                <option *ngFor="let g of grupuriDisponibile" [value]="g">{{ g }}</option>
+              </select>
+            </td>
+
             <td class="border-right-strong">
-              <span *ngIf="row['rol cerut'] === 'Vizualizare'">Viewer</span>
-              <span *ngIf="row['rol cerut'] === 'Editare'">Editor</span>
+              <span *ngIf="row['rol cerut'] === 'Vizualizare'">Vizualizare</span>
+              <span *ngIf="row['rol cerut'] === 'Editare'">Editare</span>
               <span *ngIf="row['rol cerut'] === 'Admin'">Admin</span>
               <span *ngIf="row['rol cerut'] !== 'Vizualizare' && row['rol cerut'] !== 'Editare' && row['rol cerut'] !== 'Admin'">{{ row['rol cerut'] }}</span>
             </td>
 
             <td>
               <select [(ngModel)]="row['rol aprobat']" class="role-select" (click)="$event.stopPropagation()">
-                <option value="Vizualizare">Viewer</option>
-                <option value="Editare">Editor</option>
+                <option value="Vizualizare">Vizualizare</option>
+                <option value="Editare">Editare</option>
                 <option value="Admin">Admin</option>
               </select>
             </td>
@@ -85,7 +98,7 @@
                       }"
                       class="role-select"
                       (click)="$event.stopPropagation()">
-                <option value="in_asteptare">Waiting Approval</option>
+                <option value="in_asteptare">În așteptare</option>
                 <option value="activ">Activ</option>
                 <option value="inactiv">Inactiv</option>
               </select>
@@ -97,6 +110,76 @@
           </tr>
         </tbody>
       </table>
+    </div>
+  </div>
+
+  <!-- Modal Editare Utilizator -->
+  <div class="modal-overlay" *ngIf="showEditModal" (click)="closeEditModal()">
+    <div class="modal-box modal-box-wide" (click)="$event.stopPropagation()">
+      <h3 class="modal-title">Editează Utilizator ({{ formModelEdit.utilizator }})</h3>
+      
+      <div class="echipament-form-grid" style="grid-template-columns: 1fr 1fr; display: grid; gap: 20px;">
+        <div class="echipament-form-col">
+          <div class="form-field">
+            <label>Nume</label>
+            <input type="text" [(ngModel)]="formModelEdit.nume">
+          </div>
+          <div class="form-field">
+            <label>Prenume</label>
+            <input type="text" [(ngModel)]="formModelEdit.prenume">
+          </div>
+          <div class="form-field">
+            <label>Număr marcă</label>
+            <input type="text" [(ngModel)]="formModelEdit['numar marca']">
+          </div>
+          <div class="form-field">
+            <label>Email</label>
+            <input type="text" [(ngModel)]="formModelEdit.email">
+          </div>
+        </div>
+
+        <div class="echipament-form-col">
+          <div class="form-field">
+            <label>Departament</label>
+            <input type="text" [(ngModel)]="formModelEdit.departament">
+          </div>
+          <div class="form-field">
+            <label>Funcție</label>
+            <input type="text" [(ngModel)]="formModelEdit.functie">
+          </div>
+
+          <div class="form-field">
+            <label>Grup</label>
+            <select [(ngModel)]="formModelEdit.grup">
+              <option value="">-- Fără grup --</option>
+              <option *ngFor="let g of grupuriDisponibile" [value]="g">{{ g }}</option>
+            </select>
+          </div>
+          
+          <div class="form-field">
+            <label>Rol aprobat</label>
+            <select [(ngModel)]="formModelEdit['rol aprobat']">
+              <option value="Vizualizare">Vizualizare</option>
+              <option value="Editare">Editare</option>
+              <option value="Admin">Admin</option>
+            </select>
+          </div>
+          
+          <div class="form-field">
+            <label>Status cont</label>
+            <select [(ngModel)]="formModelEdit['status cont']">
+              <option value="in_asteptare">În așteptare</option>
+              <option value="activ">Activ</option>
+              <option value="inactiv">Inactiv</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-cancel" (click)="closeEditModal()">Anulează</button>
+        <button class="btn btn-primary" (click)="saveEditModal()">Salvează Modificările</button>
+      </div>
     </div>
   </div>
 </div>

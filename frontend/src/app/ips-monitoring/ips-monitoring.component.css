@@ -1,4 +1,3 @@
-
 table {
   width: 100%;
   border-collapse: collapse;
@@ -96,6 +95,49 @@ tr:hover {
   color: white;
 }
 
+/* =========================================================
+   RESPONSIVE / MOBILE
+   ========================================================= */
+@media (max-width: 900px) {
+  /* Tabelul are de regula multe coloane (IP-uri, status-uri etc.), asa ca
+     pe ecrane inguste il facem scrollabil orizontal, fara sa avem nevoie
+     de un div wrapper suplimentar in HTML. */
+  table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+  }
+
+  thead, tbody {
+    display: table;
+    width: 100%;
+  }
+}
+
 @media (max-width: 768px) {
   th, td { font-size: 11px; padding: 4px; }
+
+  .column-checkboxes {
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+
+  .checkbox-label {
+    font-size: 12px;
+  }
+
+  .status-dot {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  th, td { padding: 3px; }
+
+  .column-checkboxes input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+  }
 }

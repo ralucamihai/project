@@ -154,23 +154,9 @@ export class AppComponent {
   // ---- Google Translate (cookie-based, cu reload) ----
   // =========================================================
 
-  /**
-   * IMPORTANT: nu mai incercam sa declansam traducerea "live", fara reload,
-   * prin dispatchEvent(new Event('change')) pe select-ul ascuns
-   * (select.goog-te-combo). Acel hack nu mai e fiabil in browserele recente:
-   * evenimentul sintetic e adesea ignorat de widget, deci pagina ramane
-   * netradusa desi eticheta din meniu pare sa se schimbe (pentru ca doar
-   * variabila locala "language" se actualiza, nu si traducerea reala).
-   *
-   * Metoda robusta, sustinuta oficial prin cookie-ul "googtrans": Google
-   * Translate citeste acest cookie DOAR la incarcarea paginii si traduce
-   * automat continutul in consecinta. Asa ca setam cookie-ul si reincarcam.
-   * Ruta curenta (HashLocationStrategy) si autentificarea (localStorage)
-   * raman neschimbate dupa reload.
-   */
   changeLanguage(langCode: string) {
     if (langCode === this.language) {
-      return; // deja pe limba respectiva, nu mai facem nimic
+      return; 
     }
 
     if (langCode === this.pageLanguage) {
@@ -184,10 +170,6 @@ export class AppComponent {
 
   private setGoogTransCookie(langCode: string) {
     const value = `/${this.pageLanguage}/${langCode}`;
-    // path=/ e suficient; NU mai setam si varianta cu "domain=" -- pe un
-    // host accesat prin adresa IP (ex: 127.0.0.1), atributul "domain" pe
-    // cookie e invalid conform RFC 6265 si browserul poate respinge toata
-    // instructiunea, ceea ce anula in tacere setarea cookie-ului.
     document.cookie = `googtrans=${value}; path=/`;
   }
 
@@ -199,7 +181,6 @@ export class AppComponent {
     const match = document.cookie.match(/(?:^|;\s*)googtrans=([^;]*)/);
     if (!match) return null;
 
-    // formatul cookie-ului e "/ro/en" -> ne intereseaza ultima parte
     const parts = decodeURIComponent(match[1]).split('/').filter(Boolean);
     return parts.length ? parts[parts.length - 1] : null;
   }

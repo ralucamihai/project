@@ -12,110 +12,157 @@
 
 <div class="page-container">
   <div class="login-container">
-    <div class="card shadow text-center login-card">
-      <h1 class="card-title mb-3">Registration</h1>
+    <div class="card shadow login-card">
+      <h1 class="card-title">Înregistrare</h1>
 
-      <div *ngIf="error" class="error-message" style="margin-bottom: 15px;">
+      <div *ngIf="error" class="error-message global-error">
         {{ error }}
       </div>
 
       <div class="form-centered">
         <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
 
-          <div class="mb-3">
-            <label for="nume" class="form-label">Last Name</label>
-            <input type="text" formControlName="nume" id="nume" class="form-control" required>
-            <div *ngIf="(registerForm.get('nume')?.touched || submitted) && registerForm.get('nume')?.invalid" class="error-message">
-              <div *ngIf="registerForm.get('nume')?.errors?.['required']">Last name is required.</div>
-              <div *ngIf="registerForm.get('nume')?.errors?.['pattern']">Last name cannot contain numbers or special characters.</div>
-            </div>
-          </div>
+          <!-- Zona cu 3 coloane -->
+          <div class="columns-wrapper">
+            
+            <!-- COLOANA 1: Personal Information -->
+            <div class="form-col section-box">
+              <h4 class="section-title">Informații Personale</h4>
+              
+              <div class="mb-3">
+                <label for="nume" class="form-label">Nume</label>
+                <input type="text" formControlName="nume" id="nume" class="form-control icon-user" required>
+                <div *ngIf="(registerForm.get('nume')?.touched || submitted) && registerForm.get('nume')?.invalid" class="error-message">
+                  <div *ngIf="registerForm.get('nume')?.errors?.['required']">Numele este obligatoriu.</div>
+                  <div *ngIf="registerForm.get('nume')?.errors?.['pattern']">Nu poate conține numere sau caractere speciale.</div>
+                </div>
+              </div>
 
-          <div class="mb-3">
-            <label for="prenume" class="form-label">First Name</label>
-            <input type="text" formControlName="prenume" id="prenume" class="form-control" required>
-            <div *ngIf="(registerForm.get('prenume')?.touched || submitted) && registerForm.get('prenume')?.invalid" class="error-message">
-              <div *ngIf="registerForm.get('prenume')?.errors?.['required']">First name is required.</div>
-              <div *ngIf="registerForm.get('prenume')?.errors?.['pattern']">First name cannot contain numbers or special characters.</div>
-            </div>
-          </div>
+              <div class="mb-3">
+                <label for="prenume" class="form-label">Prenume</label>
+                <input type="text" formControlName="prenume" id="prenume" class="form-control icon-user" required>
+                <div *ngIf="(registerForm.get('prenume')?.touched || submitted) && registerForm.get('prenume')?.invalid" class="error-message">
+                  <div *ngIf="registerForm.get('prenume')?.errors?.['required']">Prenumele este obligatoriu.</div>
+                  <div *ngIf="registerForm.get('prenume')?.errors?.['pattern']">Nu poate conține numere sau caractere speciale.</div>
+                </div>
+              </div>
 
-          <div class="mb-3">
-            <label for="username" class="form-label username-label">Username</label>
-            <input type="text" formControlName="username" id="username" class="form-control" readonly>
-          </div>
+              <div class="mb-3">
+                <label for="username" class="form-label">Nume utilizator</label>
+                <input type="text" formControlName="username" id="username" class="form-control icon-user" readonly>
+              </div>
 
-          <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" formControlName="email" id="email" class="form-control" required>
-            <div *ngIf="(registerForm.get('email')?.touched || submitted) && registerForm.get('email')?.errors?.['invalidSteinelEmail']" class="error-message">
-              Please enter a valid email address ending with &#64;steinel.ro.
-            </div>
-            <div *ngIf="(registerForm.get('email')?.touched || submitted) && registerForm.get('email')?.errors?.['required']" class="error-message">
-              Email is required.
-            </div>
-            <div *ngIf="(registerForm.get('email')?.touched || submitted) && registerForm.get('email')?.errors?.['email']" class="error-message">
-              Email is not valid.
-            </div>
-          </div>
-
-          <div class="mb-3">
-            <label for="numarMarca" class="form-label">Employee ID</label>
-            <input type="text" formControlName="numarMarca" id="numarMarca" class="form-control" required>
-            <div *ngIf="(registerForm.get('numarMarca')?.touched || submitted) && registerForm.get('numarMarca')?.invalid" class="error-message">
-              <div *ngIf="registerForm.get('numarMarca')?.errors?.['required']">Employee ID is required.</div>
-              <div *ngIf="registerForm.get('numarMarca')?.errors?.['pattern']">Employee ID must contain only numbers.</div>
-            </div>
-          </div>
-
-          <!-- CÂMP NOU PENTRU DEPARTAMENT -->
-          <div class="mb-3">
-            <label for="departament" class="form-label">Department</label>
-            <select formControlName="departament" id="departament" class="form-control" required>
-              <option value="" disabled selected>Select department...</option>
-              <option *ngFor="let dep of departamente" [value]="dep">{{ dep }}</option>
-            </select>
-            <div *ngIf="(registerForm.get('departament')?.touched || submitted) && registerForm.get('departament')?.invalid" class="error-message">
-              <div *ngIf="registerForm.get('departament')?.errors?.['required']">Department is required.</div>
-            </div>
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label">Role</label>
-            <div class="roles-container">
-              <div class="form-check" *ngFor="let rol of roluri">
-                <input type="checkbox" class="form-check-input" [id]="rol.value" [value]="rol.value"
-                  (change)="onRolChange($event)" [checked]="isRolSelected(rol.value)" />
-                <label class="form-check-label" [for]="rol.value">{{ rol.name }}</label>
+              <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" formControlName="email" id="email" class="form-control icon-user" required>
+                <div *ngIf="(registerForm.get('email')?.touched || submitted) && registerForm.get('email')?.errors?.['invalidSteinelEmail']" class="error-message">
+                  Este necesar un email valid care se termină în &#64;steinel.ro.
+                </div>
+                <div *ngIf="(registerForm.get('email')?.touched || submitted) && registerForm.get('email')?.errors?.['required']" class="error-message">
+                  Emailul este obligatoriu.
+                </div>
+                <div *ngIf="(registerForm.get('email')?.touched || submitted) && registerForm.get('email')?.errors?.['email']" class="error-message">
+                  Emailul nu este valid.
+                </div>
               </div>
             </div>
-            <div *ngIf="rolEroare" class="error-message">
-              Please select only one role.
+
+            <!-- COLOANA 2: Company Details -->
+            <div class="form-col section-box">
+              <h4 class="section-title">Detalii Companie</h4>
+
+              <div class="mb-3">
+                <label for="numarMarca" class="form-label">Număr marcă</label>
+                <input type="text" formControlName="numarMarca" id="numarMarca" class="form-control icon-user" required>
+                <div *ngIf="(registerForm.get('numarMarca')?.touched || submitted) && registerForm.get('numarMarca')?.invalid" class="error-message">
+                  <div *ngIf="registerForm.get('numarMarca')?.errors?.['required']">Numărul de marcă este obligatoriu.</div>
+                  <div *ngIf="registerForm.get('numarMarca')?.errors?.['pattern']">Trebuie să conțină doar cifre.</div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="departament" class="form-label">Departament</label>
+                <select formControlName="departament" id="departament" class="form-control icon-building" required>
+                  <option value="" disabled selected>Departament</option>
+                  <option *ngFor="let dep of departamente" [value]="dep">{{ dep }}</option>
+                </select>
+                <div *ngIf="(registerForm.get('departament')?.touched || submitted) && registerForm.get('departament')?.invalid" class="error-message">
+                  <div *ngIf="registerForm.get('departament')?.errors?.['required']">Departamentul este obligatoriu.</div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="functie" class="form-label">Funcție</label>
+                <select formControlName="functie" id="functie" class="form-control" required>
+                  <option value="" disabled selected>Selectează funcția...</option>
+                  <option *ngFor="let fn of functii" [value]="fn">{{ fn }}</option>
+                </select>
+                <div *ngIf="(registerForm.get('functie')?.touched || submitted) && registerForm.get('functie')?.invalid" class="error-message">
+                  <div *ngIf="registerForm.get('functie')?.errors?.['required']">Funcția este obligatorie.</div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="grup" class="form-label">Grup</label>
+                <select formControlName="grup" id="grup" class="form-control" required>
+                  <option value="" disabled selected>Selectează grupul...</option>
+                  <option *ngFor="let g of grupuri" [value]="g">{{ g }}</option>
+                </select>
+                <div *ngIf="grupuri.length === 0" class="error-message">
+                  Nu există grupuri definite încă.
+                </div>
+                <div *ngIf="(registerForm.get('grup')?.touched || submitted) && registerForm.get('grup')?.invalid" class="error-message">
+                  <div *ngIf="registerForm.get('grup')?.errors?.['required']">Grupul este obligatoriu.</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- COLOANA 3: Security & Role -->
+            <div class="form-col section-box">
+              <h4 class="section-title">Securitate și Rol</h4>
+
+              <div class="mb-3">
+                <label for="parola" class="form-label">Parolă</label>
+                <input type="password" formControlName="parola" id="parola" class="form-control" required>
+                <div *ngIf="(registerForm.get('parola')?.touched || submitted) && registerForm.get('parola')?.invalid" class="error-message">
+                  <div *ngIf="registerForm.get('parola')?.errors?.['required']">Parola este obligatorie.</div>
+                  <div *ngIf="registerForm.get('parola')?.errors?.['minlength']">Cel puțin 6 caractere.</div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="confirmareParola" class="form-label">Confirmă parola</label>
+                <input type="password" formControlName="confirmareParola" id="confirmareParola" class="form-control" required>
+                <div *ngIf="(registerForm.get('confirmareParola')?.touched || submitted) && registerForm.hasError('passwordsMismatch')" class="error-message">
+                  Parolele nu se potrivesc.
+                </div>
+              </div>
+
+              <div class="mb-3 role-section">
+                <label class="form-label">Rol</label>
+                <div class="roles-container">
+                  <div class="form-check" *ngFor="let rol of roluri">
+                    <input type="checkbox" class="form-check-input" [id]="rol.value" [value]="rol.value"
+                      (change)="onRolChange($event)" [checked]="isRolSelected(rol.value)" />
+                    <label class="form-check-label" [for]="rol.value">{{ rol.name }}</label>
+                  </div>
+                </div>
+                <div *ngIf="rolEroare" class="error-message">
+                  Vă rugăm să selectați un singur rol.
+                </div>
+              </div>
+            </div>
+
+          </div> <!-- End Columns Wrapper -->
+
+          <!-- Butoanele de actiune - Scoase sub cele 3 coloane -->
+          <div class="action-buttons-container">
+            <button type="submit" class="btn btn-custom">Creează cont</button>
+            <div class="login-link">
+              Ai deja un cont? <span class="forgot-password" (click)="goBackToLogin()">Autentifică-te aici.</span>
             </div>
           </div>
 
-          <div class="mb-3">
-            <label for="parola" class="form-label">Password</label>
-            <input type="password" formControlName="parola" id="parola" class="form-control" required>
-            <div *ngIf="(registerForm.get('parola')?.touched || submitted) && registerForm.get('parola')?.invalid" class="error-message">
-              <div *ngIf="registerForm.get('parola')?.errors?.['required']">Password is required.</div>
-              <div *ngIf="registerForm.get('parola')?.errors?.['minlength']">Password must be at least 6 characters long.</div>
-            </div>
-          </div>
-
-          <div class="mb-3">
-            <label for="confirmareParola" class="form-label">Confirm Password</label>
-            <input type="password" formControlName="confirmareParola" id="confirmareParola" class="form-control" required>
-            <div *ngIf="(registerForm.get('confirmareParola')?.touched || submitted) && registerForm.hasError('passwordsMismatch')" class="error-message">
-              Passwords do not match.
-            </div>
-          </div>
-
-          <button type="submit" class="btn btn-custom">Register</button>
-
-          <div class="forgot-password" (click)="goBackToLogin()">
-            Back to authentication!
-          </div>
         </form>
       </div>
     </div>

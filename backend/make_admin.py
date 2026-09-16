@@ -12,7 +12,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 db = SessionLocal()
 
 # === MODIFICĂ AICI ===
-USERNAME_NOU = "ttest"
+USERNAME_NOU = "admin"
 
 try:
     user = db.query(User).filter(User.username == USERNAME_NOU).first()

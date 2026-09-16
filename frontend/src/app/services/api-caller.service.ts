@@ -10,20 +10,25 @@ export class ApiCallerService {
   private apiUrl = environment.apiUrlIP;
   private loggedIn = new BehaviorSubject<boolean>(!!this.getToken());
 
-  // Subject pentru utilizatorul curent logat (reține datele și rolul)
   private currentUserSubject = new BehaviorSubject<any>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
   constructor(private http: HttpClient) { }
 
-  register(firstName: string, lastName: string, username: string, password: string, email:string, employeeNo:string, department: string, role: string): Observable<any> {
-    const body = {firstName, lastName, username, password, email, employeeNo, department, role};
+  register(firstName: string, lastName: string, username: string, password: string, email:string, employeeNo:string, department: string, functie: string, grup: string, role: string): Observable<any> {
+    const body = {firstName, lastName, username, password, email, employeeNo, department, functie, grup, role};
     return this.http.post(`${this.apiUrl}/register`, body);
   }
 
-  approveUser(username: string, role: string, status: string): Observable<any> {
-    const body = {username, role, status};
+  approveUser(username: string, role: string, status: string, grup?: string): Observable<any> {
+    const body = {username, role, status, grup};
     return this.http.post(`${this.apiUrl}/approve_user`, body);
+  }
+
+  // Lista de grupuri fara autentificare - folosita de pagina de Register,
+  // unde utilizatorul nu are inca token.
+  getGrupuriMuncaPublic(): Observable<string[]> {
+    return this.http.get<string[]>(`${this.apiUrl}/nomenclature/grupuri_munca_public`);
   }
 
   login(username: string, password: string): Observable<any> {
@@ -38,15 +43,12 @@ export class ApiCallerService {
           localStorage.setItem(environment.accessTokenKey, res.access_token);
           localStorage.setItem(environment.usernameKey, username);
           this.loggedIn.next(true);
-
-          // Preluăm datele utilizatorului imediat după login pentru a actualiza rolul fără refresh
           this.getUser().subscribe();
         }
       })
     );
   }
 
-  // --- Metodă nouă pentru sincronizarea util. aprobat în Nomenclator PMB ---
   saveOperatorPmb(operatorData: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/nomenclature/utilizatori_pmb`, operatorData);
   }
@@ -56,9 +58,9 @@ export class ApiCallerService {
     return this.http.post(`${this.apiUrl}/reset_password`, body);
   }
 
-  updateUserInfo(username: string | null, firstName:string, lastName:string, email:string, employeeNo:string): Observable<any> {
-    const body = {username, firstName, lastName, email, employeeNo};
-    return this.http.post(`${this.apiUrl}/api/update_user_info`, body);
+  updateUserInfo(username: string | null, firstName:string, lastName:string, email:string, employeeNo:string, departament:string, functie:string, grup?: string): Observable<any> {
+    const body = {username, firstName, lastName, email, employeeNo, departament, functie, grup};
+    return this.http.post(`${this.apiUrl}/update_user_info`, body);
   }
 
   forgotPassword(email: string): Observable<any> {
@@ -85,7 +87,6 @@ export class ApiCallerService {
     return this.loggedIn.asObservable();
   }
 
-  // Actualizează automat currentUserSubject de fiecare dată când este cerut utilizatorul
   getUser(): Observable<any> {
     return this.http.get(`${this.apiUrl}/user`).pipe(
       tap(user => this.currentUserSubject.next(user)),
@@ -111,23 +112,14 @@ export class ApiCallerService {
   get_global_lp_data(startDate?: string, endDate?: string, productCode?: string): Observable<any> {
     let params = new HttpParams();
     
-    if (startDate) {
-      params = params.set('startDate', startDate);
-    } else {
-      params = params.set('startDate', '');
-    }
+    if (startDate) params = params.set('startDate', startDate);
+    else params = params.set('startDate', '');
 
-    if (endDate) {
-      params = params.set('endDate', endDate);
-    } else {
-      params = params.set('endDate', '');
-    }
+    if (endDate) params = params.set('endDate', endDate);
+    else params = params.set('endDate', '');
 
-    if (productCode) {
-      params = params.set('productCode', productCode);
-    } else {
-      params = params.set('productCode', '');
-    }
+    if (productCode) params = params.set('productCode', productCode);
+    else params = params.set('productCode', '');
     
     return this.http.get<any>(`${this.apiUrl}/get_global_lp_data`, { params });
   }
@@ -176,11 +168,7 @@ export class ApiCallerService {
   updateGuideText(text: string): Observable<any> {
     return this.http.put(`${this.apiUrl}/put_guide_text`, 
       { text: text },
-      {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }
+      { headers: { 'Content-Type': 'application/json' } }
     )
     .pipe(
       catchError(error => {

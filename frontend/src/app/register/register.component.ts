@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ApiCallerService } from '../services/api-caller.service';
@@ -9,10 +9,10 @@ import { ApiCallerService } from '../services/api-caller.service';
   styleUrl: './register.component.css',
   standalone: false
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnInit {
   registerForm: FormGroup;
-  language: string = 'ro'; // Default language
-  version: string = '1.0'; // Version number
+  language: string = 'ro';
+  version: string = '1.0';
   buildDate: string = '2025-08-22'; 
   error: string = '';
   rolEroare: boolean = false;
@@ -25,16 +25,16 @@ export class RegisterComponent {
   ];
 
   departamente = [
-    'Administrativ',
-    'Aprovizionare',
-    'Calitate',
-    'Clădiri',
-    'Depozit',
-    'Logistic',
-    'Mentenanță',
-    'Producție',
-    'Tehnic'
+    'Administrativ', 'Aprovizionare', 'Calitate', 'Clădiri', 'Depozit',
+    'Logistic', 'Mentenanță', 'Producție', 'Tehnic'
   ];
+
+  functii = [
+    'Operator date', 'Șef de linie', 'Tehnician', 'TESA'
+  ];
+
+  // Populat din Nomenclator > Grupuri (endpoint public, fara token)
+  grupuri: string[] = [];
   
   constructor(private fb: FormBuilder, private router: Router, private api_caller: ApiCallerService) {
     this.registerForm = this.fb.group({
@@ -44,6 +44,8 @@ export class RegisterComponent {
       email: ['', [Validators.required, Validators.email, this.steinelEmailValidator]],
       numarMarca: ['', [Validators.required, Validators.pattern(/^[0-9]+$/)]],
       departament: ['', Validators.required],
+      functie: ['', Validators.required],
+      grup: ['', Validators.required],
       rol: this.fb.array([], Validators.required),
       parola: ['', [Validators.required, Validators.minLength(6)]],
       confirmareParola: ['', Validators.required],
@@ -61,8 +63,18 @@ export class RegisterComponent {
   ngOnInit() {
     this.registerForm.get('nume')?.valueChanges.subscribe(() => this.updateUsername());
     this.registerForm.get('prenume')?.valueChanges.subscribe(() => this.updateUsername());
-
     this.getEnvironmentVersion();
+    this.loadGrupuri();
+  }
+
+  loadGrupuri() {
+    this.api_caller.getGrupuriMuncaPublic().subscribe({
+      next: (grupuri: string[]) => { this.grupuri = grupuri || []; },
+      error: (err: any) => {
+        console.error('Nu s-au putut incarca grupurile:', err);
+        this.grupuri = [];
+      }
+    });
   }
 
   updateUsername(): void {
@@ -118,12 +130,10 @@ export class RegisterComponent {
   changeLanguage(event: Event) {
     const selectElement = event.target as HTMLSelectElement;
     this.language = selectElement.value;
-    
   }
 
   onSubmit() {
    this.submitted = true;
-
     const rolArray = this.registerForm.get('rol') as FormArray;
 
     if (rolArray.length !== 1) {
@@ -136,28 +146,23 @@ export class RegisterComponent {
       this.error = '';
 
       const formValues = this.registerForm.getRawValue();
-      const { nume, prenume, username, parola, email, numarMarca, departament, rol } = formValues;
+      const { nume, prenume, username, parola, email, numarMarca, departament, functie, grup, rol } = formValues;
 
-      this.api_caller.register(nume, prenume, username, parola, email, numarMarca, departament, rol[0]).subscribe({
+      this.api_caller.register(nume, prenume, username, parola, email, numarMarca, departament, functie, grup, rol[0]).subscribe({
         next: () => {
           this.error = '';
           this.router.navigate(['/login']);
         },
         error: err => {
-          if (err.error?.detail) {
-            this.error = err.error.detail;
-          } else if (typeof err.error === 'string') {
-            this.error = err.error;
-          } else {
-            this.error = 'Înregistrarea a eșuat.';
-          }
+          if (err.error?.detail) this.error = err.error.detail;
+          else if (typeof err.error === 'string') this.error = err.error;
+          else this.error = 'Înregistrarea a eșuat.';
         }
       });
     } else {
       this.error = 'Te rugăm să completezi corect formularul.';
       this.registerForm.markAllAsTouched();
     }
-
   }
 
   goBackToLogin() {

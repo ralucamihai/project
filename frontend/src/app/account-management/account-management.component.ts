@@ -21,8 +21,19 @@ export class AccountManagementComponent {
     lastName: "N/A",
     role: "N/A",
     status: "N/A",
-    username: "N/A"
+    username: "N/A",
+    departament: "N/A",
+    functie: "N/A"
   };
+
+  departamente = [
+    'Administrativ', 'Aprovizionare', 'Calitate', 'Clădiri', 'Depozit',
+    'Logistic', 'Mentenanță', 'Producție', 'Tehnic'
+  ];
+
+  functii = [
+    'Operator date', 'Sef linie', 'Tehnician', 'TESA'
+  ];
 
   resetForm: FormGroup;
   userForm: FormGroup;
@@ -47,6 +58,8 @@ export class AccountManagementComponent {
       employeeNo: ['', [Validators.required, Validators.pattern(/^[0-9]+$/)]],
       firstName: ['', [Validators.required, Validators.pattern(/^[a-zA-ZĂÂÎȘȚăâîșț\s\-]+$/)]],
       lastName: ['', [Validators.required, Validators.pattern(/^[a-zA-ZĂÂÎȘȚăâîșț\s\-]+$/)]],
+      departament: ['', Validators.required],
+      functie: ['', Validators.required],
       role: [{ value: '', disabled: true }],
       status: [{ value: '', disabled: true }],
       username: [{ value: '', disabled: true }]
@@ -80,7 +93,15 @@ export class AccountManagementComponent {
   saveChanges() {
     if (this.userForm.valid) {
       const username = localStorage.getItem(environment.usernameKey);
-      this.api_caller.updateUserInfo(username, this.userForm.value.firstName, this.userForm.value.lastName, this.userForm.value.email, this.userForm.value.employeeNo).subscribe({
+      this.api_caller.updateUserInfo(
+        username, 
+        this.userForm.value.firstName, 
+        this.userForm.value.lastName, 
+        this.userForm.value.email, 
+        this.userForm.value.employeeNo,
+        this.userForm.value.departament,
+        this.userForm.value.functie
+      ).subscribe({
         next: () => {
           this.error = '';
           this.router.navigate(['/login']);
@@ -118,6 +139,8 @@ export class AccountManagementComponent {
       this.user.username = response.username;
       this.user.role = response.role;
       this.user.status = response.status;
+      this.user.departament = response.department; // Baza de date folosește 'department'
+      this.user.functie = response.functie;
 
       // Update form values with fetched user data
       this.userForm.patchValue({
@@ -125,6 +148,8 @@ export class AccountManagementComponent {
         employeeNo: response.employeeNo,
         firstName: response.firstName,
         lastName: response.lastName,
+        departament: response.department || '',
+        functie: response.functie || '',
         role: response.role,
         status: response.status,
         username: response.username

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { delay } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 // =========================================================
 // ---- MOD MOCK (temporar, cat timp backend-ul nu exista) ----
@@ -91,7 +92,7 @@ export interface ActivitatiFiltre {
 })
 export class MaintenanceService {
 
-  private baseUrl = 'http://127.0.0.1:8080/api'; // Corectat la 8080
+  private baseUrl = environment.apiUrlIP; // Aliniat cu restul serviciilor (nomenclature.service.ts)
 
   // ---- Date mock (folosite doar cat USE_MOCK_DATA = true) ----
   private mockEchipamente: EchipamentPMB[] = [

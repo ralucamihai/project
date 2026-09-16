@@ -2,6 +2,7 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 from dotenv import load_dotenv
+ 
 
 
 
@@ -26,9 +27,8 @@ def get_db():
         yield db
     finally:
         db.close()
-
-from maintenance.main import EchipamentPMBModel, ActivitatePMBModel
+from nomenclature.models import UtilizatorPMB, GrupMuncaEntity, Piesa, ListaPiese, Sectie
 import customer_support.models
-import nomenclature.models  
+import nomenclature.models 
 
 Base.metadata.create_all(bind=engine)

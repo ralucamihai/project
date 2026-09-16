@@ -20,11 +20,10 @@
 <div class="page-container">
   <div class="login-container">
     <div class="card">
-      <h1 *ngIf="alreadyAuthenticated()" class="card-title mb-3">Already logged in as {{username}}!</h1>
-      <button *ngIf="alreadyAuthenticated()" type="submit" class="btn btn-custom" (click)="accessHomePage()">Go to main
-        page</button>
-      <h1 *ngIf="alreadyAuthenticated()" class="card-title mb-3">Log in with another user!</h1>
-      <h1 *ngIf="!alreadyAuthenticated()" class="card-title mb-3">Authentication</h1>
+      <h1 *ngIf="alreadyAuthenticated()" class="card-title mb-3">Deja logat ca {{username}}!</h1>
+      <button *ngIf="alreadyAuthenticated()" type="submit" class="btn btn-custom" (click)="accessHomePage()">Mergi la pagina principală</button>
+      <h1 *ngIf="alreadyAuthenticated()" class="card-title mb-3">Loghează-te cu alt utilizator!</h1>
+      <h1 *ngIf="!alreadyAuthenticated()" class="card-title mb-3">Autentificare</h1>
 
       <!-- msj de eroare -->
       <div *ngIf="error" class="error-message">
@@ -32,24 +31,22 @@
       </div>
       <!--msj de incarcare -->
       <div *ngIf="isLoading" class="loading-spinner">
-        Logging in...
+        Autentificare în curs...
       </div>
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="form-centered">
-        <input formControlName="username" type="text" class="form-control" placeholder="Username" />
-        <input formControlName="password" type="password" class="form-control" placeholder="Password" />
+        <input formControlName="username" type="text" class="form-control" placeholder="Nume utilizator" />
+        <input formControlName="password" type="password" class="form-control" placeholder="Parolă" />
 
         <!-- <div class="form-check">
           <input formControlName="remember" type="checkbox" />
           <label>Ține-mă minte</label>
         </div> -->
 
-
-
-        <button type="submit" class="btn-custom" [disabled]="isLoading">Log in</button>
-        <button type="button" class="btn-custom" (click)="onRegister()">Register</button>
+        <button type="submit" class="btn-custom" [disabled]="isLoading">Loghează-te</button>
+        <button type="button" class="btn-custom" (click)="onRegister()">Înregistrează-te</button>
 
         <div class="forgot-password-container">
-          <span class="forgot-password" (click)="onForgotPassword()">Forgot password?</span>
+          <span class="forgot-password" (click)="onForgotPassword()">Ai uitat parola?</span>
         </div>
       </form>
     </div>

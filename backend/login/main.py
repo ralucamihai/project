@@ -5,9 +5,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 import bcrypt
-from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
-from dotenv import load_dotenv
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 import random
@@ -27,20 +25,10 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 engine = create_engine(DB_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# --- Password hashing --------------------------------------------------
-# NOTA: am inlocuit passlib.CryptContext cu bcrypt direct.
-# passlib nu mai e intretinut si se rupe cu versiunile noi de bcrypt
-# (>=4.1), aruncand la runtime:
-#   AttributeError: module 'bcrypt' has no attribute '__about__'
-# exact la primul apel verify()/hash() -> asta provoca 500-ul la login.
-# Folosind bcrypt direct evitam complet acest bug.
-# -------------------------------------------------------------------------
-
 def get_password_hash(password: str) -> str:
     password_bytes = password.encode("utf-8")
     hashed = bcrypt.hashpw(password_bytes, bcrypt.gensalt())
     return hashed.decode("utf-8")
-
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     try:
@@ -48,24 +36,18 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
             plain_password.encode("utf-8"), hashed_password.encode("utf-8")
         )
     except (ValueError, TypeError):
-        # hash invalid/corupt in baza de date -> tratam ca parola gresita,
-        # nu lasam sa explodeze cu 500
         return False
-
 
 # OAuth2 setup
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
 
 def generate_password(length=12):
     characters = string.ascii_letters + string.digits + string.punctuation
     return ''.join(random.choice(characters) for _ in range(length))
 
-
 def create_tables():
     Base.metadata.create_all(bind=engine)
     print("Database and tables created!")
-
 
 def get_db():
     db = SessionLocal()
@@ -74,10 +56,8 @@ def get_db():
     finally:
         db.close()
 
-
 def get_user(db: Session, username: str):
     return db.query(User).filter(User.username == username).first()
-
 
 def get_all_users(db: Session, columns):
     if columns:
@@ -93,7 +73,6 @@ def get_all_users(db: Session, columns):
     else:
         return db.query(User).all()
 
-
 def approve_user(db: Session, user: UserApprove):
     existing_user = db.query(User).filter(User.username == user.username).first()
 
@@ -102,6 +81,10 @@ def approve_user(db: Session, user: UserApprove):
 
     existing_user.role = user.role
     existing_user.status = user.status
+    # Grupul e opțional: îl actualizăm doar dacă a fost trimis, ca un
+    # apel vechi (fără `grup`) să nu șteargă grupul deja salvat.
+    if user.grup is not None:
+        existing_user.grup = user.grup
 
     try:
         db.commit()
@@ -111,22 +94,17 @@ def approve_user(db: Session, user: UserApprove):
         db.rollback()
         raise e
 
-
-# Checks if the user credentials are correct
 def authenticate_user(db: Session, username: str, password: str):
     user = get_user(db, username)
     if not user or not verify_password(password, user.password_hash):
         return False
     return user
 
-
-# Creates a JWT token with exp time
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
     expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=15))
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-
 
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
@@ -147,7 +125,6 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         raise credentials_exception
     return user
 
-
 def get_all_users_with_credentials(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -162,11 +139,11 @@ def get_all_users_with_credentials(token: str = Depends(oauth2_scheme), db: Sess
         token_data = TokenData(username=username)
     except JWTError:
         raise credentials_exception
-    all_users = get_all_users(db, ['firstName', 'lastName', 'username', 'email', 'employeeNo', 'department', 'role', 'status'], )
+    # Aici am adăugat coloanele 'functie' si 'grup'
+    all_users = get_all_users(db, ['firstName', 'lastName', 'username', 'email', 'employeeNo', 'department', 'functie', 'grup', 'role', 'status'], )
     if all_users is None:
         raise credentials_exception
     return all_users
-
 
 def approve_user_with_credentials(user: UserApprove, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db), ):
     credentials_exception = HTTPException(
@@ -185,11 +162,12 @@ def approve_user_with_credentials(user: UserApprove, token: str = Depends(oauth2
     approve_user(db, user)
     return user
 
-
 def register_new_user(user: UserCreate, db: Session = Depends(get_db)):
     if get_user(db, user.username):
         err_message = f"Username {user.username} already used!"
         raise HTTPException(status_code=400, detail=err_message)
+    
+    # Aici salvăm funcția în baza de date
     user_obj = User(
         firstName=user.firstName,
         lastName=user.lastName,
@@ -198,6 +176,8 @@ def register_new_user(user: UserCreate, db: Session = Depends(get_db)):
         email=user.email,
         employeeNo=user.employeeNo,
         department=user.department,
+        functie=user.functie,
+        grup=user.grup,
         role=user.role,
         status='not confirmed')
     db.add(user_obj)
@@ -211,6 +191,8 @@ def register_new_user(user: UserCreate, db: Session = Depends(get_db)):
         'email': user.email,
         'employeeNo': user.employeeNo,
         'department': user.department,
+        'functie': user.functie,
+        'grup': user.grup,
         'role': user.role
     }
 
@@ -219,8 +201,6 @@ def register_new_user(user: UserCreate, db: Session = Depends(get_db)):
 
     return user_obj
 
-
-# Authenticates the user if the credentials are correct and creates a token to return
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = authenticate_user(db, form_data.username, form_data.password)
 
@@ -231,9 +211,6 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    # FIX: refoloseste obiectul "user" deja incarcat, nu mai face un query nou.
-    # Codul vechi apela get_user(...) inca o data si facea .__dict__["status"]
-    # fara sa verifice None -> risc de AttributeError -> 500.
     if user.status != "activ":
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -246,7 +223,6 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
         expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     )
     return {"access_token": access_token, "token_type": "bearer"}
-
 
 def reset_password(userResetPassword: UserResetPassword, db: Session = Depends(get_db)):
     user = authenticate_user(db, userResetPassword.username, userResetPassword.currentPassword)
@@ -267,7 +243,6 @@ def reset_password(userResetPassword: UserResetPassword, db: Session = Depends(g
         err_message = f"Username {userResetPassword.username} does not exist in database!"
         raise HTTPException(status_code=400, detail=err_message)
 
-
 def reset_password_with_credentials(userResetPassword: UserResetPassword, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -284,7 +259,6 @@ def reset_password_with_credentials(userResetPassword: UserResetPassword, token:
         raise credentials_exception
     user = reset_password(userResetPassword, db)
     return user
-
 
 def update_user_info_with_credentials(updateUserInfo, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
@@ -303,7 +277,6 @@ def update_user_info_with_credentials(updateUserInfo, token: str = Depends(oauth
     user = update_user_info(updateUserInfo, db)
     return user
 
-
 def update_user_info(updateUserInfo: UserUpdateInfo, db: Session = Depends(get_db)):
     user = get_user(db, updateUserInfo.username)
 
@@ -316,6 +289,15 @@ def update_user_info(updateUserInfo: UserUpdateInfo, db: Session = Depends(get_d
     user.email = updateUserInfo.email
     user.employeeNo = updateUserInfo.employeeNo
 
+    # Acestea erau trimise de FE dar nu se salvau niciodata. Sunt opționale:
+    # le scriem doar cand vin efectiv in payload.
+    if updateUserInfo.departament is not None:
+        user.department = updateUserInfo.departament
+    if updateUserInfo.functie is not None:
+        user.functie = updateUserInfo.functie
+    if updateUserInfo.grup is not None:
+        user.grup = updateUserInfo.grup
+
     try:
         db.commit()
         db.refresh(user)
@@ -324,7 +306,6 @@ def update_user_info(updateUserInfo: UserUpdateInfo, db: Session = Depends(get_d
         db.rollback()
         err_message = f"Failed to update user information: {str(e)}"
         raise HTTPException(status_code=500, detail=err_message)
-
 
 def forgot_password(email: UserForgotPassword, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == email.email).first()
@@ -345,7 +326,6 @@ def forgot_password(email: UserForgotPassword, db: Session = Depends(get_db)):
     else:
         err_message = f"Email {email.email} does not exist in database!"
         raise HTTPException(status_code=400, detail=err_message)
-
 
 if __name__ == "__main__":
     create_tables()

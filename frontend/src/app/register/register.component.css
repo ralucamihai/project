@@ -1,7 +1,7 @@
 html, body {
     height: 100%;
     margin: 0;
-    overflow: hidden;
+    overflow-y: auto; 
     background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
@@ -29,22 +29,6 @@ html, body {
     margin-right: 20px;
 }
 
-.language-section {
-    position: absolute;
-    top: 80px;
-    left: 20px;
-    z-index: 900;
-}
-
-.language-selector {
-    padding: 8px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    font-size: 16px;
-    color: #000;
-    background-color: #fff;
-}
-
 .right-section {
     display: flex;
     align-items: center;
@@ -63,13 +47,13 @@ html, body {
 }
 
 .page-container {
-    height: 100%;
+    min-height: calc(100% - 70px);
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     box-sizing: border-box;
-    padding-top: 0px; 
+    padding: 30px 10px;
 }
 
 .login-container {
@@ -77,44 +61,101 @@ html, body {
     justify-content: center;
     align-items: center;
     width: 100%;
-    padding-top: 70px;
 }
 
 .card {
-    border-radius: 15px;
+    border-radius: 12px;
     border: none;
     background: #fff;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    width: 400px;
-    padding: 40px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    width: 1000px; /* Suficient de lat pentru a ține coloanele */
+    max-width: 95vw;
+    padding: 30px 40px;
     position: relative;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    box-sizing: border-box;
 }
 
 .card-title {
-    font-weight: 600;
+    font-weight: 700;
     color: #000;
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
+    font-size: 26px;
 }
 
+/* Container pentru layout pe 3 coloane */
+.columns-wrapper {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap; 
+    gap: 20px;
+    width: 100%;
+}
+
+/* Casetele individuale pentru cele 3 secțiuni - Aspect Premium */
+.section-box {
+    border: 1px solid #ebebeb; 
+    border-radius: 14px; 
+    padding: 25px 20px;
+    background-color: #fff;
+    /* Umbră stratificată pentru un efect de profunzime premium */
+    box-shadow: 
+        0 10px 30px rgba(0, 0, 0, 0.06), 
+        0 1px 8px rgba(0, 0, 0, 0.03);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Efect interactiv când pui mouse-ul pe una dintre coloane */
+.section-box:hover {
+    transform: translateY(-5px); 
+    box-shadow: 
+        0 15px 35px rgba(0, 0, 0, 0.1), 
+        0 3px 10px rgba(0, 0, 0, 0.05); 
+    border-color: #dcb27b; 
+}
+
+.form-col {
+    display: flex;
+    flex-direction: column;
+    flex: 1; 
+    min-width: 250px; 
+}
+
+.section-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #333;
+    margin-top: 0;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eaeaea;
+    padding-bottom: 10px;
+    text-align: left;
+}
+
+/* Stiluri unificate pentru label-uri (aliniate stânga) */
 .form-label {
-    display: block;         
-    margin-left: 65px;      
-    margin-bottom: 0px;     
+    display: block;        
+    text-align: left;    
+    margin-bottom: 6px;    
     font-weight: 600;        
-    color: #333;             
+    color: #444;   
+    font-size: 13px;         
+}
+
+/* Stiluri specifice pentru secțiunea de Rol */
+.role-section {
+    margin-top: 15px;
 }
 
 .roles-container {
     display: flex;
-    gap: 10px;
+    gap: 15px;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: center; 
-    margin-top: 10px; 
+    justify-content: flex-start; /* Aliniat stânga ca în poză */
+    margin-top: 5px; 
 }
 
 .roles-container .form-check {
@@ -125,106 +166,139 @@ html, body {
 }
 
 .roles-container .form-check-input {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     margin: 0;
+    cursor: pointer;
 }
 
 .roles-container .form-check-label {
     margin-left: 0;
-    font-weight: 600;
-    color: #333;
+    font-weight: 500;
+    color: #444;
     cursor: pointer;
+    font-size: 13px;
 }
 
-/* --- STILIZARE UNIFORMĂ CASETE --- */
+/* --- STILIZARE UNIFORMĂ INPUT-URI --- */
 .form-control {
-    border-radius: 10px;
-    padding: 12px;
-    font-size: 15px;
-    text-align: center;
-    width: 250px;
-    height: 48px; /* Forțăm înălțimea să fie absolut identică pentru input și select */
-    margin: 10px auto;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 14px;
+    text-align: left;
+    width: 100%;
+    height: 42px; 
+    margin-bottom: 5px;
     display: block;
     box-sizing: border-box;
-    border: 1px solid #767676; /* Culoare uniformă pentru chenar */
+    border: 1.5px solid #dcb27b; /* Marginea portocalie/aurie din poză */
     background-color: #fff;
     color: #333;
     font-family: inherit;
-    transition: border-color 0.3s ease;
+    transition: all 0.3s ease;
 }
 
 .form-control:focus {
-    border-color: #fc8403;
+    border-color: #ff7700;
     outline: none;
+    box-shadow: 0 0 5px rgba(255, 119, 0, 0.2);
 }
 
-/* Selectul are nevoie doar de centrarea textului, mărimea o ia din .form-control */
 select.form-control {
-    text-align-last: center;
     cursor: pointer;
 }
 
-/* --- BUTON --- */
-.btn-custom {
-    border-radius: 10px;
-    padding: 12px;
-    font-size: 18px;
-    text-align: center;
-    width: 250px;
-    height: 48px;
-    margin: 25px auto 10px auto;
-    display: block;
-    box-sizing: border-box;
-    font-weight: 700;
-    color: #fc8403;
-    border: 2px solid #fc8403;
-    background-color: white;
-    transition: all 0.3s ease;
-    cursor: pointer;
+/* Iconițe încorporate în input-uri folosind SVG-uri Base64 */
+.icon-user {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23777"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>');
+    background-position: 10px center;
+    background-repeat: no-repeat;
+    background-size: 18px;
+    padding-left: 38px !important;
 }
 
-.btn-custom:hover {
-    background-color: #fc8403;
-    color: white;
+.icon-building {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23777"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/></svg>');
+    background-position: 10px center;
+    background-repeat: no-repeat;
+    background-size: 18px;
+    padding-left: 38px !important;
 }
 
-.form-check {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    margin: 15px 0;
-}
-
+/* Container-ul pentru layout corect */
 .form-centered {
     width: 100%;
 }
 
 .mb-3 {
     margin-bottom: 15px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; 
 }
 
+/* Mesajele de eroare */
 .error-message {
     color: #f12222;
-    border-radius: 8px;
-    padding: 12px 18px;
-    margin-bottom: 18px;
-    font-size: 16px;
+    padding: 2px 0 0 0;
+    font-size: 12px;
     font-weight: 500;
+    text-align: left;
+    width: 100%;
+}
+.global-error {
     text-align: center;
-    box-shadow: 0 2px 8px rgba(229,57,53,0.08);
+    margin-bottom: 15px;
+    background-color: #ffe6e6;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/* --- BUTOANE SI LINK-URI DE ACTIUNE (Baza formularului) --- */
+.action-buttons-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 35px;
+}
+
+.btn-custom {
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 16px;
+    text-align: center;
+    width: 200px;
+    height: 45px;
+    display: block;
+    box-sizing: border-box;
+    font-weight: 700;
+    color: #fff;
+    background-color: #ff6600; 
+    border: none;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+}
+
+.btn-custom:hover {
+    background-color: #e65c00;
+}
+
+.login-link {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
 }
 
 .forgot-password {
-    text-align: center;
     text-decoration: underline;
     cursor: pointer;
-    margin-top: 15px;
-    color: #fc8403;
+    color: #ff6600;
+    font-weight: 600;
 }
 
 .forgot-password:hover {
-    color: #e67e22;
+    color: #cc5200;
 }

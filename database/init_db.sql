@@ -262,3 +262,23 @@ ALTER TABLE cs_complaints ADD COLUMN IF NOT EXISTS termen_ora TIME;
 ALTER TABLE cs_complaints ADD COLUMN IF NOT EXISTS kpi VARCHAR(255);
 ALTER TABLE cs_complaints ADD COLUMN IF NOT EXISTS de_la_ora TIME;
 ALTER TABLE cs_complaints ADD COLUMN IF NOT EXISTS pana_la_ora TIME;
+
+-- =====================================================================
+-- NOMENCLATOR: TIPURI ECHIPAMENT (Șabloane Master)
+-- =====================================================================
+CREATE TABLE IF NOT EXISTS nom_tipuri_echipament (
+  id SERIAL PRIMARY KEY,
+  cod_line VARCHAR(50),
+  denumire VARCHAR(150) NOT NULL,
+  mentenanta_ac VARCHAR(50) DEFAULT 'NA',
+  mentenanta_prev VARCHAR(50) DEFAULT 'na',
+  calibrare VARCHAR(50) DEFAULT 'na',
+  esd VARCHAR(50) DEFAULT 'NA',
+  electrosecuritate VARCHAR(50) DEFAULT 'NA',
+  backup VARCHAR(50) DEFAULT 'na',
+  ssm VARCHAR(50) DEFAULT 'NA',
+  isqw VARCHAR(50) DEFAULT 'NA',
+  lista_piese VARCHAR(100),
+  lista_operatii VARCHAR(100),
+  responsabil VARCHAR(150)
+);

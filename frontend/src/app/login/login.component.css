@@ -5,54 +5,75 @@ html, body {
   background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
+
+/* --- BARA DE NAVIGARE TOP (LOGIN) --- */
 .top-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 20px;
-  background-color: #000;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  padding: 0 32px;
+  background-color: #0f1115; /* Negru modern, mat */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   width: 100%;
   box-sizing: border-box;
   z-index: 1000;
   height: 70px;
 }
+
 .left-section {
   display: flex;
   align-items: center;
 }
+
 .logo-top-left {
-  height: 50px;
+  height: 40px;
   margin-right: 20px;
 }
+
 .language-section {
-    position: absolute;
-    top: 80px;
-    left: 20px;
-    z-index: 900;
+  position: absolute;
+  top: 80px;
+  left: 20px;
+  z-index: 900;
 }
+
 .language-selector {
   padding: 8px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  font-size: 16px;
-  color: #000;
+  border-radius: 6px;
+  border: 1px solid #ebebeb;
+  font-size: 14px;
+  color: #333;
   background-color: #fff;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
 }
+
+.language-selector:focus {
+  border-color: #ff7700;
+  outline: none;
+}
+
 .right-section {
   display: flex;
   align-items: center;
 }
+
 .version-container {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
 }
+
 .app-version {
-  font-size: 16px;
-  color: #fff;
-  margin-left: 20px;
+  font-size: 12px;
+  color: #a1a1aa;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  line-height: 1.4;
 }
+
 .page-container {
   height: 100%;
   width: 100%;
@@ -62,101 +83,216 @@ html, body {
   box-sizing: border-box;
   padding-top: 0px;
 }
+
 .login-container {
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
   padding-top: 70px;
+  box-sizing: border-box;
 }
+
+/* --- CARD LOGIN PREMIUM --- */
 .card {
-  border-radius: 15px;
-  border: none;
+  border-radius: 16px;
+  border: 1px solid #ebebeb;
   background: #fff;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06), 0 1px 8px rgba(0, 0, 0, 0.03);
   width: 400px;
-  padding: 40px;
+  max-width: 92vw;
+  padding: 40px 45px;
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
+  box-sizing: border-box;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1), 0 3px 10px rgba(0, 0, 0, 0.05);
+}
+
 .card-title {
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 26px;
   color: #000;
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
 }
-.form-control,
-.btn-custom {
-  border-radius: 10px;
-  padding: 12px;
+
+/* --- INPUT-URI PREMIUM --- */
+.form-control {
+  border-radius: 8px;
+  padding: 12px 15px;
   font-size: 15px;
   text-align: center;
-  width: 250px;
+  width: 100%;
+  max-width: 260px;
   margin: 10px auto;
   display: block;
-}
-.btn-custom {
-  font-weight: 700;
-  font-size: 18px;
-  color: #fc8403;
-  border: 2px solid #fc8403;
-  background-color: white;
+  box-sizing: border-box;
+  border: 1.5px solid #dcb27b;
+  background-color: #fff;
+  color: #333;
   transition: all 0.3s ease;
-  margin-top: 15px;
 }
+
+.form-control:focus {
+  border-color: #ff7700;
+  outline: none;
+  box-shadow: 0 0 8px rgba(255, 119, 0, 0.15);
+}
+
+/* --- BUTON LOGIN PREMIUM --- */
+.btn-custom {
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 16px;
+  text-align: center;
+  width: 100%;
+  max-width: 260px;
+  margin: 20px auto 15px;
+  display: block;
+  box-sizing: border-box;
+  font-weight: 700;
+  color: #fff;
+  background-color: #ff6600;
+  border: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(255, 102, 0, 0.2);
+}
+
 .btn-custom:hover {
-  background-color: #fc8403;
-  color: white;
+  background-color: #e65c00;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(255, 102, 0, 0.3);
 }
+
 .form-check {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 8px;
   margin: 15px 0;
+  font-size: 14px;
+  color: #555;
 }
+
 .form-centered {
   width: 100%;
 }
+
 .mb-3 {
   margin-bottom: 15px;
 }
+
 .forgot-password-container {
   display: flex;
   justify-content: center;
   width: 100%;
-  margin-top: 20px;
+  margin-top: 15px;
 }
+
 .forgot-password {
   text-align: center;
   text-decoration: underline;
   cursor: pointer;
-  color: #fc8403 !important;
-  font-size: 16px;
+  color: #ff6600 !important;
+  font-size: 14px;
+  font-weight: 600;
   transition: color 0.3s ease;
 }
+
 .forgot-password:hover {
-    color: #e67e22 !important;
-    text-decoration: underline;
+  color: #cc5200 !important;
 }
 
+/* --- MESAJ DE EROARE MODERNIZAT --- */
 .error-message {
-  color: #fff;
-  background-color: #e53935;
-  border: 1px solid #b71c1c;
+  color: #d32f2f;
+  background-color: #ffebee;
+  border: 1px solid #ffcdd2;
   border-radius: 8px;
-  padding: 12px 18px;
-  margin-bottom: 18px;
-  font-size: 16px;
+  padding: 10px 15px;
+  margin-bottom: 20px;
+  font-size: 14px;
   font-weight: 500;
   text-align: center;
-  box-shadow: 0 2px 8px rgba(229,57,53,0.08);
+  width: 100%;
+  box-sizing: border-box;
+  box-shadow: 0 2px 8px rgba(211, 47, 47, 0.05);
 }
+
 .loading-spinner {
   text-align: center;
-  font-size: 15px;
-  color: #555;
+  font-size: 14px;
+  font-weight: 500;
+  color: #777;
   margin-top: 10px;
+}
+
+/* =========================================================
+   RESPONSIVE / MOBILE
+   ========================================================= */
+@media (max-width: 480px) {
+  html, body {
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .top-bar {
+    padding: 0 16px;
+    height: 60px;
+  }
+
+  .logo-top-left {
+    height: 32px;
+    margin-right: 10px;
+  }
+
+  .app-version {
+    font-size: 11px;
+  }
+
+  .language-section {
+    top: 68px;
+    left: 12px;
+  }
+
+  .language-selector {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+
+  .page-container {
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .login-container {
+    padding-top: 90px;
+    padding-bottom: 24px;
+    align-items: flex-start;
+  }
+
+  .card {
+    width: 100%;
+    max-width: none;
+    padding: 28px 20px;
+    border-radius: 12px;
+  }
+
+  .card-title {
+    font-size: 22px;
+    margin-bottom: 18px;
+  }
+
+  .form-control,
+  .btn-custom {
+    max-width: none;
+  }
 }

@@ -1,16 +1,13 @@
-
+/* --- BARA DE NAVIGARE PRINCIPALĂ --- */
 .sidebar {
-  /* position: fixed; */
   top: 0;
   left: 0;
   width: 100%;
-  /* Full width */
   height: 70px;
-  /* Adjusted height for horizontal nav */
-  background-color: #000000;
+  background-color: #0f1115; /* Un negru mai modern și mai fin */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08); /* Linie subtilă de separare */
   box-sizing: border-box;
   z-index: 1000;
-  /* Ensure navbar stays on top of other content */
 }
 
 .sidebar-container {
@@ -18,7 +15,7 @@
   justify-content: space-between;
   align-items: center;
   height: 100%;
-  padding: 0 24px;
+  padding: 0 32px; /* Spațiere ușor mărită pe laterale */
 }
 
 .left-section {
@@ -27,8 +24,8 @@
 }
 
 .logo-top-left {
-  height: 46px;
-  margin-right: 28px;
+  height: 40px; /* Ușor micșorat pentru eleganță */
+  margin-right: 32px;
 }
 
 .center-section {
@@ -38,7 +35,7 @@
   justify-content: space-between;
 }
 
-/* Navigation styles inside sidebar */
+/* --- LINK-URI ȘI BUTOANE MENIU --- */
 .nav-left-links,
 .nav-right-links {
   list-style-type: none;
@@ -46,8 +43,7 @@
   margin: 0;
   display: flex;
   align-items: center;
-  gap: 8px;
-  /* Even, breathable spacing between buttons */
+  gap: 4px; /* Spațiere redusă între elemente pentru coeziune */
 }
 
 .nav-left-links li,
@@ -57,28 +53,39 @@
 }
 
 .nav-left-links > li > a,
-.nav-right-links > li > a {
+.nav-right-links > li > a,
+.dropdown-toggle {
   display: flex;
   align-items: center;
-  padding: 10px 18px;
-  /* More comfortable padding */
-  color: white;
-  background-color: #fc8403;
+  padding: 8px 16px;
+  color: #fff; /* Text gri deschis pentru starea inactivă */
+  background-color: transparent; /* Eliminăm blocurile masive de culoare */
   text-decoration: none;
-  border-radius: 6px;
+  border-radius: 8px;
   text-align: center;
-  font-size: 14.5px;
+  font-size: 14px;
   font-weight: 500;
-  letter-spacing: 0.2px;
+  letter-spacing: 0.3px;
   white-space: nowrap;
-  transition: background-color 0.25s ease, transform 0.15s ease, box-shadow 0.25s ease;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
 }
 
+/* Efectul modern de hover (trecere cu mouse-ul) */
 .nav-left-links > li > a:hover,
-.nav-right-links > li > a:hover {
-  background-color: #8c4a03;
-  transform: translateY(-1px);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+.nav-right-links > li > a:hover,
+.dropdown-toggle:hover {
+  color: #fc8403;
+  background-color: rgba(252, 132, 3, 0.1); /* Fundal portocaliu translucid */
+}
+
+/* Starea Activă (pagina pe care ești) */
+.active-link,
+.dropdown-toggle.active {
+  background-color: #fc8403 !important;
+  color: #ffffff !important;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(252, 132, 3, 0.25); /* Umbră colorată subtilă */
 }
 
 .right-section {
@@ -90,32 +97,17 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  margin-left: 20px;
+  margin-left: 24px;
 }
 
 .app-version {
-  font-size: 13px;
-  color: #bbbbbb;
+  font-size: 12px;
+  color: #71717a; /* Gri mai discret pentru versiune */
   line-height: 1.4;
+  font-weight: 500;
 }
 
-/* Content area below the horizontal navbar */
-/* .content {
-  margin-top: 70px;
-  padding: 20px;
-  height: calc(100vh - 70px);
-  overflow-y: auto;
-} */
-
-/* Style for active link */
-.active-link {
-  background-color: #8c4a03 !important;
-  font-weight: 700;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15);
-}
-
-
-/* Dropdown Styles */
+/* --- DROPDOWN MENIU --- */
 .dropdown {
   position: relative;
   display: inline-block;
@@ -123,33 +115,17 @@
 }
 
 .dropdown-toggle {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  text-decoration: none;
-  padding: 10px 18px;
-  color: white;
-  background-color: #fc8403;
-  border-radius: 6px;
-  transition: background-color 0.25s ease, transform 0.15s ease, box-shadow 0.25s ease;
-}
-
-.dropdown-toggle:hover {
-  background-color: #8c4a03;
-  text-decoration: none;
-  transform: translateY(-1px);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
-}
-
-.dropdown-toggle.active {
-  background-color: #8c4a03;
+  gap: 8px;
 }
 
 .dropdown-arrow {
-  font-size: 11px;
-  transition: transform 0.3s ease;
-  margin-left: 2px;
+  font-size: 10px;
+  transition: transform 0.25s ease;
+  opacity: 0.7;
+}
+
+.dropdown-toggle:hover .dropdown-arrow {
+  opacity: 1;
 }
 
 .dropdown-arrow.rotated {
@@ -160,40 +136,32 @@
   position: absolute;
   top: 100%;
   left: 0;
-  right: auto;
   background-color: #ffffff;
-  border: none;
-  border-radius: 8px;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+  border: 1px solid #e4e4e7; /* Bordură foarte fină */
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08); /* Umbră difuză, modernă */
   width: max-content;
-  min-width: 100%;
+  min-width: 200px;
   max-width: 280px;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-8px);
-  transition: all 0.25s ease;
+  transform: translateY(10px) scale(0.95); /* Animație de deschidere fină */
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   z-index: 1001;
   list-style: none;
-  padding: 10px;
-  margin: 0;
-  margin-top: 8px;
+  padding: 8px; /* Spațiu în interiorul meniului */
+  margin: 12px 0 0 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  white-space: nowrap;
-  /* Prevent text wrapping */
-  overflow: hidden;
-  /* Hide any overflow */
+  gap: 2px;
 }
 
 .dropdown-menu.show {
   opacity: 1;
   visibility: visible;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
 }
 
-/* Settings e ultimul din dreapta: aliniem meniul la dreapta butonului
-   ca sa nu iasa in afara ecranului */
 .nav-right-links .dropdown-menu {
   left: auto;
   right: 0;
@@ -207,32 +175,31 @@
 
 .dropdown-menu li a {
   display: block;
-  padding: 10px 12px;
+  padding: 10px 14px;
   text-decoration: none;
-  color: #333;
-  transition: background-color 0.2s ease, color 0.2s ease;
-  border-radius: 5px;
-  background-color: #f8f9fa;
-  text-overflow: ellipsis;
-  /* Add ellipsis for long text */
+  color: #3f3f46;
+  transition: all 0.15s ease;
+  border-radius: 6px;
+  background-color: transparent;
+  font-size: 13.5px;
+  font-weight: 500;
   overflow: hidden;
-  /* Hide overflow text */
+  text-overflow: ellipsis;
   white-space: nowrap;
-  /* Prevent text wrapping */
-  font-size: 14px;
 }
 
 .dropdown-menu li a:hover {
-  background-color: #fc8403;
-  color: #ffffff;
+  background-color: #f4f4f5; /* Gri foarte deschis pe hover */
+  color: #fc8403;
 }
 
 .dropdown-menu li a.active-link {
-  background-color: #8c4a03;
-  color: white;
+  background-color: rgba(252, 132, 3, 0.08) !important;
+  color: #fc8403 !important;
+  box-shadow: none;
 }
 
-/* Responsive adjustments */
+/* --- RESPONSIVE --- */
 @media (max-width: 768px) {
   .dropdown-menu {
     position: static;
@@ -243,10 +210,11 @@
     visibility: visible;
     transform: none;
     min-width: auto;
+    padding: 0;
   }
 
   .dropdown-menu.show {
-    display: block;
+    display: flex;
   }
 
   .dropdown-menu:not(.show) {

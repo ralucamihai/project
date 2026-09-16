@@ -18,9 +18,7 @@
         <button class="btn-custom btn-logout" (click)="logout()">Deconectare</button>
       </div>
     </div>
-    <div class="image-content">
-      <div class="hero-image-container"></div>
-    </div>
+    <!-- Containerul gol pentru imagine a fost eliminat de aici -->
   </div>
   <div class="bg-decoration bg-decoration-1"></div>
   <div class="bg-decoration bg-decoration-2"></div>
@@ -36,7 +34,7 @@
     <h2>Ghid</h2>
     <div *ngIf="guideText; else loadingTemplate" [innerHTML]="guideText"></div>
     <ng-template #loadingTemplate>
-      <p>Ghidul se incarcă...</p>
+      <p>Ghidul se încarcă...</p>
     </ng-template>
     <button (click)="closeGuide()">Închide</button>
   </div>
@@ -47,16 +45,16 @@
     <h2>Editare ghid</h2>
     <div class="edit-guide-content">
       <p class="edit-info">
-        <strong>Available Variables:</strong><br>
-        <span ngNonBindable>{{role}}</span> - va fi înlocuit cu rolul userului<br>
-        <span ngNonBindable>{{username}}</span> - va fi înlocuit cu numele userului<br>
+        <strong>Variabile disponibile:</strong><br>
+        <span ngNonBindable>{{role}}</span> - va fi înlocuit cu rolul utilizatorului<br>
+        <span ngNonBindable>{{username}}</span> - va fi înlocuit cu numele utilizatorului<br>
       </p>
 
       <div class="edit-container">
         <div class="edit-section">
           <h3>Editor</h3>
           <textarea [(ngModel)]="editableGuideText" (input)="onTextInput($event)"
-            placeholder="Insert the guide's text..." class="guide-textarea" [disabled]="isLoading">
+            placeholder="Introduceți textul ghidului..." class="guide-textarea" [disabled]="isLoading">
           </textarea>
         </div>
 
@@ -68,9 +66,9 @@
 
       <div class="edit-buttons">
         <button (click)="saveGuideText()" class="btn-save" [disabled]="isLoading">
-          {{isLoading ? 'Saving...' : 'Save'}}
+          {{isLoading ? 'Se salvează...' : 'Salvează'}}
         </button>
-        <button (click)="closeEditGuide()" [disabled]="isLoading">Cancel</button>
+        <button (click)="closeEditGuide()" [disabled]="isLoading">Anulează</button>
       </div>
     </div>
   </div>
@@ -78,10 +76,10 @@
 
 <div *ngIf="reportProblemVisible" class="guide-modal-overlay" (click)="closeReportProblem()">
   <div class="guide-modal" (click)="$event.stopPropagation()">
-    <h2>Report a problem!</h2>
-    <textarea [(ngModel)]="problemDescription" placeholder="Describe the problem..." rows="5"></textarea>
-    <input type="email" [(ngModel)]="userEmail" placeholder="Your email" />
-    <button (click)="submitReport()">Send</button>
-    <button (click)="closeReportProblem()">Close</button>
+    <h2>Raportează o problemă!</h2>
+    <textarea [(ngModel)]="problemDescription" placeholder="Descrie problema..." rows="5"></textarea>
+    <input type="email" [(ngModel)]="userEmail" placeholder="Emailul tău" />
+    <button (click)="submitReport()">Trimite</button>
+    <button (click)="closeReportProblem()">Închide</button>
   </div>
 </div>

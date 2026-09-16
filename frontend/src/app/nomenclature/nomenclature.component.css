@@ -225,7 +225,7 @@
 }
 
 .col-nr {
-  width: 10%;
+  width: 20px;
   text-align: center;
   color: #888;
   font-size: 11px;
@@ -585,6 +585,10 @@
   flex: 0 1 480px;
 }
 
+.dual-panel-liste-wide {
+  flex: 1.4 1 0%;
+}
+
 .dual-panel-piese {
   flex: 2 1 0%;
 }
@@ -828,4 +832,3 @@
     flex-direction: row;
   }
 }
-

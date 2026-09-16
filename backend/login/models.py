@@ -17,6 +17,8 @@ class User(Base):
     email = Column(String(50), nullable=False)
     employeeNo = Column(String(50), nullable=False)
     department = Column(String(50), nullable=True)
+    functie = Column(String(50), nullable=True)
+    grup = Column(String(100), nullable=True, index=True)
     role = Column(String(25), nullable=False)
     status = Column(String(25), nullable=False)
 
@@ -36,12 +38,15 @@ class UserCreate(BaseModel):
     email: str
     employeeNo: str
     department: str
+    functie: str
+    grup: Optional[str] = None
     role: str
 
 class UserApprove(BaseModel):
     username: str
     role: str
     status: str
+    grup: Optional[str] = None
 
 class UserOut(BaseModel):
     id: int
@@ -64,3 +69,8 @@ class UserUpdateInfo(BaseModel):
     lastName: str
     email: str
     employeeNo: str
+    # Numele cheilor respecta exact ce trimite api-caller.service.ts
+    # (`departament`, nu `department`), ca sa nu schimbam contractul din FE.
+    departament: Optional[str] = None
+    functie: Optional[str] = None
+    grup: Optional[str] = None

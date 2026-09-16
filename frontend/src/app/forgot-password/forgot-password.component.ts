@@ -3,6 +3,7 @@ import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angula
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ApiCallerService } from '../services/api-caller.service';
+import { environment } from '../../environments/environment'; // Adăugat aici
 
 @Component({
   selector: 'app-forgot-password',
@@ -13,11 +14,13 @@ import { ApiCallerService } from '../services/api-caller.service';
 })
 export class ForgotPasswordComponent {
   forgotPasswordForm: FormGroup;
-  language: string = 'ro'; // Default language
-  version: string = '1.0'; // Version number
-  buildDate: string = '2025-08-22';
-  error: string = '';
+  language: string = 'ro'; 
   
+  // Modificarea este aici: preluăm datele direct din environment
+  version: string = environment.version; 
+  buildDate: string = environment.buildDate; 
+  
+  error: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -55,7 +58,6 @@ export class ForgotPasswordComponent {
           }
         }
       });
-
     }
   }
 

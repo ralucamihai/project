@@ -27,6 +27,7 @@
   color: #718096;
   font-weight: 500;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  word-break: break-word;
 }
 
 .role-badge {
@@ -36,6 +37,7 @@
   border-radius: 20px;
   font-size: 0.85rem;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .status-active {
@@ -45,6 +47,7 @@
   border-radius: 20px;
   font-size: 0.85rem;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .status-inactive {
@@ -54,6 +57,7 @@
   border-radius: 20px;
   font-size: 0.85rem;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .status-pending {
@@ -63,6 +67,7 @@
   border-radius: 20px;
   font-size: 0.85rem;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 /* Stiluri pentru tema întunecată */
@@ -84,7 +89,7 @@ body.dark-theme .info-value {
   .account-info-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .info-item {
     flex-direction: column;
     align-items: flex-start;
@@ -201,6 +206,7 @@ body.light-theme {
   padding: 20px;
   background-color: #f8f9fa;
   min-height: 100vh;
+  box-sizing: border-box;
 }
 
 .header {
@@ -303,6 +309,8 @@ body.light-theme {
   transition: all 0.3s ease;
   background-color: #fff;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .form-control:focus {
@@ -432,31 +440,36 @@ body.light-theme {
   .account-administration-container {
     padding: 10px;
   }
-  
+
   .header {
     padding: 20px;
     margin-bottom: 20px;
   }
-  
+
   .header h1 {
     font-size: 2rem;
   }
-  
+
   .admin-section {
     padding: 20px;
   }
-  
+
   .preferences-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .action-buttons {
     flex-direction: column;
   }
-  
+
   .btn-custom {
     width: 100%;
     margin-bottom: 10px;
+    min-width: 0;
+  }
+
+  .section-content {
+    overflow-x: hidden;
   }
 }
 
@@ -464,16 +477,25 @@ body.light-theme {
   .header h1 {
     font-size: 1.5rem;
   }
-  
+
   .subtitle {
     font-size: 1rem;
   }
-  
+
   .section-header h2 {
     font-size: 1.25rem;
   }
-  
+
   .admin-section {
     padding: 15px;
+  }
+
+  .info-item {
+    padding: 10px 12px;
+  }
+
+  .form-control {
+    padding: 10px 12px;
+    font-size: 0.95rem;
   }
 }
