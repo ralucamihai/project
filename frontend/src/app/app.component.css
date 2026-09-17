@@ -199,6 +199,16 @@
   box-shadow: none;
 }
 
+/* --- SOLUȚIE PENTRU GOOGLE TRANSLATE (Forțează Majusculă Doar Prima Literă) --- */
+.nav-text {
+  display: inline-block;
+  text-transform: lowercase !important;
+}
+
+.nav-text::first-letter {
+  text-transform: uppercase !important;
+}
+
 /* --- RESPONSIVE --- */
 @media (max-width: 768px) {
   .dropdown-menu {

@@ -159,17 +159,17 @@ html, body {
   box-sizing: border-box;
   font-weight: 700;
   color: #fff;
-  background-color: #ff6600;
+  background-color: #fc8403;
   border: none;
   transition: all 0.3s ease;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(255, 102, 0, 0.2);
+  box-shadow: 0 4px 10px rgba(252, 132, 3, 0.2);
 }
 
 .btn-custom:hover {
-  background-color: #e65c00;
+  background-color: #fc8403;
   transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(255, 102, 0, 0.3);
+  box-shadow: 0 6px 15px rgba(252, 132, 3, 0.3);
 }
 
 .form-check {
@@ -201,14 +201,14 @@ html, body {
   text-align: center;
   text-decoration: underline;
   cursor: pointer;
-  color: #ff6600 !important;
+  color: #fc8403 !important;
   font-size: 14px;
   font-weight: 600;
   transition: color 0.3s ease;
 }
 
 .forgot-password:hover {
-  color: #cc5200 !important;
+  color: #fc8403 !important;
 }
 
 /* --- MESAJ DE EROARE MODERNIZAT --- */

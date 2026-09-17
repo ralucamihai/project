@@ -6,7 +6,7 @@
 
     <nav class="center-section">
       <ul class="nav-left-links">
-        <li><a routerLink="/home" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Acasă</a></li>
+        <li><a routerLink="/home" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }"><span class="nav-text">Acasă</span></a></li>
 
         <!-- Mentenanta -->
         <li class="dropdown"
@@ -15,7 +15,7 @@
           <a class="dropdown-toggle"
              routerLink="/maintenance"
              routerLinkActive="active-link">
-            Mentenanță
+            <span class="nav-text">Mentenanță</span>
             <span class="dropdown-arrow" [class.rotated]="isHoverMenuOpen('maintenance')">▼</span>
           </a>
           <ul class="dropdown-menu" [class.show]="isHoverMenuOpen('maintenance')">
@@ -31,7 +31,7 @@
           <a class="dropdown-toggle"
              routerLink="/testing"
              routerLinkActive="active-link">
-            Testare
+            <span class="nav-text">Testare</span>
             <span class="dropdown-arrow" [class.rotated]="isHoverMenuOpen('testing')">▼</span>
           </a>
           <ul class="dropdown-menu" [class.show]="isHoverMenuOpen('testing')">
@@ -49,12 +49,11 @@
           <a class="dropdown-toggle"
              routerLink="/nomenclature"
              routerLinkActive="active-link">
-            Nomenclator
+            <span class="nav-text">Nomenclator</span>
             <span class="dropdown-arrow" [class.rotated]="isHoverMenuOpen('nomenclature')">▼</span>
           </a>
           <ul class="dropdown-menu" [class.show]="isHoverMenuOpen('nomenclature')">
             <li><a routerLink="/nomenclature" [queryParams]="{ tab: 'tip_echipament' }">Tipuri Echipamente</a></li>
-            <!--<li><a routerLink="/nomenclature" [queryParams]="{ tab: 'utilizatori_pmb' }">Responsabili</a></li>-->
             <li><a routerLink="/nomenclature" [queryParams]="{ tab: 'grupuri' }">Grupuri Intervenție</a></li>
             <li><a routerLink="/nomenclature" [queryParams]="{ tab: 'tip_interventie' }">Tipuri Intervenții</a></li>
             <li><a routerLink="/nomenclature" [queryParams]="{ tab: 'categorie_defect' }">Categorii Defecte</a></li>
@@ -71,14 +70,13 @@
           <a class="dropdown-toggle"
              routerLink="/customer_support"
              routerLinkActive="active-link">
-            Suport
+            <span class="nav-text">Suport</span>
             <span class="dropdown-arrow" [class.rotated]="isHoverMenuOpen('customer_support')">▼</span>
           </a>
           <ul class="dropdown-menu" [class.show]="isHoverMenuOpen('customer_support')">
             <li><a routerLink="/customer_support" [queryParams]="{ tab: 'tickets' }">Tichete</a></li>
             <li><a routerLink="/customer_support" [queryParams]="{ tab: 'orders' }">Comenzi</a></li>
             <li><a routerLink="/customer_support" [queryParams]="{ tab: 'suggestions' }">Sugestii </a></li>
-           
           </ul>
         </li>
       </ul>
@@ -89,10 +87,10 @@
           <a class="dropdown-toggle"
              [class.active]="isClickMenuOpen('lang')"
              (click)="toggleClickDropdown($event, 'lang')">
-            🌐 {{ language.toUpperCase() }}
+            🌐 <span class="notranslate" translate="no">{{ language }}</span>
             <span class="dropdown-arrow" [class.rotated]="isClickMenuOpen('lang')">▼</span>
           </a>
-          <ul class="dropdown-menu" [class.show]="isClickMenuOpen('lang')">
+          <ul class="dropdown-menu notranslate" translate="no" [class.show]="isClickMenuOpen('lang')">
             <li><a (click)="changeLanguage('ro'); closeClickDropdown()">Română</a></li>
             <li><a (click)="changeLanguage('en'); closeClickDropdown()">English</a></li>
             <li><a (click)="changeLanguage('fr'); closeClickDropdown()">Français</a></li>
@@ -107,7 +105,7 @@
           <a class="dropdown-toggle"
              [class.active]="isClickMenuOpen('settings')"
              (click)="toggleClickDropdown($event, 'settings')">
-            Setări
+            <span class="nav-text">Setări</span>
             <span class="dropdown-arrow" [class.rotated]="isClickMenuOpen('settings')">▼</span>
           </a>
           <ul class="dropdown-menu" [class.show]="isClickMenuOpen('settings')">
