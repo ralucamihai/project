@@ -231,3 +231,29 @@
     display: none;
   }
 }
+.dropdown-item.text-danger {
+  color: #ef4444;
+  border-top: 1px solid #f4f4f5;
+}
+.dropdown-item.text-danger:hover {
+  background-color: #fef2f2;
+  color: #dc2626;
+}
+.dropdown-item {
+  background: transparent;
+  border: none;
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  color: #3f3f46;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  width: 100%;
+  display: block;
+}
+
+.dropdown-item:hover {
+  background-color: #fcebd7;
+  color: #fc8403;
+}

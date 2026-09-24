@@ -1,34 +1,174 @@
-<div class="hero-section">
-  <div class="user-info">
-    <span class="username">{{currentUser.username}}</span>
-    <span class="role">{{currentUser.role}}</span>
-  </div>
-
-  <div class="hero-content">
-    <div class="text-content">
-      <h1 class="hero-title">
-        Bună!<br>
-        Bine ai revenit!<br>
-      </h1>
-      <div class="button-group">
-        <!-- <button class="btn-custom" (click)="goToForgotPassword()">Uitat parolă</button> -->
-        <!-- <button class="btn-custom" (click)="goToAccountManagement()">Administrare cont</button> -->
-        <button class="btn-custom" (click)="openGuide()">Ghid</button>
-        <button *ngIf="isAdmin()" class="btn-custom btn-admin" (click)="openEditGuide()">Editare ghid</button>
-        <button class="btn-custom btn-logout" (click)="logout()">Deconectare</button>
+<div class="hero-section" (click)="closeUserMenu()">
+  <!-- Header superior -->
+  <div class="dashboard-header">
+    <div class="dashboard-title-area">
+      <h1>Panou de bord</h1>
+    </div>
+    
+    <!-- Meniu Dropdown pentru Utilizator & Opțiuni -->
+    <div class="user-menu-container" (click)="$event.stopPropagation()">
+      <div class="user-info" (click)="toggleUserMenu()">
+        <span class="username">{{currentUser.username}}</span>
+        <span class="role">{{currentUser.role}}</span>
       </div>
     </div>
-    <!-- Containerul gol pentru imagine a fost eliminat de aici -->
   </div>
+
+  <!-- Structura principală pe 3 coloane -->
+  <div class="dashboard-grid">
+    
+    <!-- Coloana 1: Prezența -->
+    <div class="dashboard-card">
+      <div class="card-header">
+        <h3>Prezență</h3>
+      </div>
+      <div class="data-table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Dată</th>
+              <th>Nume</th>
+              <th>Funcție</th>
+              <th>Schimb</th>
+              <th>Timp rămas</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{ currentDateShort }}</td>
+              <td>{{ getFullName() }}</td>
+              <td>{{ currentUser.functie || 'N/A' }}</td>
+              <td>{{ schimbCurentNumar }}</td>
+              <td>480</td>
+              <td><span class="status-active">Prezent</span></td>
+            </tr>
+            <tr *ngFor="let p of listaPrezenti">
+              <td>{{ currentDateShort }}</td>
+              <td>{{ p.nume }}</td>
+              <td>{{ p.functie }}</td>
+              <td>{{ getSchimbNumar(p.schimb) }}</td>
+              <td>{{ p.timpRamas }}</td>
+              <td><span class="status-active">{{ p.status }}</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="absent-section">
+        <h4>Personal absent / învoit</h4>
+        <div class="data-table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Dată</th>
+                <th>Nume</th>
+                <th>Funcție</th>
+                <th>Schimb</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let p of listaAbsenti">
+                <td>{{ currentDateShort }}</td>
+                <td>{{ p.nume }}</td>
+                <td>{{ p.functie }}</td>
+                <td>{{ getSchimbNumar(p.schimb) }}</td>
+                <td>
+                  <span [ngClass]="p.status === 'Absent' ? 'status-absent' : 'status-invoit'">
+                    {{ p.status }}
+                  </span>
+                </td>
+              </tr>
+              <tr *ngIf="!listaAbsenti || listaAbsenti.length === 0">
+                <td colspan="5" class="text-center" style="color: #71717a; text-align: center; padding: 10px;">Nu există personal absent sau învoit.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Coloana 2: Întreruperi active -->
+    <div class="dashboard-card">
+      <div class="card-header">
+        <h3>Întreruperi active (linii fabricație)</h3>
+      </div>
+      <div class="data-table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Dată</th>
+              <th>Linie</th>
+              <th>Tip defect</th>
+              <th>Timp</th>
+              <th>Stare</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let linie of liniiFabricatie">
+              <td>{{ currentDateShort }}</td>
+              <td>{{ linie.linia || linie.sectie }}</td>
+              <td>-</td>
+              <td>0 min</td>
+              <td><span class="badge badge-info" style="color: #3b82f6; font-weight: 600;">Deschis</span></td>
+            </tr>
+            <tr *ngIf="liniiFabricatie.length === 0">
+              <td colspan="5" class="text-center">Nu există linii configurate în secții.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Coloana 3: Activități programate -->
+    <div class="dashboard-card">
+      <div class="card-header">
+        <h3>Activități programate (lună curentă)</h3>
+        <label class="filter-checkbox-label">
+          <input type="checkbox" [(ngModel)]="doarAleMele" /> Doar ale mele
+        </label>
+      </div>
+      <div class="data-table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Nr. inv.</th>
+              <th>Denumire</th>
+              <th>Tip</th>
+              <th>Responsabil</th>
+              <th>Termen</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let eq of activitatiFiltrate">
+              <td>{{ eq.numar }}</td>
+              <td>{{ eq.denumire }}</td>
+              <td>Mentenanță</td>
+              <td>{{ eq.responsabil || currentUser.username }}</td>
+              <td>{{ ultimaZiLunaCurenta }}</td>
+            </tr>
+            <tr *ngIf="activitatiFiltrate.length === 0">
+              <td colspan="5" class="text-center">Nicio activitate programată.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card-footer-actions">
+        <button class="btn-listeaza" (click)="listeazaCSV()">Listează</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Decorațiuni fundal mesh gradient -->
   <div class="bg-decoration bg-decoration-1"></div>
   <div class="bg-decoration bg-decoration-2"></div>
   <div class="bg-decoration bg-decoration-3"></div>
 </div>
 
-<!-- <button class="feedback-button" (click)="openReportProblem()">
-  Ai găsit o problemă? Raportează aici!
-</button> -->
-
+<!-- Modal Ghid -->
 <div *ngIf="showGuide" class="guide-modal-overlay" (click)="closeGuide()">
   <div class="guide-modal" (click)="$event.stopPropagation()">
     <h2>Ghid</h2>
@@ -40,14 +180,14 @@
   </div>
 </div>
 
+<!-- Modal Editare Ghid (Admin) -->
 <div *ngIf="showEditGuide" class="guide-modal-overlay" (click)="closeEditGuide()">
   <div class="guide-modal edit-modal" (click)="$event.stopPropagation()">
     <h2>Editare ghid</h2>
     <div class="edit-guide-content">
       <p class="edit-info">
-        <strong>Variabile disponibile:</strong><br>
-        <span ngNonBindable>{{role}}</span> - va fi înlocuit cu rolul utilizatorului<br>
-        <span ngNonBindable>{{username}}</span> - va fi înlocuit cu numele utilizatorului<br>
+        <strong>Variabile disponibile:</strong> 
+        <span ngNonBindable>{{role}}</span>, <span ngNonBindable>{{username}}</span>
       </p>
 
       <div class="edit-container">
@@ -71,15 +211,5 @@
         <button (click)="closeEditGuide()" [disabled]="isLoading">Anulează</button>
       </div>
     </div>
-  </div>
-</div>
-
-<div *ngIf="reportProblemVisible" class="guide-modal-overlay" (click)="closeReportProblem()">
-  <div class="guide-modal" (click)="$event.stopPropagation()">
-    <h2>Raportează o problemă!</h2>
-    <textarea [(ngModel)]="problemDescription" placeholder="Descrie problema..." rows="5"></textarea>
-    <input type="email" [(ngModel)]="userEmail" placeholder="Emailul tău" />
-    <button (click)="submitReport()">Trimite</button>
-    <button (click)="closeReportProblem()">Închide</button>
   </div>
 </div>

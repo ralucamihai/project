@@ -97,7 +97,7 @@ export class LoginComponent implements OnInit {
         this.username = this.api_caller.getUsername();
 
         // ✅ navigate immediately
-        this.router.navigate(['/pmb_dashboard']);
+        this.router.navigate(['/home']);
       },
       error: (err) => {
         this.error = err?.error?.detail || 'Invalid username or password';

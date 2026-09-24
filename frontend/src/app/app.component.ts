@@ -3,6 +3,7 @@ import { Component, HostListener } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
 import { ApiCallerService } from './services/api-caller.service';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -29,7 +30,12 @@ export class AppComponent {
   // Limba paginii asa cum e configurata Google Translate (pageLanguage din index.html)
   private readonly pageLanguage: string = 'ro';
 
-  constructor(private router: Router, private http: HttpClient, private api_caller: ApiCallerService) {
+  constructor(
+    private router: Router, 
+    private http: HttpClient, 
+    private api_caller: ApiCallerService,
+    private authService: AuthService
+  ) {
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
@@ -102,6 +108,12 @@ export class AppComponent {
     } else {
       return false;
     }
+  }
+
+  logout(): void {
+    this.api_caller.logout();
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 
   shouldShowNav() {

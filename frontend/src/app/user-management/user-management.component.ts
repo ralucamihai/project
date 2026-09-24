@@ -6,6 +6,8 @@ import { NomenclatureService, GrupMunca } from '../services/nomenclature.service
 import { Subscription } from 'rxjs';
 
 interface UserRow {
+  firstName: string;
+  lastName: string;
   nume: string;
   prenume: string;
   utilizator: string;
@@ -58,7 +60,6 @@ export class UserManagementComponent implements OnInit {
   editingUser: UserRow | null = null;
   formModelEdit: Partial<UserRow> = {};
 
-  // Grupurile definite in Nomenclator > Grupuri, pentru dropdown-urile din tabel/modal
   grupuriDisponibile: string[] = [];
 
   loadGrupuri() {
@@ -90,6 +91,8 @@ export class UserManagementComponent implements OnInit {
 
   mapResponseToUserRows(response: any[]): UserRow[] {
     return response.map(user => ({
+      firstName: user.firstName || '',
+      lastName: user.lastName || '',
       nume: user.firstName || '',
       prenume: user.lastName || '',
       utilizator: user.username || '',
@@ -115,7 +118,6 @@ export class UserManagementComponent implements OnInit {
   }
 
   approveUser(row: UserRow) {
-    // Convertim statusul înapoi în engleză dacă backend-ul îl așteaptă așa
     const backendStatusMap: { [key: string]: string } = {
       'in_asteptare': 'pending',
       'activ': 'active',
@@ -126,8 +128,6 @@ export class UserManagementComponent implements OnInit {
     this.api_caller.approveUser(row.utilizator, row['rol aprobat'], statusToSend, row.grup).subscribe({
       next: () => {
         this.error = '';
-        
-        // Sincronizare opțională cu nomenclatorul PMB
         if (row['status cont'] === 'activ') {
           const operatorPmbData = {
             marca: row['numar marca'] || '0000',
@@ -146,8 +146,6 @@ export class UserManagementComponent implements OnInit {
             error: err => console.warn('Eroare la salvarea operatorului:', err)
           });
         }
-
-        // Reîmprospătează lista pentru confirmare vizuală imediată
         this.getAllUsers();
       },
       error: err => {
@@ -195,13 +193,9 @@ export class UserManagementComponent implements OnInit {
 
   saveEditModal() {
     if (this.editingUser) {
-      // 1. Actualizăm vizual rândul imediat (pentru fluiditate)
       Object.assign(this.editingUser, this.formModelEdit);
-      
-      // 2. Salvăm rolul aprobat și statusul (Aprobare user)
       this.saveUser(this.editingUser);
 
-      // 3. Salvăm datele personale din formular (Nume, Marca, Departament, Funcție, Email)
       this.api_caller.updateUserInfo(
         this.editingUser.utilizator,
         this.editingUser.nume,
@@ -214,7 +208,6 @@ export class UserManagementComponent implements OnInit {
       ).subscribe({
         next: () => {
           console.log('Datele personale au fost actualizate și salvate în DB!');
-          // Forțăm o reîmprospătare a tabelului ca să fim siguri că reflectă baza de date
           this.getAllUsers();
         },
         error: err => {

@@ -100,7 +100,7 @@
           </ul>
         </li>
 
-        <!-- Settings Dropdown -->
+        <!-- Settings Dropdown (Mutat butonul de Deconectare aici) -->
         <li class="dropdown">
           <a class="dropdown-toggle"
              [class.active]="isClickMenuOpen('settings')"
@@ -109,9 +109,10 @@
             <span class="dropdown-arrow" [class.rotated]="isClickMenuOpen('settings')">▼</span>
           </a>
           <ul class="dropdown-menu" [class.show]="isClickMenuOpen('settings')">
-            <li><a routerLink="/login" routerLinkActive="active-link" (click)="closeClickDropdown()">Login</a></li>
+            <li *ngIf="!isAuthenticated()"><a routerLink="/login" routerLinkActive="active-link" (click)="closeClickDropdown()">Login</a></li>
             <li *ngIf="isAdmin"><a routerLink="/user_management" routerLinkActive="active-link" (click)="closeClickDropdown()">Managementul utilizatorilor</a></li>
             <li><a routerLink="/account_management" routerLinkActive="active-link" (click)="closeClickDropdown()">Managementul contului</a></li>
+            <button class="dropdown-item text-danger" (click)="logout()">Deconectare</button>
           </ul>
         </li>
       </ul>

@@ -270,6 +270,7 @@
           </div>
         </div>
         <div class="filter-panel" *ngIf="!listaSelectataPiese">
+          <!-- Actualizat filter-grid-piese pentru aliniere perfectă -->
           <div class="filter-grid filter-grid-piese">
             <div class="filter-field"><label>ID:</label><input type="text" [(ngModel)]="filtruPiesaId"></div>
             <div class="filter-field"><label>Denumire:</label><input type="text" [(ngModel)]="filtruPiesaDenumire"></div>
@@ -330,7 +331,7 @@
       </div>
     </div>
 
-    <!-- Modal Piesa -->
+    <!-- Modal Piesa (Actualizat: Fără zona de exclude) -->
     <div class="modal-overlay" *ngIf="showFormPiesa" (click)="closeFormPiesa()">
       <div class="modal-box modal-box-wide" (click)="$event.stopPropagation()">
         <h3 class="modal-title">{{ isEditModePiesa ? 'Editează piesă' : 'Adaugă piesă nouă' }}</h3>
@@ -353,7 +354,6 @@
               <div class="piesa-field"><label>MOQ :</label><input type="text" [(ngModel)]="formModelPiesa.moq"></div>
               <div class="piesa-field"><label>Utilizare:</label><input type="text" [(ngModel)]="formModelPiesa.utilizare"></div>
               <div class="piesa-field"><label>Dublura:</label><input type="text" [(ngModel)]="formModelPiesa.dublura"></div>
-              <fieldset class="piesa-exclude-fieldset"><legend>Exclude:</legend><label class="piesa-checkbox"><input type="checkbox" [(ngModel)]="formModelPiesa.excludeDublate"> Dublate</label><label class="piesa-checkbox"><input type="checkbox" [(ngModel)]="formModelPiesa.excludeIesiteDinFabricatie"> Iesite din fabricatie</label></fieldset>
             </div>
             <div class="piesa-col">
               <div class="piesa-field"><label>Furnizor:</label><input type="text" [(ngModel)]="formModelPiesa.furnizor"></div>

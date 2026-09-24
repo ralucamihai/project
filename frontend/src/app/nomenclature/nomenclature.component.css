@@ -1,39 +1,42 @@
 .nomenclature-page {
-  padding: 24px;
-  background-color: #f4f5f7;
+  padding: 24px 32px;
+  background-color: #fafafa;
   min-height: calc(100vh - 70px);
   box-sizing: border-box;
 }
 
-/* ---- Tab switcher ---- */
+/* ---- Tab switcher modernizat ---- */
 .tab-switcher {
   display: flex;
-  gap: 4px;
-  margin-bottom: 20px;
-  border-bottom: 2px solid #e0e0e0;
+  gap: 8px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid #e4e4e7;
   flex-wrap: wrap;
 }
 
 .tab-btn {
   background: none;
   border: none;
-  padding: 9px 16px;
-  font-size: 13px;
+  padding: 10px 18px;
+  font-size: 13.5px;
   font-weight: 600;
-  color: #555;
+  color: #52525b;
   cursor: pointer;
   border-bottom: 3px solid transparent;
   transition: all 0.2s ease;
   white-space: nowrap;
+  border-radius: 8px 8px 0 0;
 }
 
 .tab-btn:hover {
   color: #fc8403;
+  background-color: rgba(252, 132, 3, 0.05);
 }
 
 .tab-btn.active {
   color: #fc8403;
   border-bottom-color: #fc8403;
+  background-color: rgba(252, 132, 3, 0.08);
 }
 
 .tab-content {
@@ -46,15 +49,15 @@
 }
 
 .placeholder-text {
-  color: #777;
+  color: #71717a;
   font-style: italic;
 }
 
 .btn {
   padding: 8px 16px;
-  border-radius: 6px;
+  border-radius: 8px;
   border: none;
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -63,48 +66,55 @@
 .btn-primary {
   background-color: #fc8403;
   color: #fff;
+  box-shadow: 0 4px 12px rgba(252, 132, 3, 0.2);
 }
 
 .btn-primary:hover {
-  background-color: #d96f00;
+  background-color: #e07302;
 }
 
 .btn-cancel {
-  background-color: #e9e9e9;
-  color: #333;
+  background-color: #f4f4f5;
+  color: #3f3f46;
 }
 
 .btn-cancel:hover {
-  background-color: #dcdcdc;
+  background-color: #e4e4e7;
 }
 
 /* =========================================================
-   PANEL — look compact, structurat, fara aglomerare vizuala
+   PANEL — Stil modernizat, compatibil cu cardurile de pe Home
    ========================================================= */
 
 .panel {
   background: #ffffff;
-  border: 1px solid #b9c2cc;
-  border-radius: 8px;
+  border: 2px solid #cbd5e1;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease-in-out;
+}
+
+.panel:hover {
+  border-color: #fc8403;
+  box-shadow: 0 20px 40px -15px rgba(252, 132, 3, 0.15);
 }
 
 .panel-title-bar {
-  background: #35424f;
-  color: #f0f2f4;
-  font-size: 13px;
+  background: #18181b;
+  color: #ffffff;
+  font-size: 14px;
   font-weight: 700;
-  padding: 9px 14px;
+  padding: 14px 18px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  letter-spacing: 0.2px;
+  gap: 10px;
+  letter-spacing: -0.01em;
 }
 
 .panel-title-icon {
-  font-size: 12px;
-  opacity: 0.8;
+  font-size: 13px;
+  opacity: 0.9;
 }
 
 .panel-toolbar {
@@ -112,9 +122,9 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 12px 14px;
-  background: #eef1f4;
-  border-bottom: 1px solid #d5dbe1;
+  padding: 12px 16px;
+  background: #f4f4f5;
+  border-bottom: 1px solid #e4e4e7;
   flex-wrap: wrap;
 }
 
@@ -123,12 +133,13 @@
   min-width: 220px;
 }
 
+/* Căsuțe de căutare principale (sus) */
 .search-input {
   flex: 1;
   min-width: 200px;
   max-width: 320px;
-  padding: 7px 11px;
-  border: 1px solid #c3cad1;
+  padding: 6px 10px;
+  border: 1px solid #cbd5e1;
   border-radius: 6px;
   font-size: 12.5px;
   background-color: #fff;
@@ -138,9 +149,10 @@
 
 .search-input:focus {
   border-color: #fc8403;
+  box-shadow: 0 0 0 3px rgba(252, 132, 3, 0.1);
 }
 
-/* ---- Table — mai mica, mai densa, mai usor de citit ---- */
+/* ---- Table — curată, aerisită și modernă ---- */
 .table-wrap {
   overflow-x: auto;
   max-height: 480px;
@@ -157,15 +169,18 @@
 .legacy-table thead th {
   position: sticky;
   top: 0;
-  background: #e4e9ee;
-  color: #33414d;
+  background: #f4f4f5;
+  color: #18181b;
   font-weight: 700;
   font-size: 11.5px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
   text-align: left;
-  padding: 7px 10px;
-  border: 1px solid #c9d1d8;
+  padding: 10px 12px;
+  border-bottom: 2px solid #e4e4e7;
+  border-top: none;
+  border-left: none;
+  border-right: none;
   cursor: pointer;
   user-select: none;
   white-space: nowrap;
@@ -174,19 +189,22 @@
 }
 
 .legacy-table thead th:hover {
-  background: #d6dee5;
+  background: #e4e4e7;
 }
 
 .sort-arrow {
   color: #fc8403;
-  font-size: 9px;
-  margin-left: 3px;
+  font-size: 10px;
+  margin-left: 4px;
 }
 
 .legacy-table td {
-  padding: 5px 10px;
-  border: 1px solid #eaedf0;
-  color: #2a2a2a;
+  padding: 10px 12px;
+  border-bottom: 1px solid #f4f4f5;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  color: #3f3f46;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -195,15 +213,16 @@
 .legacy-table tbody tr {
   background: #ffffff;
   cursor: pointer;
-  height: 32px;
+  height: 38px;
+  transition: background-color 0.15s ease;
 }
 
-.legacy-table tbody tr.row-alt {
-  background: #f6f9fc;
+.legacy-table tbody tr:nth-child(even) {
+  background-color: #fff0eb; /* Nuanța peach specifică brandului de pe Home */
 }
 
 .legacy-table tbody tr:hover {
-  background: #fdeacb;
+  background: #fcebd7;
 }
 
 .legacy-table tbody tr.row-selected {
@@ -217,7 +236,7 @@
 
 .legacy-table tbody tr.row-inactive .cell-cod,
 .legacy-table tbody tr.row-inactive td {
-  color: #a3a3a3;
+  color: #a1a1aa;
 }
 
 .legacy-table tbody tr.row-inactive.row-selected td {
@@ -225,9 +244,9 @@
 }
 
 .col-nr {
-  width: 20px;
+  width: 30px;
   text-align: center;
-  color: #888;
+  color: #71717a;
   font-size: 11px;
 }
 
@@ -250,14 +269,14 @@
 }
 
 .col-date {
-  width: 96px;
-  color: #666;
-  font-size: 11.5px;
+  width: 100px;
+  color: #71717a;
+  font-size: 12px;
 }
 
 .flag-x {
   font-weight: 800;
-  color: #1e8e3e;
+  color: #10b981;
 }
 
 .row-selected .flag-x {
@@ -265,66 +284,73 @@
 }
 
 .col-actions {
-  width: 84px;
+  width: 90px;
   text-align: center;
   white-space: nowrap;
 }
 
 .icon-btn {
-  background: #f4f5f7;
+  background: #f4f4f5;
   border: none;
-  border-radius: 5px;
-  padding: 3px 6px;
-  font-size: 11px;
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 12px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .icon-btn:hover {
-  background-color: #e9e9e9;
+  background-color: #e4e4e7;
+  color: #fc8403;
 }
 
 .icon-btn-danger:hover {
-  background-color: #fde8e8;
+  background-color: #fef2f2;
+  color: #ef4444;
 }
 
 .empty-state {
   text-align: center;
-  padding: 24px;
-  color: #999;
+  padding: 32px;
+  color: #71717a;
   font-style: italic;
   white-space: normal;
 }
 
-/* ---- Bottom toolbar (Listeaza / Salveaza) ---- */
+/* ---- Bottom toolbar ---- */
 .panel-bottom-bar {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
-  padding: 10px 14px;
-  background: #cfe3ef;
-  border-top: 1px solid #b9c2cc;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #f4f4f5;
+  border-top: 1px solid #e4e4e7;
 }
 
 .btn-toolbar {
   background-color: #ffffff;
-  color: #35424f;
-  border: 1px solid #a9b6c1;
-  min-width: 90px;
+  color: #18181b;
+  border: 1px solid #cbd5e1;
+  min-width: 100px;
+  border-radius: 8px;
+  font-weight: 600;
 }
 
 .btn-toolbar:hover {
-  background-color: #eef1f4;
+  background-color: #fcebd7;
+  border-color: #fc8403;
+  color: #fc8403;
 }
 
-/* ---- Modal ---- */
+/* ---- Modal modernizat ---- */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -333,63 +359,67 @@
 
 .modal-box {
   background: #fff;
-  border-radius: 12px;
-  padding: 22px 26px;
+  border-radius: 16px;
+  padding: 24px 28px;
   width: 100%;
-  max-width: 360px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  max-width: 400px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e4e4e7;
   max-height: 88vh;
   overflow-y: auto;
 }
 
 .modal-title {
-  margin: 0 0 16px 0;
-  font-size: 16px;
-  color: #1a1a1a;
+  margin: 0 0 18px 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #18181b;
 }
 
 .form-field {
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
 }
 
 .form-field label {
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 600;
-  color: #444;
+  color: #3f3f46;
 }
 
 .form-field input[type="text"],
 .form-field input[type="date"] {
-  padding: 8px 11px;
-  border: 1px solid #d5d5d5;
-  border-radius: 6px;
+  padding: 9px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
   font-size: 13.5px;
   outline: none;
   font-family: inherit;
   background: #fff;
+  transition: border-color 0.2s ease;
 }
 
 .form-field input[type="text"]:focus,
 .form-field input[type="date"]:focus {
   border-color: #fc8403;
+  box-shadow: 0 0 0 3px rgba(252, 132, 3, 0.1);
 }
 
 .form-field-checkbox label {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   cursor: pointer;
   font-weight: 500;
-  color: #333;
+  color: #3f3f46;
 }
 
 .form-field-checkbox input[type="checkbox"] {
   accent-color: #fc8403;
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   cursor: pointer;
 }
 
@@ -397,53 +427,62 @@
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  margin-top: 18px;
+  margin-top: 22px;
 }
 
-/* ---- Panou de filtrare (Utilizatori PMB) ---- */
+/* =========================================================
+   PANOU FILTRARE MICȘORAT (Pentru Piese / Echipamente)
+   ========================================================= */
 .filter-panel {
-  padding: 14px 14px 2px;
-  background: #f7f9fb;
-  border-bottom: 1px solid #d5dbe1;
+  padding: 12px 16px 8px; /* Padding mai compact */
+  background: #fafafa;
+  border-bottom: 1px solid #e4e4e7;
 }
 
+/* Grila automată, flexibilă pe lățime */
 .filter-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(200px, 1fr));
-  gap: 10px 22px;
-}
-
-.filter-grid-piese {
-  grid-template-columns: repeat(4, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Redus minmax pentru a încăpea mai multe coloane */
+  gap: 10px 14px; /* Spații reduse */
+  margin-bottom: 8px;
 }
 
 .filter-field {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px; /* Redus distanța dintre etichetă și input */
 }
 
+/* Lățime fixă la etichete ca să alinieze perfect câmpurile */
 .filter-field label {
-  max-width: 53px;
-  font-size: 12.5px;
+  width: 60px; /* Redus considerabil pentru a salva spațiu */
+  flex-shrink: 0;
+  font-size: 11.5px; /* Font mai mic */
   font-weight: 600;
-  color: #444;
+  color: #3f3f46;
   text-align: right;
+  white-space: nowrap;
 }
 
+/* Input-urile de filtrare făcute mult mai compacte */
 .filter-field input[type="text"],
 .filter-field select {
   flex: 1;
-  padding: 6px 6px;
-  border: 1px solid #c3cad1;
-  border-radius: 6px;
-  font-size: 12.5px;
+  padding: 5px 8px; /* Înălțime mai mică a inputului */
+  border: 1px solid #cbd5e1;
+  border-radius: 6px; /* Colțuri ușor mai puțin rotunjite pentru câmpuri mici */
+  font-size: 12px; /* Text mai mic în interiorul căsuței */
   outline: none;
+  min-width: 0;
+  box-sizing: border-box;
+  background-color: #fff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .filter-field input[type="text"]:focus,
 .filter-field select:focus {
   border-color: #fc8403;
+  box-shadow: 0 0 0 3px rgba(252, 132, 3, 0.1);
 }
 
 .filter-field-checkbox {
@@ -453,40 +492,41 @@
 .filter-field-checkbox label {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   min-width: 0;
   text-align: left;
   cursor: pointer;
+  width: auto;
 }
 
 .filter-field-checkbox input[type="checkbox"] {
   accent-color: #fc8403;
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   cursor: pointer;
 }
 
-/* ---- Admin flag in toolbar ---- */
+/* ---- Admin flag în toolbar ---- */
 .admin-flag {
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 600;
-  color: #1e8e3e;
+  color: #10b981;
   background: #e3f8ea;
-  padding: 5px 11px;
-  border-radius: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
 }
 
 .admin-flag-readonly {
-  color: #a15c00;
-  background: #fdf1de;
+  color: #d97706;
+  background: #fef3c7;
 }
 
-/* ---- Badge-uri (nivel acces / status) — mai mici, mai discrete ---- */
+/* ---- Badge-uri moderne ---- */
 .badge {
   display: inline-block;
-  padding: 2px 8px;
-  border-radius: 10px;
-  font-size: 10px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   white-space: nowrap;
@@ -494,67 +534,62 @@
 
 .badge-success {
   background-color: #e3f8ea;
-  color: #1e8e3e;
+  color: #10b981;
 }
 
-.badge-danger {
-  background-color: #fde8e8;
-  color: #c0332f;
-}
-
-.badge-admin {
-  background-color: #fde8e8;
-  color: #c0332f;
+.badge-danger, .badge-admin {
+  background-color: #fef2f2;
+  color: #ef4444;
 }
 
 .badge-edit {
-  background-color: #fdf1de;
-  color: #a15c00;
+  background-color: #fef3c7;
+  color: #d97706;
 }
 
 .badge-view {
-  background-color: #e6eef7;
-  color: #2f5f8f;
+  background-color: #eff6ff;
+  color: #3b82f6;
 }
 
 .row-selected .badge {
   background-color: rgba(255, 255, 255, 0.9);
 }
 
-/* ---- Badge Condiție aprovizionare (calculat automat) ---- */
+/* ---- Badge Condiție aprovizionare ---- */
 .badge-aprov {
   display: inline-block;
   padding: 4px 12px;
   border-radius: 14px;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
 }
 
 .badge-aprov-verde {
   background-color: #e3f8ea;
-  color: #1e8e3e;
+  color: #10b981;
 }
 
 .badge-aprov-albastru {
-  background-color: #e6eef7;
-  color: #2f5f8f;
+  background-color: #eff6ff;
+  color: #3b82f6;
 }
 
 .badge-aprov-rosu {
-  background-color: #fde3e6;
-  color: #c0332f;
+  background-color: #fef2f2;
+  color: #ef4444;
 }
 
 .row-selected .badge-aprov {
   background-color: rgba(255, 255, 255, 0.9) !important;
 }
 
-/* ---- Select in modal ---- */
+/* ---- Select în modal ---- */
 .form-field select {
-  padding: 8px 11px;
-  border: 1px solid #d5d5d5;
-  border-radius: 6px;
+  padding: 9px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
   font-size: 13.5px;
   outline: none;
   background: #fff;
@@ -562,16 +597,17 @@
 
 .form-field select:focus {
   border-color: #fc8403;
+  box-shadow: 0 0 0 3px rgba(252, 132, 3, 0.1);
 }
 
 /* =========================================================
-   PIESE — layout pe doua panouri cu transfer
+   PIESE — layout pe două panouri cu transfer
    ========================================================= */
 
 .dual-panel-wrap {
   display: flex;
   align-items: stretch;
-  gap: 10px;
+  gap: 16px;
 }
 
 .dual-panel {
@@ -594,7 +630,6 @@
 }
 
 .dual-panel .panel-title-bar {
-  /* Aliniere noua flexibila pe orizontala pentru a permite butoanelor sa stea dreapta */
   display: flex;
   align-items: center;
 }
@@ -608,16 +643,17 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   padding: 0 4px;
 }
 
 .transfer-btn {
-  width: 30px;
-  height: 30px;
+  width: 34px;
+  height: 34px;
   font-size: 14px;
-  background: #35424f;
+  background: #18181b;
   color: #fff;
+  border-radius: 8px;
 }
 
 .transfer-btn:hover:not(:disabled) {
@@ -631,37 +667,38 @@
 
 .btn-back {
   background: none;
-  border: 1px solid rgba(240, 242, 244, 0.4);
-  color: #f0f2f4;
-  border-radius: 5px;
-  padding: 3px 9px;
-  font-size: 11px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 11.5px;
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
 
 .btn-back:hover {
-  background-color: rgba(240, 242, 244, 0.15);
+  background-color: rgba(255, 255, 255, 0.15);
 }
 
-/* ---- Modal formular Piesa (Piese de schimb) ---- */
+/* ---- Modal formular Piesa ---- */
 .modal-box-wide {
   max-width: 900px;
 }
 
 .piesa-fieldset {
-  border: 1px solid #b9c2cc;
-  border-radius: 6px;
-  padding: 14px 16px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 16px 18px 12px;
   margin: 0;
+  background: #fafafa;
 }
 
 .piesa-fieldset legend {
   padding: 0 8px;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
-  color: #35424f;
+  color: #18181b;
 }
 
 .piesa-columns {
@@ -673,7 +710,7 @@
 .piesa-col {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .piesa-field {
@@ -685,9 +722,9 @@
 .piesa-field label {
   min-width: 92px;
   flex-shrink: 0;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 600;
-  color: #444;
+  color: #3f3f46;
   text-align: right;
 }
 
@@ -695,10 +732,10 @@
 .piesa-field select {
   flex: 1;
   min-width: 0;
-  padding: 6px 9px;
-  border: 1px solid #c3cad1;
-  border-radius: 6px;
-  font-size: 12.5px;
+  padding: 7px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 13px;
   outline: none;
   font-family: inherit;
   background: #fff;
@@ -710,81 +747,74 @@
 }
 
 .piesa-exclude-fieldset {
-  border: 1px solid #c3cad1;
-  border-radius: 6px;
-  padding: 8px 12px 10px;
-  margin-top: 4px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 10px 14px 12px;
+  margin-top: 6px;
+  background: #fff;
 }
 
 .piesa-exclude-fieldset legend {
   padding: 0 6px;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
-  color: #35424f;
+  color: #18181b;
 }
 
 .piesa-checkbox {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 12.5px;
-  color: #333;
+  gap: 8px;
+  font-size: 13px;
+  color: #3f3f46;
   cursor: pointer;
   margin-top: 4px;
 }
 
 .piesa-checkbox input[type="checkbox"] {
   accent-color: #fc8403;
-  width: 15px;
-  height: 15px;
+  width: 16px;
+  height: 16px;
   cursor: pointer;
 }
 
-@media (max-width: 720px) {
-  .piesa-columns {
-    grid-template-columns: 1fr;
-    gap: 10px 0;
-  }
-}
-
 /* =========================================================
-   BUTOANE SUS IN BARA ALBASTRA (HEADER ACTIONS)
+   BUTOANE SUS ÎN BARA ANTET (HEADER ACTIONS)
    ========================================================= */
 
 .header-actions {
-  margin-left: auto; /* Împinge butoanele în extrema dreaptă */
+  margin-left: auto;
   display: flex;
   gap: 8px;
 }
 
 .btn-header {
-  background-color: #fc8403; /* Portocaliu de bază */
+  background-color: #fc8403;
   color: #ffffff;
-  border: 1px solid #fc8403; /* Contur portocaliu */
-  padding: 4px 12px;
-  font-size: 11px;
+  border: 1px solid #fc8403;
+  padding: 5px 14px;
+  font-size: 11.5px;
   font-weight: 600;
-  border-radius: 5px;
+  border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); /* Umbră fină pentru adâncime */
+  box-shadow: 0 2px 5px rgba(252, 132, 3, 0.2);
 }
 
 .btn-header:hover:not(:disabled) {
-  background-color: #e07600; /* Portocaliu mai închis la hover */
-  border-color: #e07600;
+  background-color: #e07302;
+  border-color: #e07302;
 }
 
-/* Pentru butonul de ștergere: Îl lăsăm portocaliu inițial, dar devine roșu DOAR la hover, pentru siguranță */
 .btn-header-danger:hover:not(:disabled) {
-  background-color: #d13a35;
-  border-color: #d13a35;
+  background-color: #dc2626;
+  border-color: #dc2626;
 }
 
 .btn-header:disabled {
   opacity: 0.4;
   cursor: not-allowed;
-  filter: grayscale(100%); /* Facem vizibil faptul că e dezactivat */
+  filter: grayscale(100%);
 }
 
 /* ---- Responsive ---- */
@@ -804,15 +834,6 @@
 
   .btn-toolbar {
     flex: 1;
-  }
-
-  .filter-grid,
-  .filter-grid-piese {
-    grid-template-columns: 1fr;
-  }
-
-  .filter-field label {
-    min-width: 70px;
   }
 
   .legacy-table {

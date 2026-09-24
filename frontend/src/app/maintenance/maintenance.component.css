@@ -1,35 +1,46 @@
 /* =========================================================
-   1. STILURI GENERALE ȘI LAYOUT BASE
+   1. STILURI GENERALE ȘI LAYOUT BASE (Modernizat Home-like)
    ========================================================= */
 .maintenance-page {
-  padding: 24px;
-  background-color: #f4f5f7;
+  padding: 24px 32px;
+  background-color: #fafafa;
   min-height: calc(100vh - 70px);
   box-sizing: border-box;
 }
 
-/* ---- Tab switcher ---- */
+/* ---- Tab switcher modernizat ---- */
 .tab-switcher {
   display: flex;
   gap: 8px;
-  margin-bottom: 20px;
-  border-bottom: 2px solid #e0e0e0;
+  margin-bottom: 24px;
+  border-bottom: 2px solid #e4e4e7;
+  flex-wrap: wrap;
 }
 
 .tab-btn {
   background: none;
   border: none;
-  padding: 10px 20px;
-  font-size: 15px;
+  padding: 10px 18px;
+  font-size: 13.5px;
   font-weight: 600;
-  color: #555;
+  color: #52525b;
   cursor: pointer;
   border-bottom: 3px solid transparent;
   transition: all 0.2s ease;
+  white-space: nowrap;
+  border-radius: 8px 8px 0 0;
 }
 
-.tab-btn:hover { color: #fc8403; }
-.tab-btn.active { color: #fc8403; border-bottom-color: #fc8403; }
+.tab-btn:hover { 
+  color: #fc8403; 
+  background-color: rgba(252, 132, 3, 0.05);
+}
+
+.tab-btn.active { 
+  color: #fc8403; 
+  border-bottom-color: #fc8403; 
+  background-color: rgba(252, 132, 3, 0.08);
+}
 
 .tab-content { animation: fadeIn 0.2s ease; }
 
@@ -40,55 +51,61 @@
 
 /* ---- Loading / Error states ---- */
 .state-box {
-  padding: 20px 24px;
-  border-radius: 10px;
+  padding: 16px 20px;
+  border-radius: 12px;
   margin-bottom: 20px;
-  font-size: 14px;
+  font-size: 13.5px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  border: 1px solid transparent;
 }
-.loading-box { background-color: #eef4ff; color: #1a5fc4; }
-.error-box { background-color: #fde8e8; color: #c0332f; }
+.loading-box { background-color: #eff6ff; color: #3b82f6; border-color: #dbeafe; }
+.error-box { background-color: #fef2f2; color: #ef4444; border-color: #fee2e2; }
 
 /* ---- Badges ---- */
 .badge {
   display: inline-block;
-  padding: 4px 10px;
+  padding: 3px 10px;
   border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
   text-align: center;
   white-space: nowrap;
 }
-.badge-success { background-color: #e3f8ea; color: #1e8e3e; }
-.badge-warning { background-color: #fff4e0; color: #b06a00; }
-.badge-info { background-color: #e6f0fd; color: #1a5fc4; }
-.badge-danger { background-color: #fde8e8; color: #c0332f; }
+.badge-success { background-color: #e3f8ea; color: #10b981; }
+.badge-warning { background-color: #fef3c7; color: #d97706; }
+.badge-info { background-color: #eff6ff; color: #3b82f6; }
+.badge-danger { background-color: #fef2f2; color: #ef4444; }
 
 /* ---- Butoane Generale ---- */
 .btn {
-  padding: 8px 18px;
-  border-radius: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
   border: none;
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
 }
-.btn-primary { background-color: #fc8403; color: #fff; }
-.btn-primary:hover { background-color: #d96f00; }
-.btn-primary:disabled { background-color: #f5c48a; cursor: not-allowed; }
+.btn-primary { 
+  background-color: #fc8403; 
+  color: #fff; 
+  box-shadow: 0 4px 12px rgba(252, 132, 3, 0.2);
+}
+.btn-primary:hover { background-color: #e07302; }
+.btn-primary:disabled { background-color: #fdba74; cursor: not-allowed; box-shadow: none; }
 
-.btn-cancel { background-color: #ffffff; color: #333; border: 1px solid #c3cad1; }
-.btn-cancel:hover { background-color: #f0f0f0; }
+.btn-cancel { background-color: #f4f4f5; color: #3f3f46; border: 1px solid #cbd5e1; }
+.btn-cancel:hover { background-color: #e4e4e7; }
 
-.btn-reset { background-color: #e9e9e9; color: #333; }
-.btn-reset:hover { background-color: #dcdcdc; }
+.btn-reset { background-color: #f4f4f5; color: #3f3f46; }
+.btn-reset:hover { background-color: #e4e4e7; }
 
-.btn-retry { background-color: #c0332f; color: #fff; white-space: nowrap; }
-.btn-retry:hover { background-color: #a3241f; }
+.btn-retry { background-color: #ef4444; color: #fff; white-space: nowrap; }
+.btn-retry:hover { background-color: #dc2626; }
 
 
 /* =========================================================
@@ -96,43 +113,48 @@
    ========================================================= */
 .panel {
   background: #ffffff;
-  border: 1px solid #b9c2cc;
-  border-radius: 8px;
+  border: 2px solid #cbd5e1;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease-in-out;
+}
+.panel:hover {
+  border-color: #fc8403;
+  box-shadow: 0 20px 40px -15px rgba(252, 132, 3, 0.15);
 }
 
 .panel-title-bar {
-  background: #35424f;
-  color: #f0f2f4;
-  font-size: 13px;
+  background: #18181b;
+  color: #ffffff;
+  font-size: 14px;
   font-weight: 700;
-  padding: 9px 14px;
+  padding: 14px 18px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  letter-spacing: 0.2px;
+  gap: 10px;
+  letter-spacing: -0.01em;
 }
-.panel-title-icon { font-size: 12px; opacity: 0.8; }
-.results-count { margin-left: 12px; font-size: 11.5px; font-weight: 500; color: #cfd6dc; }
+.panel-title-icon { font-size: 13px; opacity: 0.9; }
+.results-count { margin-left: 12px; font-size: 12px; font-weight: 500; color: #a1a1aa; }
 
-/* ---- Buton adăugare activitate pe bara albastră ---- */
+/* ---- Buton adăugare activitate pe bara antet ---- */
 .btn-header-add-activitate {
   background-color: #fc8403;
   color: #ffffff;
   border: 1px solid #fc8403;
-  padding: 4px 12px;
+  padding: 5px 14px;
   font-size: 11.5px;
   font-weight: 600;
-  border-radius: 5px;
+  border-radius: 6px;
   cursor: pointer;
   margin-left: 15px;
   transition: all 0.2s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 5px rgba(252, 132, 3, 0.2);
 }
 .btn-header-add-activitate:hover {
-  background-color: #e07600;
-  border-color: #e07600;
+  background-color: #e07302;
+  border-color: #e07302;
 }
 
 /* Toolbar specific echipamente */
@@ -141,9 +163,9 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 12px 14px;
-  background: #eef1f4;
-  border-bottom: 1px solid #d5dbe1;
+  padding: 14px 18px;
+  background: #f4f4f5;
+  border-bottom: 1px solid #e4e4e7;
   flex-wrap: wrap;
 }
 .search-filters-group { display: flex; gap: 10px; flex-wrap: wrap; flex: 1; }
@@ -151,24 +173,24 @@
   flex: 1;
   min-width: 160px;
   max-width: 240px;
-  padding: 7px 11px;
-  border: 1px solid #c3cad1;
-  border-radius: 6px;
-  font-size: 12.5px;
+  padding: 8px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 13px;
   background-color: #fff;
   outline: none;
   transition: border-color 0.2s ease;
 }
-.search-input:focus { border-color: #fc8403; }
+.search-input:focus { border-color: #fc8403; box-shadow: 0 0 0 3px rgba(252, 132, 3, 0.1); }
 .search-input-small { max-width: 170px; min-width: 140px; }
 
 
 /* =========================================================
-   3. TABELE (Legacy Table pt. Echipamente vs Activitati Grid)
+   3. TABELE (Legacy Table vs Activitati Grid)
    ========================================================= */
 .table-wrap { overflow-x: auto; max-height: 560px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 
-/* BAZA: Folosita la Echipamente (Design-ul Tau) */
+/* BAZA: Echipamente */
 .legacy-table {
   width: 100%;
   border-collapse: collapse;
@@ -178,91 +200,95 @@
 .legacy-table thead th {
   position: sticky;
   top: 0;
-  background: #e4e9ee;
-  color: #33414d;
+  background: #f4f4f5;
+  color: #18181b;
   font-weight: 700;
   font-size: 11.5px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
   text-align: left;
-  padding: 7px 10px;
-  border: 1px solid #c9d1d8;
+  padding: 10px 12px;
+  border-bottom: 2px solid #e4e4e7;
+  border-top: none;
+  border-left: none;
+  border-right: none;
   cursor: pointer;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   z-index: 10;
 }
-.legacy-table thead th:hover { background: #d6dee5; }
-.sort-arrow { color: #fc8403; font-size: 9px; margin-left: 3px; }
+.legacy-table thead th:hover { background: #e4e4e7; }
+.sort-arrow { color: #fc8403; font-size: 10px; margin-left: 4px; }
 
 .legacy-table td {
-  padding: 6px 10px;
-  border: 1px solid #eaedf0;
-  color: #2a2a2a;
+  padding: 10px 12px;
+  border-bottom: 1px solid #f4f4f5;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  color: #3f3f46;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.legacy-table tbody tr { background: #ffffff; cursor: pointer; height: 32px; }
-.legacy-table tbody tr.row-alt { background: #f6f9fc; }
-.legacy-table tbody tr:hover { background: #fdeacb; }
+.legacy-table tbody tr { background: #ffffff; cursor: pointer; height: 38px; }
+.legacy-table tbody tr:nth-child(even) { background-color: #fff0eb; }
+.legacy-table tbody tr:hover { background: #fcebd7; }
 
-/* Randuri selectate (Echipamente) */
+/* Rânduri selectate */
 .legacy-table tbody tr.row-selected { background: #fc8403 !important; color: #fff; }
 .legacy-table tbody tr.row-selected td { color: #fff; }
-.legacy-table tbody tr.row-inactive td { color: #a3a3a3; }
+.legacy-table tbody tr.row-inactive td { color: #a1a1aa; }
 .legacy-table tbody tr.row-inactive.row-selected td { color: #fff; }
 
-.col-nr { width: 40px; text-align: center; color: #888; font-size: 11px; }
+.col-nr { width: 40px; text-align: center; color: #71717a; font-size: 11px; }
 .col-flag { width: 90px; text-align: center; }
-.col-actions { width: 84px; text-align: center; white-space: nowrap; }
+.col-actions { width: 90px; text-align: center; white-space: nowrap; }
 .cell-cod { font-weight: 700; color: #fc8403; }
-.empty-state { text-align: center; padding: 24px; color: #999; font-style: italic; white-space: normal; }
+.empty-state { text-align: center; padding: 32px; color: #71717a; font-style: italic; white-space: normal; }
 
 .icon-btn {
-  background: #f4f5f7;
+  background: #f4f4f5;
   border: none;
-  border-radius: 5px;
-  padding: 3px 6px;
-  font-size: 11px;
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 12px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
 }
-.icon-btn:hover { background-color: #e9e9e9; }
-.icon-btn-danger:hover { background-color: #fde8e8; }
+.icon-btn:hover { background-color: #e4e4e7; color: #fc8403; }
+.icon-btn-danger:hover { background-color: #fef2f2; color: #ef4444; }
 
 .panel-bottom-bar {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
-  padding: 10px 14px;
-  background: #cfe3ef;
-  border-top: 1px solid #b9c2cc;
+  gap: 12px;
+  padding: 14px 18px;
+  background: #f4f4f5;
+  border-top: 1px solid #e4e4e7;
 }
-.btn-toolbar { background-color: #ffffff; color: #35424f; border: 1px solid #a9b6c1; min-width: 90px; }
-.btn-toolbar:hover { background-color: #eef1f4; }
+.btn-toolbar { background-color: #ffffff; color: #18181b; border: 1px solid #cbd5e1; min-width: 100px; border-radius: 8px; font-weight: 600; }
+.btn-toolbar:hover { background-color: #fcebd7; border-color: #fc8403; color: #fc8403; }
 
 
-/* -------- OVERRIDE PENTRU GRILA DE ACTIVITATI (Rânduri Subțiri) -------- */
+/* -------- OVERRIDE PENTRU GRILA DE ACTIVITĂȚI -------- */
 .legacy-table.activitati-grid {
   table-layout: auto;
   font-size: 12px !important;
 }
 
 .legacy-table.activitati-grid thead th {
-  padding: 5px 8px !important;
+  padding: 8px 10px !important;
   white-space: nowrap;
   overflow: visible;
   text-overflow: clip;
 }
 
-.legacy-table.activitati-grid tbody tr {
-  height: auto !important;
-}
+.legacy-table.activitati-grid tbody tr { height: auto !important; }
 
 .legacy-table.activitati-grid tbody td {
-  padding: 4px 8px !important;
+  padding: 8px 10px !important;
   white-space: normal !important;
   overflow: visible;
   text-overflow: clip;
@@ -283,126 +309,136 @@
   border-left: 3px solid #fc8403;
 }
 
-.cell-pmb { font-weight: 600; color: #1a5fc4; }
-.denumire-cell { font-weight: 600; color: #111; }
+.cell-pmb { font-weight: 600; color: #3b82f6; }
+.denumire-cell { font-weight: 600; color: #18181b; }
 .unselectable { user-select: none; cursor: pointer; }
 
 
 /* =========================================================
-   4. MODAL V1 (PENTRU ECHIPAMENTE)
+   4. MODAL V1 (PENTRU ECHIPAMENTE - COMPACT ȘI FĂRĂ SCROLL)
    ========================================================= */
 .modal-overlay {
   position: fixed;
   top: 0; left: 0; width: 100vw; height: 100vh;
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 2000;
-  padding: 20px;
+  padding: 12px;
   box-sizing: border-box;
 }
 
 .modal-box {
   background: #fff;
-  border-radius: 12px;
-  padding: 22px 26px;
+  border-radius: 16px;
+  padding: 0;
   width: 100%;
-  max-width: 360px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-  max-height: 88vh;
-  overflow-y: auto;
+  max-width: 900px; /* Lărgit ca să se așeze frumos pe 3 coloane */
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e4e4e7;
+  max-height: 94vh; /* Ocupă mai mult din ecran pe verticală */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 .modal-box-wide { max-width: 960px; }
 .modal-box-no-padding { padding: 0; }
 
 .modal-header-bar {
-  background: #2c3e50;
+  background: #18181b;
   color: #fff;
   font-size: 16px;
   font-weight: 700;
-  padding: 16px 22px;
-  border-radius: 12px 12px 0 0;
+  padding: 12px 20px; /* Padding redus */
+  border-radius: 16px 16px 0 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-shrink: 0;
 }
 
 .modal-header-close {
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
   color: #fff;
-  width: 30px;
-  height: 30px;
-  font-size: 14px;
-  line-height: 1;
+  width: 28px;
+  height: 28px;
+  font-size: 13px;
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
 .modal-header-close:hover { background-color: rgba(255, 255, 255, 0.15); }
 
-.modal-box-content { padding: 22px 26px; }
+.modal-box-content { 
+  padding: 16px 20px; /* Redus interiorul ca să elimine scroll-ul */
+  overflow-y: auto;
+  flex: 1;
+}
 
 .echipament-form-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0 24px;
-  margin-bottom: 16px;
+  gap: 0 20px;
+  margin-bottom: 10px;
 }
 
-.echipament-form-col { display: flex; flex-direction: column; gap: 6px; }
+.echipament-form-col { display: flex; flex-direction: column; gap: 4px; }
 .echipament-form-col-header {
   font-size: 0px;
   font-weight: 700;
-  color: #35424f;
+  color: #18181b;
   text-transform: uppercase;
-  padding-bottom: 2px;
+  padding-bottom: 0px;
   border-bottom: 2px solid #fc8403;
   margin-bottom: 0px;
 }
 
-.form-field { margin-bottom: 3px; display: flex; flex-direction: column; gap: 5px; }
-.form-field label { font-size: 12.5px; font-weight: 600; color: #444; }
+.form-field { margin-bottom: 8px; display: flex; flex-direction: column; gap: 3px; } /* Spațiere redusă între câmpuri */
+.form-field label { font-size: 12px; font-weight: 600; color: #3f3f46; }
 .form-field input[type="text"],
 .form-field input[type="date"],
 .form-field select {
-  padding: 8px 11px;
-  border: 1px solid #d5d5d5;
+  padding: 6px 10px; /* Inputuri mai compacte pe înălțime */
+  border: 1px solid #cbd5e1;
   border-radius: 6px;
-  font-size: 13.5px;
+  font-size: 12.5px;
   outline: none;
   font-family: inherit;
   background: #fff;
+  transition: border-color 0.2s ease;
 }
-.form-field input[type="text"]:focus, .form-field select:focus { border-color: #fc8403; }
-.form-field select:disabled, .form-field input:disabled { background-color: #eee; color: #999; cursor: not-allowed; }
+.form-field input[type="text"]:focus, .form-field select:focus { border-color: #fc8403; box-shadow: 0 0 0 3px rgba(252, 132, 3, 0.1); }
+.form-field select:disabled, .form-field input:disabled { background-color: #f4f4f5; color: #a1a1aa; cursor: not-allowed; }
 
-.form-field-checkbox label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500; color: #333; }
-.form-field-checkbox input[type="checkbox"] { accent-color: #fc8403; width: 16px; height: 16px; cursor: pointer; }
+.form-field-checkbox label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500; color: #3f3f46; }
+.form-field-checkbox input[type="checkbox"] { accent-color: #fc8403; width: 15px; height: 15px; cursor: pointer; }
 
 .period-result {
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 600;
-  color: #a15c00;
-  background: #fdf1de;
+  color: #d97706;
+  background: #fef3c7;
   padding: 1px 6px;
-  border-radius: 5px;
+  border-radius: 4px;
   margin-top: 1px;
   align-self: flex-start;
 }
 .period-result-hidden { visibility: hidden; }
 
-.modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; flex-shrink: 0; }
 
 
 /* =========================================================
-   5. MODAL V2 (PENTRU ACTIVITATI / TICKETE)
+   5. MODAL V2 (PENTRU ACTIVITATI / TICKETE - 2 COLOANE ȘI EGALIZATE)
    ========================================================= */
 .modal-overlay-v2 {
   position: fixed;
   top: 0; left: 0; width: 100vw; height: 100vh;
-  background: rgba(20, 25, 30, 0.55);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -414,30 +450,32 @@
 .modal-pair-wrap {
   display: flex;
   flex-direction: row;
-  align-items: stretch;
+  align-items: stretch; /* Face ambele ferestre să aibă exact aceeași înălțime vizuală */
+  justify-content: center;
   gap: 20px;
-  max-width: 1200px;
+  max-width: 1450px;
   width: 100%;
   max-height: 90vh;
-  flex-wrap: wrap;
-  justify-content: center;
+  box-sizing: border-box;
 }
 
 .modal-box-v2 {
   background: #ffffff;
-  border-radius: 10px;
+  border-radius: 16px;
   width: 100%;
-  max-width: 760px;
+  max-width: 720px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e4e4e7;
   overflow: hidden;
+  max-height: 88vh;
 }
 
 .modal-header-v2 {
-  background: #35424f;
+  background: #18181b;
   color: #f0f2f4;
-  padding: 16px 22px;
+  padding: 16px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -447,19 +485,20 @@
 }
 
 .modal-close-v2 {
-  background: none;
-  border: none;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
   color: #f0f2f4;
-  font-size: 16px;
+  font-size: 14px;
   cursor: pointer;
   line-height: 1;
-  padding: 4px 8px;
-  border-radius: 4px;
+  padding: 6px 10px;
+  transition: background-color 0.2s ease;
 }
 .modal-close-v2:hover { background: rgba(255, 255, 255, 0.15); }
 
 .modal-body-v2 {
-  padding: 20px 22px;
+  padding: 24px;
   overflow-y: auto;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -468,94 +507,42 @@
 }
 
 .field-v2 { display: flex; flex-direction: column; gap: 6px; }
-.field-v2 label { font-size: 13px; font-weight: 600; color: #444; }
+.field-v2 label { font-size: 13px; font-weight: 600; color: #3f3f46; }
 
 .field-v2 input,
 .field-v2 select {
   padding: 9px 12px;
-  border: 1px solid #d5d9dd;
-  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
   font-size: 13.5px;
   background-color: #fff;
-  color: #222;
+  color: #18181b;
   outline: none;
   transition: border-color 0.2s ease;
   font-family: inherit;
+  width: 100%;
+  box-sizing: border-box;
 }
 .field-v2 input:focus:not([disabled]),
-.field-v2 select:focus:not([disabled]) { border-color: #fc8403; }
+.field-v2 select:focus:not([disabled]) { border-color: #fc8403; box-shadow: 0 0 0 3px rgba(252, 132, 3, 0.1); }
 
 .modal-footer-v2 {
-  padding: 14px 22px;
-  border-top: 1px solid #e0e0e0;
+  padding: 16px 24px;
+  border-top: 1px solid #e4e4e7;
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  background: #f7f9fb;
+  background: #f4f4f5;
   flex-shrink: 0;
 }
 
-/* Modificari speciale pentru popup-ul din dreapta */
-.modal-box-v2-narrow { max-width: 420px; }
+/* --- Modificări pentru al doilea popup (Detalii suplimentare) în 2 coloane --- */
+.modal-box-v2-narrow { 
+  max-width: 600px; /* Lărgit ca să încapă confortabil 2 coloane */
+  flex-shrink: 0;
+}
+
 .modal-body-v2-narrow {
-  grid-template-columns: repeat(2, 1fr);
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-.modal-body-v2-narrow::-webkit-scrollbar { display: none; }
-
-
-/* =========================================================
-   6. RESPONSIVE DESIGN UNIFICAT
-   ========================================================= */
-@media (max-width: 900px) {
-  .modal-box-wide { max-width: 96vw; }
-  .echipament-form-grid { grid-template-columns: 1fr; gap: 10px; }
-
-  .modal-pair-wrap {
-    flex-direction: column;
-    align-items: center;
-  }
-}
-
-@media (max-width: 768px) {
-  .maintenance-page { padding: 16px; }
-  .modal-body-v2 { grid-template-columns: 1fr; }
-  .modal-body-v2-narrow { grid-template-columns: 1fr; }
-}
-
-@media (max-width: 600px) {
-  .panel-toolbar { flex-direction: column; align-items: stretch; }
-  .search-input { max-width: none; }
-  .panel-bottom-bar { justify-content: stretch; }
-  .btn-toolbar { flex: 1; }
-  .legacy-table { table-layout: auto; }
-}
-
-@media (max-width: 480px) {
-  .maintenance-page { padding: 10px; }
-
-  .tab-btn {
-    padding: 8px 12px;
-    font-size: 13px;
-  }
-
-  .modal-box,
-  .modal-box-v2,
-  .modal-header-bar,
-  .modal-box-content {
-    border-radius: 10px;
-  }
-
-  .modal-box { padding: 16px 18px; }
-  .modal-box-content { padding: 16px 18px; }
-  .modal-header-bar { padding: 12px 16px; }
-  .modal-header-v2 { padding: 12px 16px; font-size: 15px; }
-  .modal-body-v2 { padding: 14px 16px; }
-  .modal-footer-v2 { padding: 12px 16px; }
-
-  .legacy-table td,
-  .legacy-table thead th { padding: 5px 7px; }
-
-  .btn-header-add-activitate { margin-left: 8px; }
+  grid-template-columns: repeat(2, 1fr) !important; /* Forțează exact 2 coloane */
+  gap: 16px 20px;
 }

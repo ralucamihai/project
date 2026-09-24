@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { finalize } from 'rxjs';
 import {
@@ -85,7 +85,7 @@ export interface DetaliiActivitateEditModel {
   styleUrl: './maintenance.component.css',
   standalone: false
 })
-export class MaintenanceComponent implements OnInit {
+export class MaintenanceComponent implements OnInit, OnDestroy {
 
   activeTab: string = 'echipamente';
 
@@ -94,6 +94,8 @@ export class MaintenanceComponent implements OnInit {
   isLoadingGrupuri: boolean = false;
   isLoadingOptions: boolean = false;
   currentUsername: string = '';
+
+  private timerInterval: any;
 
   get grupOptions(): string[] {
     return this.grupuriMunca.map(g => g.grup);
@@ -132,6 +134,10 @@ export class MaintenanceComponent implements OnInit {
       this.sabloaneNomenclator = data;
       this.tipEchipamentOptions = data.map(t => t.denumire);
     });
+  }
+
+  ngOnDestroy(): void {
+    this.stopTimer();
   }
 
   setTab(tab: string) {
@@ -731,6 +737,22 @@ export class MaintenanceComponent implements OnInit {
     this.rowSelectat = r;
   }
 
+  private startTimer() {
+    this.stopTimer(); // Ne asigurăm că nu avem mai multe intervale
+    this.timerInterval = setInterval(() => {
+      if (this.randEdit && this.rowSelectat && this.rowSelectat.rowId.startsWith('new-')) {
+        this.randEdit.termenInitiat = new Date().toISOString();
+      }
+    }, 1000);
+  }
+
+  private stopTimer() {
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
+    }
+  }
+
   onRowDblClick(r: RandActivitate | null) {
     if (!r) {
       const dataCurentaIso = new Date().toISOString();
@@ -764,6 +786,11 @@ export class MaintenanceComponent implements OnInit {
         explValid: '',
         sursaTicket: false
       };
+      // Pornim timerul doar dacă e o activitate NOUĂ
+      this.startTimer();
+    } else {
+      // Dacă e editare, oprim timerul
+      this.stopTimer();
     }
 
     this.rowSelectat = r;
@@ -850,6 +877,7 @@ export class MaintenanceComponent implements OnInit {
   closeTicketPopup() {
     this.showTicketPopup = false;
     this.randEdit = null;
+    this.stopTimer();
     if (!this.showDetaliiPopup) this.rowSelectat = null;
   }
 
@@ -911,6 +939,7 @@ export class MaintenanceComponent implements OnInit {
     }
 
     this.isSavingTicket = true;
+    this.stopTimer();
 
     const isTicket = this.rowSelectat.sursaTicket;
     const idPart = this.rowSelectat.rowId.split('-')[1];
@@ -996,5 +1025,6 @@ export class MaintenanceComponent implements OnInit {
     this.randEdit = null;
     this.detaliiEdit = null;
     this.rowSelectat = null;
+    this.stopTimer();
   }
 }
